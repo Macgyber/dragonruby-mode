@@ -1,6 +1,6 @@
 # DragonRuby Mode for Emacs
 
-This project follows a strict [Project Contract](CONTRACT.md).
+This project follows a strict [Project Contract](docs/CONTRACT.md).
 
 ## Philosophy
 "The goal is not speed of typing, but clarity of thought."
