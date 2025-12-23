@@ -11,13 +11,12 @@ See [INSTALL_INSTRUCTIONS.md](INSTALL_INSTRUCTIONS.md) for setup details.
 ## Usage
 The mode activates **automatically** when you open a Ruby file containing `def tick`. You will see `DR` in the modeline.
 
-### Key Commands
+## Commands
 
-**`M-x dragonruby-mode`**
-- **Toggle manually.** Use this to force the mode ON in files that don't have a `tick` method, or to turn it OFF if you want silence.
-
-**`M-x load-file`**
-- **Manual loading.** Use this to try a specific version of the plugin without restarting Emacs (e.g., `~/emacs-packages/dragonruby-mode/src/dragonruby.el`).
+| Command | Description |
+|---------|-------------|
+| **`M-x dragonruby-mode`** | **Toggle ON/OFF.** Manually activate or deactivate the mode in the current buffer. |
+| **`M-x load-file`** | **Reload Plugin.** Forces Emacs to reload the plugin code (useful for testing dev versions). |
 
 ## Features
 - Contextual explanations of DragonRuby concepts.
