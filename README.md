@@ -6,7 +6,7 @@ This project follows a strict [Contract](docs/CONTRACT.md).
 "The goal is not speed of typing, but clarity of thought."
 
 ## Installation
-See [instructions](docs/INSTALL_INSTRUCTIONS.md) for setup details.
+See [Instructions](docs/INSTALL_INSTRUCTIONS.md) for setup details.
 
 ## Usage
 The mode activates **automatically** when you open a Ruby file containing `def tick`. You will see `DR` in the modeline.
@@ -21,3 +21,6 @@ The mode activates **automatically** when you open a Ruby file containing `def t
 ## Features
 - Contextual explanations of DragonRuby concepts.
 - Explicit visibility of engine concepts.
+
+## Contributing
+Please read [contributing](docs/CONTRIBUTING.md) for architectural rules and guidelines.
