@@ -41,6 +41,21 @@ When creating a concept, **fill ALL fields** to make it a true cognitive tool:
 
 **See [`docs/CONCEPT_GUIDE.md`](CONCEPT_GUIDE.md) for detailed guidance and examples.**
 
+## Development Workflow
+
+### How to Update Your Local Installation
+When you make changes to the source code and want to push them to your live Emacs installation (so they persist after restart), run this terminal command from the project root:
+
+```bash
+# REINSTALL / UPDATE COMMAND
+rm -rf ~/emacs-packages/dragonruby-mode && mkdir -p ~/emacs-packages/dragonruby-mode && cp -R . ~/emacs-packages/dragonruby-mode/
+```
+
+**What this does:**
+1.  🗑️ **Deletes** the old installed version (`rm -rf ...`).
+2.  📁 **Recreates** the directory structure.
+3.  ©️ **Copies** your current working version to the installation path.
+
 ## Philosophy
 
 Remember: **"The goal is not speed of typing, but clarity of thought."**
