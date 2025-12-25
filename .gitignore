@@ -36,3 +36,4 @@ PROYECTO_GENESIS/
 *.zip
 *.tar.gz
 MANUAL_TEST_CHECKLIST.md
+compile-dragonruby.el
