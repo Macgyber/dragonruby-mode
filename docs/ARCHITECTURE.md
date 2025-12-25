@@ -1,44 +1,44 @@
-# DragonRuby Mode - Architecture Documentation
+# Architecture & Design
 
-## Core Philosophy
-This minor-mode follows a **Semantic First** approach. It strictly avoids UI clutter (popups, sidebars) in favor of inline overlays that enhance the text without hiding it.
+This document describes the internal structure of **DragonRuby Mode** (`v0.2.0`).
 
-## Module Structure
+## Core Philosophy: Semantic Overlays
 
-### `src/dragonruby.el`
-The entry point. Responsibilities:
-- Sets up the `load-path`.
-- Requires the core modules in order (`project`, `features`, `mode`).
-- Provides the `dragonruby` feature.
+The mode operates strictly on **overlays**. It never modifies buffer text unless the user explicitly commits an edit (e.g., changing a color value). It follows the **Zero-UI** principle: no popups, no sidebars, no modal dialogs. Use the buffer itself as the UI.
 
-### `src/dragonruby-mode.el`
-The Minor Mode definition (`define-minor-mode`). Responsibilities:
-- Activates/Deactivates the mode (`dragonruby-mode`).
-- Manages global hooks:
-    - `after-change-functions`: Triggers rescans when text is edited.
-    - `completion-at-point-functions`: Registers semantic autocompletion.
-- Orchestrates the scanning loops (Scan Colors → Scan Sprites → Scan Paths).
+## Module Breakdown
 
-### `src/features/`
-Each feature is an independent "contract" that implements a specific semantic behavior.
+### 1. `dragonruby-mode.el` (Orchestrator)
+- Defines the minor mode.
+- Manages hooks (`after-change-functions`, `completion-at-point-functions`).
+- **Optimization**: Sets a local `tooltip-delay` of `0.1s` for instant feedback without affecting global Emacs settings.
+- Runs the scanning loop: `Scan Colors` -> `Scan Sprites` -> `Scan Paths`.
 
-#### 1. Color Semantics (`dragonruby-colors.el`)
-- **Detection**: Regex matching `[r, g, b, a?]` arrays (decimal and hex support).
-- **Visualization**: Overlays the text with the actual color background.
-- **Interaction**: Click/Command to edit values dialog-free (minibuffer interaction).
+### 2. `features/dragonruby-colors.el`
+- **Regex Parsing**:
+  - Arrays: `\[\s*(0x[0-9a-f]+|\d+), ... \]`
+  - Hashes: Finds blocks like `r: 10, g: 20...` allowing arbitrary key order.
+- **Overlay**: Uses `(:background HEX :foreground CONTRAST)` face.
+- **Interaction**: Uses `read-number` in the minibuffer for non-intrusive editing.
 
-#### 2. Sprite Semantics (`dragonruby-sprites.el`)
-- **Detection**: Regex matching strings ending in `.png`, `.jpg`, etc.
-- **Visualization**: Interactive overlay (clickable).
-- **Feedback**:
-    - Underline Cyan: File exists.
-    - Wavy Red: File missing.
-    - Hover: Shows image thumbnail and metadata (dimensions, size).
+### 3. `features/dragonruby-sprites.el`
+- **Regex**: Matches `"path/to/image.ext"`.
+- **Validation**:
+  - Checks if file exists on disk relative to Project Root.
+  - Checks extension against allow-list (`png`, `jpg`, `bmp`, `gif`).
+- **Tooltip**: Generates a rich string with:
+  - Header: `📏 WxH px (EXT) SIZEkb` (using `identify` or `sips`).
+  - Body: Image thumbnail (`create-image`).
 
-#### 3. Path Navigation (`dragonruby-paths.el`)
-- **Detection**: `require` statements.
-- **Interaction**: Click to jump to file.
-- **Autocompletion**: Context-aware `completion-at-point` for local project files.
+### 4. `features/dragonruby-paths.el`
+- **Require Linking**:
+  - Matches `require "..."`.
+  - Resolves path relative to `app/` (standard DragonRuby behavior).
+- **Auto-completion**:
+  - Hooks into `completion-at-point`.
+  - Scans `app/`, `sprites/`, `audio/` recursively.
+  - Triggered automatically on `/` inside strings.
 
-## Project Resolution
-The system relies on finding the project root (usually denoted by `app/main.rb` or `.git`). All paths are resolved relative to this root.
+## Project Resolution (`core/dragonruby-project.el`)
+- Finds the Project Root by looking for the `app/` folder upwards.
+- All asset resolution is relative to this root.

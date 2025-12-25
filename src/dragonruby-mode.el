@@ -43,11 +43,14 @@
         ;; (dragonruby-navigation-enable) ;; Not used yet in this simplified version if it relied on eldoc hook
         (dragonruby--scan-all)
         (add-hook 'after-change-functions #'dragonruby--after-change nil t)
-        (add-hook 'completion-at-point-functions #'dragonruby--completion-at-point nil t))
+        (add-hook 'completion-at-point-functions #'dragonruby--completion-at-point nil t)
+        ;; Optimizacion: Tooltip rapido (buffer-local)
+        (set (make-local-variable 'tooltip-delay) dragonruby-tooltip-delay))
     ;; Disable
     ;; (dragonruby-navigation-disable)
     (remove-hook 'after-change-functions #'dragonruby--after-change t)
     (remove-hook 'completion-at-point-functions #'dragonruby--completion-at-point t)
+    (kill-local-variable 'tooltip-delay)
     (remove-overlays (point-min) (point-max) 'dragonruby-color-overlay t)
     (remove-overlays (point-min) (point-max) 'dragonruby-sprite-overlay t)
     (remove-overlays (point-min) (point-max) 'dragonruby-require-overlay t)))

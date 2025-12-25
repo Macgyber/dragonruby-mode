@@ -3,8 +3,8 @@
 (require 'dragonruby-project)
 (require 'dragonruby-config)
 
-(defconst dragonruby-supported-sprite-formats '("png" "bmp" "jpg" "jpeg"))
-(defconst dragonruby-unsupported-sprite-formats '("gif" "webp" "svg" "psd" "tiff"))
+(defconst dragonruby-supported-sprite-formats '("png" "bmp" "jpg" "jpeg" "gif"))
+(defconst dragonruby-unsupported-sprite-formats '("webp" "svg" "psd" "tiff"))
 
 ;; Updated Regex: Supports "path" and 'path'
 (defconst dragonruby--sprite-regex "[\"']\\([^\"]+\\.\\([a-zA-Z0-9]+\\)\\)[\"']")
@@ -37,15 +37,11 @@
            (size-kb (/ (file-attribute-size (file-attributes full-path)) 1024))
            (img (create-image full-path nil nil :max-height 128 :max-width 128)))
       
-      ;; Return a propertized string with image and text
+      ;; Header: 64x64 PNG 12kb
       (concat
+       (format "📏 %dx%d %s %dkb\n" (or width 0) (or height 0) ext size-kb)
        (propertize " " 'display img)
-       (format "\n\n📊 Sprite Info:\n")
-       (format "  Size: %dx%d px\n" (or width 0) (or height 0))
-       (format "  Format: %s\n" ext)
-       (format "  File Size: %d KB\n" size-kb)
-       (format "  Path: %s\n" full-path)
-       (propertize "\n💡 Click to open file" 'face 'italic)))))
+       (propertize "\n💡 Click to open" 'face 'italic)))))
 
 (defun dragonruby--make-sprite-overlay (start end path full-path)
   "Create overlay with interactive sprite preview and rich metadata tooltip."

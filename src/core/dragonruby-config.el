@@ -31,4 +31,10 @@ Prevents visual overload in files with many colors/sprites."
   :type 'integer
   :group 'dragonruby)
 
+(defcustom dragonruby-tooltip-delay 0.1
+  "Delay in seconds before showing tooltips (sprites, colors).
+Default is 0.1s for rapid feedback."
+  :type 'float
+  :group 'dragonruby)
+
 (provide 'dragonruby-config)

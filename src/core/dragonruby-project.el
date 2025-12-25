@@ -21,11 +21,11 @@
      dir
      (concat "\\." (regexp-opt extensions) "$"))))
 
-(defun dragonruby--resolve-require (path)
-  "Convert 'require \"foo\"' into a real path inside app/."
   (let ((root (dragonruby--project-root)))
     (when root
-      (expand-file-name (concat "app/" path ".rb") root))))
+      (let* ((rb-path (if (string-suffix-p ".rb" path) path (concat path ".rb")))
+             (full-path (expand-file-name rb-path root)))
+        full-path))))
 
 (defun dragonruby--resolve-asset (path)
   "Check if an asset exists relative to project root (or current dir)."
