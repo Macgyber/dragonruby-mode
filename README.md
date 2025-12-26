@@ -87,6 +87,7 @@ Now using `:hero_color` in Ruby will show a preview!
     *   [ ] **Inline Thumbnails**: Small 32px icon next to the filename.
     *   [ ] **Hover Tooltip**: Image appears only on mouseover.
     *   [ ] **Margin Display**: Image appears in the frieze/margin.
+    *   [ ] **Sprite Optimizer**: Context action to Trim/Compress images (requires ImageMagick).
 
 ### 3. Advanced Features
 *   **Hot Reload Integration**: Trigger DRGTK reload directly from Emacs.
