@@ -1,84 +1,70 @@
-# DragonRuby Mode for Emacs
+# DragonRuby Emacs Mode 🐉
 
-**Semantic Extension for DragonRuby.**
+A semantic-first, Zero-UI development environment for DragonRuby Game Toolkit.
 
-> "The goal is not speed of typing, but clarity of thought."
+## 🌟 Philosophy
 
-This mode enhances Emacs with semantic understanding of DragonRuby projects, focusing on visual clarity and navigation without adding UI clutter.
+This mode transforms Emacs into a semantic editor for DragonRuby, utilizing **overlays** and **contextual intelligence** to verify "Does this asset exist?" or "What color is this?" without leaving the code.
 
-## Core Features
+## ✨ Features (Phase 1 Complete)
 
-### 1. 🎨 Semantic Color Interaction
-- **Detection**: Automatically highlights colors in two formats:
-  - **Arrays**: `[255, 0, 0]` or `[0xFF, 0, 0]` (Decimal & Hex).
-  - **Hashes**: `r: 255, g: 0, b: 0` (Supports any order, e.g., `g: 0, r: 255...`).
-- **Interaction**: **Click** on any color text to edit its values inline (no popups).
+### 🎨 Semantic Colors
+Automatically detects and visualizes colors in code. Supports virtually every DragonRuby syntax format:
 
-### 2. 👾 Asset Intelligence
-- **Sprite Preview**: Hover over `"sprites/player.png"` to see:
-  - **Thumbnail**: Actual image preview.
-  - **Metadata**: `📏 WxH px (FORMAT) SIZEkb` (e.g., `32x32 PNG 12kb`).
-- **Optimization**: Instant tooltip feedback (0.1s delay).
-- **Validation**:
-  - **Cyan Underline**: File exists.
-  - **Red Wavy Line**: File missing.
-  - **Orange Underline**: Unsupported format.
-- **Support**: `png`, `jpg`, `bmp`, `gif`.
-- **Navigation**: Click on any asset path to open the file.
+*   **Arrays (RGB & RGBA)**: `[255, 0, 0]` and `[0, 255, 0, 128]`
+*   **Hexadecimal**: `0xFF00FF` (Common in DR)
+*   **Hashes (Hybrid Smart-Mode)**:
+    *   **One-Liners**: `{ r: 255, g: 0, b: 0 }` -> Highlights the full block.
+    *   **Multiline**: Resects indentation. Highlights fragments (`r: 255`) individually for a clean, professional look.
+*   **Symbols (Data-Driven)**: `:red`, `:blue`, `:pico_orange`
+    *   🚀 **Extensible Palettes**: Colors are loaded from `src/data/palettes.json`. You can add your own palettes (PICO-8, Nord, etc.) without touching Lisp code.
 
-### 3. 🔗 Project Navigation
-- **Clickable Requires**: `require "app/logic.rb"` becomes a clickable link (Cyan=Exists, Red=Missing).
-- **Contextual Autocomplete**: Smart completion for `app/`, `sprites/`, and `audio/` when typing inside strings.
+### 🖼️ Semantic Sprites
+*   Hyperlink interaction for sprite paths.
+*   **Visual Validation**:
+    *   <u>Underlined</u>: File exists and is valid.
+    *   <span style="color:red">Wavy Red</span>: File missing.
+    *   <span style="color:orange">Wavy Orange</span>: Unsupported format (e.g. `.psd`).
 
-## Installation
+### 🧭 Semantic Navigation
+*   `require "app/game.rb"` become clickable links.
+*   Auto-detects project root using `dragonruby` conventions.
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/Macgyber/dragonruby-mode.git ~/.emacs.d/dragonruby-mode
-   ```
-2. Add to your `init.el`:
-   ```elisp
-   (add-to-list 'load-path "~/.emacs.d/dragonruby-mode/src")
-   (require 'dragonruby)
-   ```
+## 🚀 Installation
 
-## Usage
+### Quick Start (Dev Mode)
+1.  Run the clean installer script:
+    ```bash
+    sh clean_install.sh
+    ```
+2.  Restart Emacs.
 
-The mode activates **automatically** when you open a Ruby file containing `def tick`. You will see `DR` in the modeline.
+### Manual Installation
+Add the `src` directory to your load-path and require the mode:
 
-## Configuration
-
-Customize via `M-x customize-group RET dragonruby RET`.
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `dragonruby-enable-color-preview` | `t` | Show real color overlays. |
-| `dragonruby-enable-sprite-preview` | `t` | Show image thumbnails on hover. |
-| `dragonruby-enable-require-linking` | `t` | Make `require` paths clickable. |
-| `dragonruby-max-overlays-per-type` | `50` | Performance limit for large files. |
-
-## Architecture
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for technical details on how the semantic engine works.
-
-## Development
-
-To verify that your changes compile correctly, you can use the included `Makefile`:
-
-```bash
-make compile
+```elisp
+(add-to-list 'load-path "/path/to/dragonruby-mode/src")
+(add-to-list 'load-path "/path/to/dragonruby-mode/src/core")
+(add-to-list 'load-path "/path/to/dragonruby-mode/src/features")
+(require 'dragonruby-mode)
 ```
 
-## Development
+## 🛠️ Configuration
 
-To verify that your changes compile correctly, you can use the included `Makefile`:
-
-```bash
-make compile
+### Customizing Colors
+Edit `src/data/palettes.json` to add new color symbols.
+```json
+{
+  "my_theme": {
+    "hero_color": "#FFCC00",
+    "enemy_color": "#FF0000"
+  }
+}
 ```
+Now using `:hero_color` in Ruby will show a preview!
 
-This will byte-compile all source files, identifying syntax errors or missing requirements immediately.
-
-## Roadmap / Potential Features
-We are collecting feedback on the following ideas:
-- **Visual Color Picker**: A GUI popup to select colors instead of typing numbers. (Pending community interest: strict "no-popup" philosophy vs usability).
+## 📂 Project Structure
+*   `src/core/`: Configuration and Project Root logic.
+*   `src/features/`: Feature modules (Colors, Sprites, Paths).
+*   `src/data/`: JSON data assets (Palettes).
+*   `examples/`: Test suite (`main.rb`) to validate all features.

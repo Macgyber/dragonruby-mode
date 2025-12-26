@@ -1,39 +1,17 @@
-# Emacs compilation artifacts
-*.elc
+# Emacs
 *~
 \#*\#
-auto-save-list/
-custom.el
+/.emacs.desktop
+/auto-save-list
+*.elc
+/init.el
+/init-plugin.el
 
-# Local Configuration & Loaders
-.emacs-init.el
-init.el
-load-plugin.el
-.dir-locals.el
-
-# OS specific
+# Mac
 .DS_Store
-.subversion
-Thumbs.db
 
-# Quick/Dirty Dev Scripts (Noise)
-test-*.el
-simple-test.el
-quick-color-test.el
-run-tests.el
-*.bat
-test.sh
-
-# Temporary Debug Documentation
-DEBUG_COLORS.md
-QUICKSTART_DEBUG.md
-
-# Project Genesis (Meta-Project / Personal Philosophy)
-# Excluded to keep the repo focused on the tool itself
-PROYECTO_GENESIS/
-
-# Archives
-*.zip
-*.tar.gz
-MANUAL_TEST_CHECKLIST.md
-compile-dragonruby.el
+# Temporary Local Scripts (Do not commit)
+fix_init.sh
+repair_init.py
+clean_install.sh
+install_plugin.sh

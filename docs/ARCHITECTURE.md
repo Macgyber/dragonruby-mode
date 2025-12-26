@@ -1,44 +1,42 @@
-# Architecture & Design
+# DragonRuby Mode Architecture
 
-This document describes the internal structure of **DragonRuby Mode** (`v0.2.0`).
+## 🏛️ Core Principles
 
-## Core Philosophy: Semantic Overlays
+1.  **Semantic Overlays**: We do not use font-lock (regex highlighting) for semantic features. We use `overlays`, which allow for rich interaction (click, hover), boxes, and arbitrary styling independent of syntax highlighting.
+2.  **Zero-UI**: Information appears *in-place*. No sidebars or popups unless explicitly requested by interaction (e.g. Color Picker).
+3.  **Data-Driven**: Hardcoded lists are avoided. Critical data (like color palettes) lives in external JSON files for extensibility.
 
-The mode operates strictly on **overlays**. It never modifies buffer text unless the user explicitly commits an edit (e.g., changing a color value). It follows the **Zero-UI** principle: no popups, no sidebars, no modal dialogs. Use the buffer itself as the UI.
-
-## Module Breakdown
+## 🧩 Module Breakdown
 
 ### 1. `dragonruby-mode.el` (Orchestrator)
-- Defines the minor mode.
-- Manages hooks (`after-change-functions`, `completion-at-point-functions`).
-- **Optimization**: Sets a local `tooltip-delay` of `0.1s` for instant feedback without affecting global Emacs settings.
-- Runs the scanning loop: `Scan Colors` -> `Scan Sprites` -> `Scan Paths`.
+*   Manages the minor mode state.
+*   Enables/Disables sub-features (`colors`, `sprites`, `paths`).
+*   Hooks into `after-change-functions` to trigger incremental scanning.
 
-### 2. `features/dragonruby-colors.el`
-- **Regex Parsing**:
-  - Arrays: `\[\s*(0x[0-9a-f]+|\d+), ... \]`
-  - Hashes: Finds blocks like `r: 10, g: 20...` allowing arbitrary key order.
-- **Overlay**: Uses `(:background HEX :foreground CONTRAST)` face.
-- **Interaction**: Uses `read-number` in the minibuffer for non-intrusive editing.
+### 2. `features/dragonruby-colors.el` (The Painter)
+*   **Scanning Strategy**: "Context Window". For complex structures like Hashes, we find an anchor (`r:`) and scan a limited forward window (200 chars) for related keys (`g:`, `b:`).
+*   **Contrast Logic**: Automatically calculates luminance to set text color (black/white) for readability.
+*   **Data Source**: Reads `src/data/palettes.json` at startup via `json-read-file`. Flattens nested JSON categories into a single `O(1)` Hash Table lookup for symbol resolution.
 
-### 3. `features/dragonruby-sprites.el`
-- **Regex**: Matches `"path/to/image.ext"`.
-- **Validation**:
-  - Checks if file exists on disk relative to Project Root.
-  - Checks extension against allow-list (`png`, `jpg`, `bmp`, `gif`).
-- **Tooltip**: Generates a rich string with:
-  - Header: `📏 WxH px (EXT) SIZEkb` (using `identify` or `sips`).
-  - Body: Image thumbnail (`create-image`).
+### 3. `features/dragonruby-sprites.el` (The asset Manager)
+*   Scans string literals ending in image extensions.
+*   **Validation**: Checks `file-exists-p` relative to the Project Root.
+*   **Feedback**: Uses distinct overlay styles (color/underline style) to communicate validity instantly.
 
-### 4. `features/dragonruby-paths.el`
-- **Require Linking**:
-  - Matches `require "..."`.
-  - Resolves path relative to `app/` (standard DragonRuby behavior).
-- **Auto-completion**:
-  - Hooks into `completion-at-point`.
-  - Scans `app/`, `sprites/`, `audio/` recursively.
-  - Triggered automatically on `/` inside strings.
+### 4. `core/dragonruby-project.el` (The Brain)
+*   Locates the `app/main.rb` or `.dragonruby/` marker to establish root.
+*   Resolves relative paths (`sprites/foo.png`) to absolute system paths.
 
-## Project Resolution (`core/dragonruby-project.el`)
-- Finds the Project Root by looking for the `app/` folder upwards.
-- All asset resolution is relative to this root.
+## 🔄 Execution Flow
+
+1.  **User types** in buffer.
+2.  `after-change-functions` hook fires.
+3.  Each enabled feature (`scan-colors`, `scan-sprites`) runs incrementally.
+4.  **Colors**:
+    *   Regex search finds candidate.
+    *   Validation logic runs (e.g. "Do we have r, g, and b?").
+    *   `dragonruby--make-overlay` creates the visual block.
+5.  **Data Persistence**: Overlays persist until explicitly cleared or the buffer text changes significantly.
+
+## 🎨 Extensibility
+New color palettes can be added by modifying `src/data/palettes.json`. Emacs loads this map into memory once, ensuring high performance during typing.

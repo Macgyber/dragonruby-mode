@@ -1,0 +1,34 @@
+{
+    "basic": {
+        "red": "#FF0000",
+        "green": "#008000",
+        "blue": "#0000FF",
+        "white": "#FFFFFF",
+        "black": "#000000",
+        "gray": "#808080",
+        "indigo": "#4B0082",
+        "violet": "#EE82EE",
+        "orange": "#FFA500",
+        "yellow": "#FFFF00",
+        "cyan": "#00FFFF",
+        "magenta": "#FF00FF"
+    },
+    "pico8": {
+        "pico_black": "#000000",
+        "pico_dark_blue": "#1D2B53",
+        "pico_dark_purple": "#7E2553",
+        "pico_dark_green": "#008751",
+        "pico_brown": "#AB5236",
+        "pico_dark_gray": "#5F574F",
+        "pico_light_gray": "#C2C3C7",
+        "pico_white": "#FFF1E8",
+        "pico_red": "#FF004D",
+        "pico_orange": "#FFA300",
+        "pico_yellow": "#FFEC27",
+        "pico_green": "#00E436",
+        "pico_blue": "#29ADFF",
+        "pico_indigo": "#83769C",
+        "pico_pink": "#FF77A8",
+        "pico_peach": "#FFCCAA"
+    }
+}
