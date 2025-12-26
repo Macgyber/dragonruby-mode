@@ -61,11 +61,11 @@ We need your feedback to prioritize the next wave of features:
 *   **[ ] Phase 4: Hot Reload**
     *   Trigger DragonRuby reset from Emacs.
 
-### 4. Future Semantic Branches (Visionary) 🔮
-*   **[ ] Audio Semantics**: Hover over `"jump.wav"` to see duration and click to **[▶️ Play]** inside Emacs.
-*   **[ ] Geometric Semantics**: Visualize arrays `[x, y, w, h]` as proportional wireframe rectangles to understand scale.
-*   **[ ] Animation Semantics (Atlas)**: Show the specific *slice* of a spritesheet defined by `source_x/y/w/h` instead of the full image.
-*   **[ ] Entity Intelligence**: Semantic validation for `attr_accessor` and state properties (Refactoring tools).
+### 4. DragonRuby Wiki-Org (Visionary Phase) 🧠
+*   **Contextual Glossary**: Press `F1` on any symbol (`args`, `outputs`) to open a dedicated **Side Panel**.
+*   **Focused Learning**: Uses Emacs **Org-mode** to "narrow" the view. You see *only* the dictionary definition of that specific concept, distraction-free.
+*   **Progress Tracking**: Mark concepts as `[X] Learned` directly in the docs.
+*   **Multilingual**: Switch between `en.org`, `es.org`, `fr.org` instantly.
 
 ---
 *Built with ❤️ for the DragonRuby Community.*
