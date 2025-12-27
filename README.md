@@ -58,6 +58,9 @@ git clone https://github.com/Macgyber/dragonruby-mode.git
    
    ;; Auto-activate on .rb files
    (add-hook 'ruby-mode-hook #'dragonruby-mode)
+   ;; If using tree-sitter in ruby mode, you need to use:
+   (add-hook 'ruby-ts-mode-hook #'dragonruby-mode)
+
    ```
    
    > ⚠️ Replace `/path/to/dragonruby-mode` with your actual path!
@@ -106,6 +109,8 @@ En el archivo que se abrió, añade:
 (add-to-list 'load-path "e:/ANTIGRAVITY/dragonruby-emacs/packages/dragonruby-mode")
 (require 'dragonruby-mode)
 (add-hook 'ruby-mode-hook #'dragonruby-mode)
+;; If using tree-sitter in ruby mode, you need to use:
+(add-hook 'ruby-ts-mode-hook #'dragonruby-mode)
 ```
 
 #### Paso 4: Guarda y reinicia
