@@ -36,7 +36,7 @@
 ;; Minor mode definition
 (define-minor-mode dragonruby-mode
   "Semantic assistance for DragonRuby projects."
-  :lighter " DR"
+  :lighter " DragonRuby"
   :group 'dragonruby
   (if dragonruby-mode
       (progn
