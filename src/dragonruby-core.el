@@ -10,6 +10,18 @@
 (defconst dragonruby-audio-exts '("wav" "ogg" "mp3"))
 (defconst dragonruby-code-exts  '("rb"))
 
+(defcustom dragonruby-sprite-source-extensions '(".aseprite" ".ase" ".psd" ".xcf" ".graphite")
+  "List of source extensions to prioritize when opening a sprite."
+  :type '(repeat string)
+  :group 'dragonruby)
+
+(defcustom dragonruby-experimental-smart-jump nil
+  "Enable experimental Smart Source Jumping.
+If non-nil, clicking a sprite or [Edit] opens the source file (e.g. .aseprite)
+if found in the same directory or 'art/' folder."
+  :type 'boolean
+  :group 'dragonruby)
+
 (defun dragonruby--find-project-root ()
   "Find the root of the DragonRuby project.
 Looks for app/main.rb, dragonruby executable, or .dragonruby/ folder."
@@ -40,6 +52,33 @@ Looks for app/main.rb, dragonruby executable, or .dragonruby/ folder."
     (cancel-timer dragonruby--debounce-timer))
   (setq dragonruby--debounce-timer
         (run-with-idle-timer delay nil func)))
+
+(defun dragonruby--find-source-file (path)
+  "Find a source file (e.g. .aseprite) for the given image PATH.
+Checks:
+1. The same directory as PATH.
+2. The 'art/' directory at project root."
+  (let ((base-name (file-name-sans-extension path))
+        (extensions dragonruby-sprite-source-extensions)
+        (root (dragonruby--find-project-root))
+        (found nil))
+    
+    ;; 1. Check local directory
+    (dolist (ext extensions)
+      (let ((source-path (concat base-name ext)))
+        (when (and (not found) (file-exists-p source-path))
+          (setq found source-path))))
+    
+    ;; 2. Check 'art/' folder if not found locally
+    (when (and (not found) root)
+      (let* ((rel-name (file-name-nondirectory base-name))
+             (art-dir (expand-file-name "art" root)))
+        (when (file-directory-p art-dir)
+          (dolist (ext extensions)
+            (let ((source-path (expand-file-name (concat rel-name ext) art-dir)))
+              (when (and (not found) (file-exists-p source-path))
+                (setq found source-path)))))))
+    found))
 
 (provide 'dragonruby-core)
 

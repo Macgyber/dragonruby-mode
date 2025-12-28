@@ -109,6 +109,45 @@ nano ~/.config/emacs/init.el
 
 4. Save and restart Emacs
 
+## 🛠️ Advanced Configuration (Optional)
+
+If you want to customize the external image editor or enable Smart Source Jumping, use this full configuration block in your `init.el`.
+
+This example includes English comments explaining each part.
+
+```elisp
+;; -------------------------------------------------------------------------
+;; 🐉 DRAGONRUBY MODE CONFIGURATION
+;; -------------------------------------------------------------------------
+
+;; 1. Load the package (adjust path to where you cloned/downloaded it)
+;; NOTE: If you use Doom/Spacemacs, this might differ slightly.
+(add-to-list 'load-path "/path/to/dragonruby-mode")
+(require 'dragonruby-mode)
+
+;; 2. Automatically enable in Ruby files (only activates if DragonRuby is detected)
+(add-hook 'ruby-mode-hook #'dragonruby-maybe-enable)
+(add-hook 'ruby-ts-mode-hook #'dragonruby-maybe-enable)
+
+;; 3. (OPTIONAL) Configure your favorite External Image Editor
+;; If left nil, it uses the system default (Preview, Photos, etc).
+;; Uncomment the line for your OS/Editor:
+
+;; [MacOS] Aseprite Example
+;; (setq dragonruby-external-image-editor "/Applications/Aseprite.app/Contents/MacOS/aseprite")
+
+;; [Windows] Graphite Example
+;; (setq dragonruby-external-image-editor "C:/Program Files/Graphite/Graphite.exe")
+
+;; 4. (OPTIONAL) Configure Smart Source Jumping
+;; Defines which source files to look for when clicking a sprite (.png).
+;; Defaults are: .aseprite, .graphite, .psd, .xcf
+;; Add extensions here if you use other tools (e.g., Krita .kra)
+;; (setq dragonruby-sprite-source-extensions '(".aseprite" ".graphite" ".psd" ".xcf" ".kra"))
+
+;; -------------------------------------------------------------------------
+```
+
 ## Troubleshooting
 
 ### 🔍 Finding Your Config from Inside Emacs

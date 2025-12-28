@@ -39,13 +39,8 @@
 (defun dragonruby--process-hash-match (match-start limit)
   "Helper to process a potential hash starting at MATCH-START."
   ;; Determine context (one-line vs multiline)
-  (let* ((brace-start (save-excursion (ignore-errors (backward-up-list 1) (point))))
-         (brace-end (save-excursion (ignore-errors (up-list 1) (point))))
-         (valid-context (and brace-start brace-end 
-                             (> match-start brace-start) 
-                             (< match-start brace-end)))
-         (matches '())
-         (r nil) (g nil) (b nil))
+  (let* ((matches '())
+          (r nil) (g nil) (b nil))
 
     (save-excursion
       (goto-char match-start)
@@ -64,12 +59,17 @@
          ((string= (nth 2 m) "b") (setq b (nth 3 m)))))
       
       (when (and r g b)
-        (if (and valid-context (= (line-number-at-pos brace-start) (line-number-at-pos brace-end)))
-            ;; ONE-LINER: Paint full block
-            (dragonruby--make-color-overlay brace-start brace-end r g b)
-          ;; MULTILINE: Paint fragments
-          (dolist (m matches)
-            (dragonruby--make-color-overlay (nth 0 m) (nth 1 m) r g b)))
+        (let ((start (apply #'min (mapcar #'car matches)))
+              (end (apply #'max (mapcar #'cadr matches))))
+          ;; Semantic Check: Are they contiguous? 
+          ;; If the total range length is close to the sum of match lengths (allowing for some whitespace),
+          ;; we paint it as a single block. Otherwise, fragments.
+          (if (< (- end start) (+ (apply #'+ (mapcar (lambda (m) (- (cadr m) (car m))) matches)) 10)) 
+              ;; CONTIGUOUS: Paint the whole RGB block as one unit
+              (dragonruby--make-color-overlay start end r g b)
+            ;; SCATTERED: Paint fragments
+            (dolist (m matches)
+              (dragonruby--make-color-overlay (nth 0 m) (nth 1 m) r g b))))
         ;; Return the limit to advance the main loop
         limit))))
 

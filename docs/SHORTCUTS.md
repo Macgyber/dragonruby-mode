@@ -142,7 +142,7 @@ When viewing an image in a DragonRuby project, a toolbar appears with these butt
 | `[1:1]` | Reload image (reset) |
 | `[Rot]` | Rotate 90° |
 | `[Info]` | Toggle metadata display |
-| `[Open]` | Open in external editor |
+| `[Edit]` | Open in external editor |
 
 ### ImageMagick Operations
 | Button | Action |
@@ -156,6 +156,10 @@ When viewing an image in a DragonRuby project, a toolbar appears with these butt
 | `[Gry]` | Grayscale |
 | `[Inv]` | Invert colors |
 | `[NoBG]` | Remove white background |
+| `[Crop]` | Crop with params |
+| `[Tint]` | Tint with color |
+| `[PNG]` | Convert to PNG |
+| `[Undo]` | **Revert changes** |
 
 > Requires [ImageMagick](https://imagemagick.org) for advanced operations.
 

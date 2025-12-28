@@ -4,10 +4,13 @@
 (require 'image-file)
 (require 'dragonruby-core)
 
+(declare-function w32-shell-execute "w32fns.c")
+
 (defvar-local dragonruby--sprite-overlays nil
   "List of sprite overlays in the current buffer.")
 (defvar dragonruby-supported-sprites '("png" "jpg" "jpeg" "gif" "bmp"))
 (defvar dragonruby-unsupported-sprites '("svg" "psd" "xcf" "ase" "aseprite"))
+
 
 ;; --- PATH RESOLUTION ---
 ;; Note: dragonruby--find-project-root is now in dragonruby-core.el
@@ -15,6 +18,25 @@
 (defun dragonruby--resolve-asset-path (path)
   (let ((root (dragonruby--find-project-root)))
     (expand-file-name path root)))
+
+(defun dragonruby-jump-to-sprite-source (path)
+  "Open the source file for PATH if it exists, otherwise open PATH directly.
+Checks extensions in `dragonruby-sprite-source-extensions`."
+  (interactive "fOpen sprite: ")
+  (let ((source (and dragonruby-experimental-smart-jump 
+                     (dragonruby--find-source-file path))))
+    (if source
+        (progn
+          (message "Found source file: %s" (file-name-nondirectory source))
+          (cond
+           ((eq system-type 'windows-nt)
+            (w32-shell-execute "open" source))
+           ((eq system-type 'darwin)
+            (start-process "open" nil "open" source))
+           (t
+            (start-process "xdg-open" nil "xdg-open" source))))
+      ;; Fallback: Open the PNG/JPG inside Emacs
+      (find-file path))))
 
 ;; --- AUTOCOMPLETE (CAPF) ---
 (defun dragonruby--get-all-sprites-in-project ()
@@ -63,7 +85,8 @@
         (when thumb (overlay-put ov 'after-string thumb)))
       (overlay-put ov 'keymap 
                    (let ((map (make-sparse-keymap)))
-                     (define-key map [mouse-1] (lambda () (interactive) (find-file path)))
+                     ;; CHANGED: Use new jump function instead of find-file
+                     (define-key map [mouse-1] (lambda () (interactive) (dragonruby-jump-to-sprite-source path)))
                      map))
       (overlay-put ov 'mouse-face 'highlight))
     (push ov dragonruby--sprite-overlays)))

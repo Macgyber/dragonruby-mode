@@ -5,6 +5,8 @@
 (require 'image-mode)
 (require 'dragonruby-core)
 
+(declare-function w32-shell-execute "w32fns.c")
+
 (defcustom dragonruby-external-image-editor nil
   "Path to your preferred image editor.
 If nil, uses system default.
@@ -255,24 +257,33 @@ Examples:
   (message "Image info: %s" (if dragonruby--show-image-info "ON" "OFF")))
 
 (defun dragonruby-image-open-external ()
-  "Open image in external editor.
+  "Open image (or its source file) in external editor.
+Checks for .aseprite/.psd/etc first.
 Uses `dragonruby-external-image-editor' if set, otherwise system default."
   (interactive)
   (when buffer-file-name
-    (if dragonruby-external-image-editor
-        ;; Use custom editor
-        (progn
-          (start-process "dr-editor" nil dragonruby-external-image-editor buffer-file-name)
-          (message "Opened in: %s" (file-name-nondirectory dragonruby-external-image-editor)))
-      ;; Use system default
-      (cond
-       ((eq system-type 'windows-nt)
-        (w32-shell-execute "open" buffer-file-name))
-       ((eq system-type 'darwin)
-        (start-process "open" nil "open" buffer-file-name))
-       (t
-        (start-process "xdg-open" nil "xdg-open" buffer-file-name)))
-      (message "Opened in system default editor"))))
+    (let* ((source (and dragonruby-experimental-smart-jump 
+                        (dragonruby--find-source-file buffer-file-name)))
+           (target-file (or source buffer-file-name))
+           (editor dragonruby-external-image-editor))
+      
+      (when source
+        (message "Found source file: %s" (file-name-nondirectory source)))
+
+      (if editor
+          ;; Use custom editor
+          (progn
+            (start-process "dr-editor" nil editor target-file)
+            (message "Opened in: %s" (file-name-nondirectory editor)))
+        ;; Use system default
+        (cond
+         ((eq system-type 'windows-nt)
+          (w32-shell-execute "open" target-file))
+         ((eq system-type 'darwin)
+          (start-process "open" nil "open" target-file))
+         (t
+          (start-process "xdg-open" nil "xdg-open" target-file)))
+        (message "Opened in system default editor")))))
 
 (defun dragonruby--make-header-button (label action help &optional face)
   "Create a clickable button string for header-line."

@@ -48,6 +48,12 @@ def tick args
   # Unsupported Format (Should be marked orange if configured)
   args.outputs.sprites << { path: "sprites/logo.psd" }
 
+  # Solid Pixel (Color + Sprite combined - Testing Granular Highlight)
+  # This previously caused the entire hash to be highlighted. Now only r/g/b should be.
+  width = 100
+  height = 100
+  args.outputs.sprites << { x: 0, y: 0, w: width, h: height, path: :pixel, r: 0, g: 0, b: 0 }
+
   # --- 3. NAVIGATION (FASE 3) -----------------------------
   # Click or press RET on the string below to jump to file
   require "app/conecto.rb"

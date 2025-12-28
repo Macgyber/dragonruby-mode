@@ -49,7 +49,7 @@ Visualizes your game assets immediately.
 - **Inline Previews**: A tiny thumbnail (20px) appears next to the filename
 - **Rich Hover**: Hover over the path to see full image + file size + dimensions
 - **Validation**: Cyan = Valid, Red = Missing
-- **Navigation**: Click on a sprite path to jump to the file
+- **Navigation**: Click on a sprite path to jump to the file (or its source, e.g., `.aseprite`)
 
 > 🛠️ **Optional**: An image editor is also available for basic manipulations. See [IMAGE_EDITOR.md](docs/IMAGE_EDITOR.md).
 
