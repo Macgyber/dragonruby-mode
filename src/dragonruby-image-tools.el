@@ -57,6 +57,25 @@ Examples:
   "Check if ImageMagick is installed."
   (executable-find "magick"))
 
+;; --- BACKUP SYSTEM ---
+
+(defun dragonruby-image--backup (file)
+  "Create a backup of FILE before editing."
+  (message "backup")
+  (copy-file file (concat file ".bak") t))
+
+(defun dragonruby-image-undo ()
+  "Restore the backup of the current image."
+  (interactive)
+  (let* ((file buffer-file-name)
+         (backup (concat file ".bak")))
+    (if (file-exists-p backup)
+        (progn
+          (copy-file backup file t)
+          (revert-buffer t t t)
+          (message "Reverted to backup"))
+      (message "No backup found"))))
+
 (defun dragonruby-image-trim ()
   "Trim transparent/white edges from image using ImageMagick."
   (interactive)
@@ -64,6 +83,7 @@ Examples:
       (message "❌ ImageMagick not found. Install from: https://imagemagick.org")
     (when buffer-file-name
       (let ((file buffer-file-name))
+        (dragonruby-image--backup file)
         (shell-command (format "magick \"%s\" -trim +repage \"%s\"" file file))
         (revert-buffer t t t)
         (message "✂️ Trimmed transparent/white edges")))))
@@ -76,6 +96,7 @@ Examples:
     (when buffer-file-name
       (let* ((file buffer-file-name)
              (size-before (file-attribute-size (file-attributes file))))
+        (dragonruby-image--backup file)
         (shell-command (format "magick \"%s\" -strip -quality 90 \"%s\"" file file))
         (let ((size-after (file-attribute-size (file-attributes file))))
           (revert-buffer t t t)
@@ -100,6 +121,7 @@ Examples:
       (message "❌ ImageMagick not found. Install from: https://imagemagick.org")
     (when buffer-file-name
       (let ((file buffer-file-name))
+        (dragonruby-image--backup file)
         (shell-command (format "magick \"%s\" -resize 200%% \"%s\"" file file))
         (revert-buffer t t t)
         (message "🔍 Resized to 2x")))))
@@ -111,6 +133,7 @@ Examples:
       (message "❌ ImageMagick not found. Install from: https://imagemagick.org")
     (when buffer-file-name
       (let ((file buffer-file-name))
+        (dragonruby-image--backup file)
         (shell-command (format "magick \"%s\" -resize 50%% \"%s\"" file file))
         (revert-buffer t t t)
         (message "🔍 Resized to 0.5x")))))
@@ -144,6 +167,7 @@ Examples:
       (message "❌ ImageMagick not found. Install from: https://imagemagick.org")
     (when buffer-file-name
       (let ((file buffer-file-name))
+        (dragonruby-image--backup file)
         (shell-command (format "magick \"%s\" -colorspace Gray \"%s\"" file file))
         (revert-buffer t t t)
         (message "🎨 Converted to grayscale")))))
@@ -155,6 +179,7 @@ Examples:
       (message "❌ ImageMagick not found. Install from: https://imagemagick.org")
     (when buffer-file-name
       (let ((file buffer-file-name))
+        (dragonruby-image--backup file)
         (shell-command (format "magick \"%s\" -negate \"%s\"" file file))
         (revert-buffer t t t)
         (message "🔄 Colors inverted")))))
@@ -166,9 +191,49 @@ Examples:
       (message "❌ ImageMagick not found. Install from: https://imagemagick.org")
     (when buffer-file-name
       (let ((file buffer-file-name))
+        (dragonruby-image--backup file)
         (shell-command (format "magick \"%s\" -fuzz 10%% -transparent white \"%s\"" file file))
         (revert-buffer t t t)
         (message "✨ White background removed")))))
+
+(defun dragonruby-image-crop (width height x y)
+  "Crop image to WIDTHxHEIGHT+X+Y."
+  (interactive "nWidth: \nnHeight: \nnX: \nnY: ")
+  (if (not (dragonruby--imagemagick-available-p))
+      (message "❌ ImageMagick not found.")
+    (when buffer-file-name
+      (let ((file buffer-file-name))
+        (dragonruby-image--backup file)
+        (shell-command (format "magick \"%s\" -crop %dx%d+%d+%d +repage \"%s\"" 
+                               file width height x y file))
+        (revert-buffer t t t)
+        (message "✂️  Cropped to %dx%d at %d,%d" width height x y)))))
+
+(defun dragonruby-image-tint (color)
+  "Tint the image with COLOR."
+  (interactive "sColor (name or hex): ")
+  (if (not (dragonruby--imagemagick-available-p))
+      (message "❌ ImageMagick not found.")
+    (when buffer-file-name
+      (let ((file buffer-file-name))
+        (dragonruby-image--backup file)
+        (shell-command (format "magick \"%s\" -fill \"%s\" -colorize 50%% \"%s\"" 
+                               file color file))
+        (revert-buffer t t t)
+        (message "🎨 Tinted with %s" color)))))
+
+(defun dragonruby-image-to-png ()
+  "Convert current image to PNG."
+  (interactive)
+  (if (not (dragonruby--imagemagick-available-p))
+      (message "❌ ImageMagick not found.")
+    (when buffer-file-name
+      (let* ((file buffer-file-name)
+             (new-file (concat (file-name-sans-extension file) ".png")))
+        (shell-command (format "magick \"%s\" \"%s\"" file new-file))
+        (kill-buffer)
+        (find-file new-file)
+        (message "✨ Converted to PNG: %s" (file-name-nondirectory new-file))))))
 
 (defun dragonruby-image-reset-zoom ()
   "Reset image by reloading the file completely."
@@ -209,10 +274,13 @@ Uses `dragonruby-external-image-editor' if set, otherwise system default."
         (start-process "xdg-open" nil "xdg-open" buffer-file-name)))
       (message "Opened in system default editor"))))
 
-(defun dragonruby--make-header-button (label action help)
+(defun dragonruby--make-header-button (label action help &optional face)
   "Create a clickable button string for header-line."
-  (propertize label
-              'mouse-face 'highlight
+  (propertize (concat " " label " ")
+              'face (append `(:box (:line-width 2 :style released-button)
+                              :background "#222222" :foreground "white"
+                              ,@face))
+              'mouse-face '(:box (:line-width 2 :style pressed-button) :background "#444444" :foreground "white")
               'help-echo help
               'local-map (let ((map (make-sparse-keymap)))
                           (define-key map [header-line mouse-1] action)
@@ -241,66 +309,46 @@ Uses `dragonruby-external-image-editor' if set, otherwise system default."
   "Set up header-line with image editing buttons."
   (setq header-line-format
         (list
-         (dragonruby--make-header-button "[+]" #'dragonruby-image-zoom-in "Zoom In")
+         (dragonruby--make-header-button "+" #'dragonruby-image-zoom-in "Zoom In")
          " "
-         (dragonruby--make-header-button "[-]" #'dragonruby-image-zoom-out "Zoom Out")
+         (dragonruby--make-header-button "-" #'dragonruby-image-zoom-out "Zoom Out")
          " "
-         (dragonruby--make-header-button "[1:1]" #'dragonruby-image-reset-zoom "Reset")
+         (dragonruby--make-header-button "1:1" #'dragonruby-image-reset-zoom "Reset")
          " "
-         (dragonruby--make-header-button "[Rot]" #'dragonruby-image-rotate "Rotate")
+         (dragonruby--make-header-button "Rot" #'dragonruby-image-rotate "Rotate")
          " "
-         (dragonruby--make-header-button "[Info]" #'dragonruby-image-info "Info")
-         " "
-         (dragonruby--make-header-button "[Open]" #'dragonruby-image-open-external "External")
+         (dragonruby--make-header-button "Info" #'dragonruby-image-info "Info")
          " | "
-         (propertize "[Trim]" 'face '(:foreground "orange") 
-                     'mouse-face 'highlight 'help-echo "Trim edges"
-                     'local-map (let ((map (make-sparse-keymap)))
-                                 (define-key map [header-line mouse-1] #'dragonruby-image-trim)
-                                 map))
+         (dragonruby--make-header-button "Trim" #'dragonruby-image-trim "Trim edges" '(:foreground "orange"))
          " "
-         (propertize "[Zip]" 'face '(:foreground "green")
-                     'mouse-face 'highlight 'help-echo "Compress"
-                     'local-map (let ((map (make-sparse-keymap)))
-                                 (define-key map [header-line mouse-1] #'dragonruby-image-compress)
-                                 map))
+         (dragonruby--make-header-button "Zip" #'dragonruby-image-compress "Compress" '(:foreground "green"))
          " "
-         (propertize "[2x]" 'face '(:foreground "cyan")
-                     'mouse-face 'highlight 'help-echo "Double"
-                     'local-map (let ((map (make-sparse-keymap)))
-                                 (define-key map [header-line mouse-1] #'dragonruby-image-resize-2x)
-                                 map))
+         (dragonruby--make-header-button "2x" #'dragonruby-image-resize-2x "Double" '(:foreground "cyan"))
          " "
-         (propertize "[.5]" 'face '(:foreground "cyan")
-                     'mouse-face 'highlight 'help-echo "Half"
-                     'local-map (let ((map (make-sparse-keymap)))
-                                 (define-key map [header-line mouse-1] #'dragonruby-image-resize-half)
-                                 map))
+         (dragonruby--make-header-button ".5" #'dragonruby-image-resize-half "Half" '(:foreground "cyan"))
          " "
-         (dragonruby--make-header-button "[<>]" #'dragonruby-image-flip-h "Flip H")
+         (dragonruby--make-header-button "<>" #'dragonruby-image-flip-h "Flip H")
          " "
-         (dragonruby--make-header-button "[/\\]" #'dragonruby-image-flip-v "Flip V")
+         (dragonruby--make-header-button "/\\" #'dragonruby-image-flip-v "Flip V")
          " "
-         (propertize "[Gry]" 'face '(:foreground "gray")
-                     'mouse-face 'highlight 'help-echo "Grayscale"
-                     'local-map (let ((map (make-sparse-keymap)))
-                                 (define-key map [header-line mouse-1] #'dragonruby-image-grayscale)
-                                 map))
+         (dragonruby--make-header-button "Gry" #'dragonruby-image-grayscale "Grayscale" '(:foreground "gray"))
          " "
-         (propertize "[Inv]" 'face '(:foreground "magenta")
-                     'mouse-face 'highlight 'help-echo "Invert"
-                     'local-map (let ((map (make-sparse-keymap)))
-                                 (define-key map [header-line mouse-1] #'dragonruby-image-invert)
-                                 map))
+         (dragonruby--make-header-button "Inv" #'dragonruby-image-invert "Invert" '(:foreground "magenta"))
          " "
-         (propertize "[NoBG]" 'face '(:foreground "pink")
-                     'mouse-face 'highlight 'help-echo "Remove BG"
-                     'local-map (let ((map (make-sparse-keymap)))
-                                 (define-key map [header-line mouse-1] #'dragonruby-image-remove-white-bg)
-                                 map))
+         (dragonruby--make-header-button "NoBG" #'dragonruby-image-remove-white-bg "Remove BG" '(:foreground "pink"))
+         " | "
+         (dragonruby--make-header-button "Crop" #'dragonruby-image-crop "Crop (W H X Y)" '(:foreground "yellow"))
+         " "
+         (dragonruby--make-header-button "Tint" #'dragonruby-image-tint "Tint Color" '(:foreground "yellow"))
+         " "
+         (dragonruby--make-header-button "PNG" #'dragonruby-image-to-png "Convert to PNG" '(:foreground "yellow"))
+         " | "
+         (dragonruby--make-header-button "Undo" #'dragonruby-image-undo "Revert to backup" '(:foreground "red" :weight bold))
+         " | "
+         (dragonruby--make-header-button "Edit" #'dragonruby-image-open-external "External Editor")
          ;; Show image info if enabled (dynamically evaluated)
          '(:eval (if dragonruby--show-image-info
-                     (concat "  |  " (or (dragonruby--get-image-info-string) ""))
+                     (concat "  " (or (dragonruby--get-image-info-string) ""))
                    "")))))
 
 (defun dragonruby--image-mode-hook ()
