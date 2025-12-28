@@ -50,7 +50,7 @@
       (concat (propertize " " 'display '(space :width 1))
               (propertize " " 'display image)))))
 
-(defun dragonruby--make-sprite-overlay (start end text path status)
+(defun dragonruby--make-sprite-overlay (start end _text path status)
   (let ((ov (make-overlay start end))
         (color (pcase status ('valid "cyan") ('missing "red") ('unsupported "orange")))
         (style (if (eq status 'valid) nil 'wave))
@@ -114,7 +114,7 @@
 
 (define-minor-mode dragonruby-sprite-mode
   "Sprite previews."
-  :lighter " DR-Sprite"
+  :lighter ""
   (if dragonruby-sprite-mode
       (progn
         (add-hook 'after-change-functions #'dragonruby--after-sprite-change nil t)

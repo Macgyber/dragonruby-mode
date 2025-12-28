@@ -36,7 +36,7 @@
         (backward-sexp 1) ;; Jump back to see if previous word is 'require'
         (when (looking-at-p "\\(?:require\\|require_relative\\|load\\)")
           (let* ((start (nth 8 state))
-                 (end (point)))
+                 (_end (point)))
              (list (1+ start) (nth 1 (syntax-ppss))
                    (completion-table-dynamic
                     (lambda (_) (dragonruby--get-all-ruby-files)))
@@ -47,7 +47,7 @@
   (mapc #'delete-overlay dragonruby--path-overlays)
   (setq dragonruby--path-overlays nil))
 
-(defun dragonruby--make-path-overlay (start end text real-path type valid)
+(defun dragonruby--make-path-overlay (start end _text real-path type valid)
   (let* ((is-error (and (eq type 'ruby) (not valid)))
          (face-props (if valid 
                          '(:foreground "#61AFEF" :underline t)
@@ -111,7 +111,7 @@
 
 (define-minor-mode dragonruby-paths-mode
   "Universal Navigation."
-  :lighter " DR-Path"
+  :lighter ""
   (if dragonruby-paths-mode
       (progn
         (add-hook 'after-change-functions #'dragonruby--after-path-change nil t)

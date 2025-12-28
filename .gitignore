@@ -10,8 +10,8 @@
 .DS_Store
 
 # Local development only
-/tests/
+
 
 # Build artifacts
 /dist/
-docs/.learndr-plan.md
+

@@ -125,7 +125,7 @@
 
 (define-minor-mode dragonruby-color-blocks-mode
   "Smart color highlighting."
-  :lighter " DR-Color"
+  :lighter ""
   (if dragonruby-color-blocks-mode
       (progn
         (add-hook 'after-change-functions #'dragonruby--after-color-change nil t)

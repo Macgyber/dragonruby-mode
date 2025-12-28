@@ -31,7 +31,7 @@ Examples:
 (defun dragonruby-image-zoom-in ()
   "Zoom in the image."
   (interactive)
-  (condition-case err
+  (condition-case _err
       (progn
         (setq dragonruby--image-scale (* dragonruby--image-scale 1.2))
         (image-transform-set-scale dragonruby--image-scale))
@@ -40,7 +40,7 @@ Examples:
 (defun dragonruby-image-zoom-out ()
   "Zoom out the image."
   (interactive)
-  (condition-case err
+  (condition-case _err
       (progn
         (setq dragonruby--image-scale (/ dragonruby--image-scale 1.2))
         (image-transform-set-scale dragonruby--image-scale))
@@ -235,7 +235,7 @@ Uses `dragonruby-external-image-editor' if set, otherwise system default."
                (height (truncate (cdr img-size))))
           (propertize (format "%s %dx%d %s" ext width height size-str)
                       'face '(:weight bold)))
-      (error "")))))
+      (error ""))))
 
 (defun dragonruby--setup-image-header-line ()
   "Set up header-line with image editing buttons."
