@@ -1,5 +1,6 @@
 ;;; dragonruby-image-ui.el --- Header line and UI elements -*- lexical-binding: t; -*-
 
+(require 'face-remap)
 (require 'dragonruby-core)
 (require 'dragonruby-image-modify)
 (require 'dragonruby-image-view)
@@ -160,7 +161,7 @@ Reverted to Adobe Pro style: consistent dark background with neon labels."
                             (define-key map [header-line mouse-1] action)
                             (when (and help (string-match-p "Edit" help))
                               (define-key map [header-line mouse-3] 
-                                (lambda (e) (interactive "e") (run-at-time 0.05 nil #'dragonruby-select-external-editor))))
+                                (lambda (_e) (interactive "e") (run-at-time 0.05 nil #'dragonruby-select-external-editor))))
                             map))))
 
 (defun dragonruby--get-image-info-string ()
@@ -231,7 +232,7 @@ If no editor is set, prompts the user to select one."
              " "
              (dragonruby--make-header-button 
               (dragonruby--header-adaptive-label "VIEW" "V" "👁️" 'dragonruby--ui-group-view)
-              (lambda (e) (interactive "e") (dragonruby--toggle-ui-group "view"))
+              (lambda (_e) (interactive "e") (dragonruby--toggle-ui-group "view"))
               "View controls"
               (if dragonruby--ui-group-view
                   '(:foreground "#000000" :background "#FF8C00" :height 0.9)
@@ -257,7 +258,7 @@ If no editor is set, prompts the user to select one."
              (if (> width 90) " " "")
              (dragonruby--make-header-button 
               (dragonruby--header-adaptive-label "TRANSFORM" "TR" "🧱" 'dragonruby--ui-group-modify)
-              (lambda (e) (interactive "e") (dragonruby--toggle-ui-group "modify"))
+              (lambda (_e) (interactive "e") (dragonruby--toggle-ui-group "modify"))
               "Transform controls" 
               (if dragonruby--ui-group-modify
                   '(:foreground "#000000" :background "#00CED1" :height 0.9)
@@ -282,7 +283,7 @@ If no editor is set, prompts the user to select one."
              (if (> width 90) " " "")
              (dragonruby--make-header-button 
               (dragonruby--header-adaptive-label "COLOR" "C" "🎨" 'dragonruby--ui-group-color)
-              (lambda (e) (interactive "e") (dragonruby--toggle-ui-group "color"))
+              (lambda (_e) (interactive "e") (dragonruby--toggle-ui-group "color"))
               "Color controls" 
               (if dragonruby--ui-group-color
                   '(:foreground "#000000" :background "#A1D95A" :height 0.9)
@@ -303,7 +304,7 @@ If no editor is set, prompts the user to select one."
              (if (> width 90) " " "")
              (dragonruby--make-header-button 
               (dragonruby--header-adaptive-label "SYSTEM" "S" "⚙️" 'dragonruby--ui-group-tools)
-              (lambda (e) (interactive "e") (dragonruby--toggle-ui-group "tools"))
+              (lambda (_e) (interactive "e") (dragonruby--toggle-ui-group "tools"))
               "System controls" 
               (if dragonruby--ui-group-tools
                   '(:foreground "#000000" :background "#FFFFFF" :height 0.9)

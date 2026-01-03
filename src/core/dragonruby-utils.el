@@ -12,7 +12,7 @@
 
 (defun dragonruby--debounce (task-id func delay)
   "Run FUNC after DELAY seconds of idleness for TASK-ID.
-Uses Emacs idle timers to ensure we wait for the user to 'breathe'."
+Uses Emacs idle timers to ensure we wait for the user to \\='breathe\\='."
   (unless (hash-table-p dragonruby--debounce-timers)
     (setq dragonruby--debounce-timers (make-hash-table :test 'eq)))
   (let ((buf (current-buffer))

@@ -11,7 +11,7 @@
   :group 'dragonruby-colors)
 
 (defun dragonruby--clear-color-overlays ()
-  "Remove all color overlays from the current buffer using the 'dragonruby-color property."
+  "Remove all color overlays from the current buffer using the \\='dragonruby-color property."
   (remove-overlays (point-min) (point-max) 'dragonruby-color t)
   (setq dragonruby--color-overlays nil))
 

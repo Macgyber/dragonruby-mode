@@ -11,7 +11,7 @@
 
 (defun dragonruby--after-color-change (beg end _len)
   "Trigger color scan after buffer change with debounce.
-Cleans up overlays in the entire modified line factor to avoid 'visual ghosts' 
+Cleans up overlays in the entire modified line factor to avoid visual ghosts
 of orphaned overlays in multiline hashes or arrays."
   (save-match-data
     (let ((line-beg (save-excursion (goto-char beg) (line-beginning-position)))

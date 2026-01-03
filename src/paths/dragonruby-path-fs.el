@@ -4,9 +4,9 @@
 (require 'dragonruby-path-model)
 
 (defun dragonruby--resolve-path (raw-path type)
-  "Resolve RAW-PATH based on TYPE ('require, 'require_relative, 'load).
-If TYPE is 'require or 'load, resolve relative to project root.
-If TYPE is 'require_relative, resolve relative to current file."
+  "Resolve RAW-PATH based on TYPE (\\='require, \\='require_relative, \\='load).
+If TYPE is \\='require or \\=load, resolve relative to project root.
+If TYPE is \\='require_relative, resolve relative to current file."
   (let* ((root (dragonruby--find-project-root))
          (base-dir (if (eq type 'require_relative)
                        (file-name-directory (or buffer-file-name default-directory))
@@ -20,7 +20,7 @@ If TYPE is 'require_relative, resolve relative to current file."
 
 (defun dragonruby--collect-project-files (&optional type)
   "Return project files relative to root.
-TYPE can be 'ruby, 'data, or nil for all."
+TYPE can be \\='ruby, \\='data, or nil for all."
   (let* ((root (dragonruby--find-project-root))
          (ruby-exts dragonruby-ruby-extensions)
          (data-exts dragonruby-data-extensions)

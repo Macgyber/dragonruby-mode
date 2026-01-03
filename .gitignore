@@ -9,8 +9,11 @@
 # macOS
 .DS_Store
 
-# Local development only
-
+# Local development and internal state
+.CHECKPOINT_ESTABILIDAD.md
+.ideas-global.md
+.PROJECT_GENESIS_SNAPSHOT.md
+.dr_history/
 
 # Build artifacts
 /dist/
