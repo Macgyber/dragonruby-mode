@@ -10,10 +10,15 @@
 (defcustom dragonruby-external-editor-presets
   '((darwin . (("Aseprite" . "/Applications/Aseprite.app/Contents/MacOS/aseprite")
                ("Photoshop" . "/Applications/Adobe Photoshop 2024/Adobe Photoshop 2024.app/Contents/MacOS/Adobe Photoshop 2024")
+               ("Inkscape" . "/Applications/Inkscape.app/Contents/MacOS/inkscape")
+               ("Pixelmator Pro" . "/Applications/Pixelmator Pro.app/Contents/MacOS/Pixelmator Pro")
                ("GIMP" . "/Applications/GIMP.app/Contents/MacOS/gimp")
-               ("Krita" . "/Applications/Krita.app/Contents/MacOS/krita")))
+               ("Krita" . "/Applications/Krita.app/Contents/MacOS/krita")
+               ("Affinity Photo" . "/Applications/Affinity Photo 2.app/Contents/MacOS/Affinity Photo 2")))
     (windows-nt . (("Aseprite" . "C:/Program Files/Aseprite/aseprite.exe")
                    ("Photoshop" . "C:/Program Files/Adobe/Adobe Photoshop 2024/Photoshop.exe")
+                   ("Inkscape" . "C:/Program Files/Inkscape/bin/inkscape.exe")
+                   ("GIMP" . "C:/Program Files/GIMP 2/bin/gimp-2.10.exe")
                    ("Paint.NET" . "C:/Program Files/paint.net/PaintDotNet.exe")))
     (gnu/linux . (("GIMP" . "/usr/bin/gimp")
                   ("Krita" . "/usr/bin/krita")
@@ -26,63 +31,43 @@
   "Get the list of editor presets for the current OS."
   (cdr (assoc system-type dragonruby-external-editor-presets)))
 
-(defun dragonruby-select-external-editor ()
-  "Select an external editor from categorized presets.
-Includes direct web links for downloading tools."
-  (interactive)
-  (if (active-minibuffer-window)
-      (message "Minibuffer is already in use!")
-    (let (choice path result-name)
-      (condition-case nil
-          (unwind-protect
-                (let* ((presets (dragonruby--get-os-presets))
-                       (current-name (when dragonruby-external-image-editor
-                                       (file-name-nondirectory dragonruby-external-image-editor)))
-                       (launch-opt (when current-name (list (format "🚀 Launch %s" current-name))))
-                       (magick-url (dragonruby--get-magick-download-url))
-                     (os-name (cond ((eq system-type 'darwin) "macOS")
-                                    ((eq system-type 'windows-nt) "Windows")
-                                    (t "Linux")))
-                     (web-links `(("🌐 Download Aseprite (aseprite.org)" . "https://www.aseprite.org/download/")
-                                  ("🌐 Download Krita (krita.org)" . "https://krita.org/en/download/")
-                                  (,(format "🌐 Download ImageMagick for %s" os-name) . ,magick-url)))
-                       (options (append '("❌ Cancel") 
-                                        launch-opt
-                                        (mapcar #'car presets) 
-                                        (mapcar #'car web-links)
-                                        '("📁 Custom Path..."))))
-                  (message nil)
-                  (setq choice (completing-read "🛠️ Artist Portal: " options nil t))
-                  
-                  (cond
-                   ((string= choice "❌ Cancel")
-                    (setq path nil))
-                   ((and current-name (string= choice (format "🚀 Launch %s" current-name)))
-                    (setq path dragonruby-external-image-editor
-                          result-name current-name))
-                   ((string-prefix-p "🌐" choice)
-                  (browse-url (cdr (assoc choice web-links)))
-                  (message "Opening download page...")
-                  (setq path nil))
-                 (t
-                  (setq path (if (string= choice "📁 Custom Path...")
-                                 (read-file-name "Enter editor executable path: ")
-                               (cdr (assoc choice presets))))
-                  (when (and path (not (string-empty-p path)))
-                    (setq result-name choice)))))
-            (message nil)
-            (abort-recursive-edit) ; Force exit any lingering state
-            (redisplay t))
-        (quit (setq path nil)))
+(defcustom dragonruby-recent-editors nil
+  "List of recently used editor paths."
+  :type '(repeat string)
+  :group 'dragonruby)
 
-      (if (and path (not (string-empty-p path)))
-          (progn
-            (customize-save-variable 'dragonruby-external-image-editor path)
-            (message "🚀 Editor locked: %s" result-name)
-            path)
-        (unless (string-prefix-p "🌐" (or choice ""))
-          (message "Selection cancelled."))
-        nil))))
+(defcustom dragonruby-user-creative-links nil
+  "User-defined custom links for the Creative Hub.
+Each entry is a list of (NAME URL-OR-PATH COLOR).
+If it starts with http, it opens in browser; otherwise it's a local program.
+
+Example configuration in your init.el:
+  (setq dragonruby-user-creative-links
+        \\='((\"MyTool\" \"https://mytool.com\" \"#FF5500\")
+          (\"LocalApp\" \"/path/to/app\" \"#00FF00\")))"
+  :type '(repeat (list (string :tag "Name")
+                       (string :tag "URL or Path")
+                       (string :tag "Color")))
+  :group 'dragonruby)
+
+(defcustom dragonruby-hidden-creative-tools nil
+  "List of predefined Creative Hub tools to hide.
+Add tool names like \"Graphite\", \"Photopea\", \"Piskel\", \"Lospec\", \"Itch\".
+
+Example:
+  (setq dragonruby-hidden-creative-tools \\='(\"Lospec\" \"Itch\"))"
+  :type '(repeat string)
+  :group 'dragonruby)
+
+(defun dragonruby--add-recent-editor (path)
+  "Add PATH to the recent editors list, keeping it unique and limited."
+  (when (and path (not (string-empty-p path)))
+    (setq dragonruby-recent-editors (delete path dragonruby-recent-editors))
+    (push path dragonruby-recent-editors)
+    (when (> (length dragonruby-recent-editors) 5)
+      (setq dragonruby-recent-editors (butlast dragonruby-recent-editors)))
+    (customize-save-variable 'dragonruby-recent-editors dragonruby-recent-editors)))
+
 
 (defcustom dragonruby-external-image-editor nil
   "Path to your preferred image editor executable."
@@ -108,6 +93,9 @@ Includes direct web links for downloading tools."
 (defvar-local dragonruby--ui-group-tools nil
   "Toggle for Tools group visibility.")
 
+(defvar-local dragonruby--ui-group-creative nil
+  "Toggle for Creative Hub group visibility.")
+
 (defun dragonruby--toggle-ui-group (group)
   "Toggle a UI GROUP visibility and refresh header-line.
 Accordion logic: opening one group closes others to prevent overflow."
@@ -117,7 +105,8 @@ Accordion logic: opening one group closes others to prevent overflow."
     (setq dragonruby--ui-group-view nil
           dragonruby--ui-group-modify nil
           dragonruby--ui-group-color nil
-          dragonruby--ui-group-tools nil)
+          dragonruby--ui-group-tools nil
+          dragonruby--ui-group-creative nil)
     ;; Set the target group to its new state
     (set (make-local-variable target-var) target-state)
     (force-mode-line-update)
@@ -159,9 +148,6 @@ Consistent dark background with neon labels."
                 'help-echo help
                 'local-map (let ((map (make-sparse-keymap)))
                             (define-key map [header-line mouse-1] action)
-                            (when (and help (string-match-p "Edit" help))
-                              (define-key map [header-line mouse-3] 
-                                (lambda (_e) (interactive "e") (run-at-time 0.05 nil #'dragonruby-select-external-editor))))
                             map))))
 
 (defun dragonruby--get-image-info-string ()
@@ -205,8 +191,9 @@ If no editor is set, prompts the user to select one."
   (when buffer-file-name
     (let* ((source (dragonruby--find-source-file buffer-file-name))
            (target-file (or source buffer-file-name))
-           (editor (or dragonruby-external-image-editor
-                       (dragonruby-select-external-editor))))
+           (editor dragonruby-external-image-editor))
+      (unless editor
+        (message "No editor set. Use [+] in CREATIVE to add one."))
       
       (when editor
         (if source
@@ -316,9 +303,114 @@ If no editor is set, prompts the user to select one."
                   (if (> width 90) " " "")
                   (dragonruby--adaptive-tool "Crop" "C" "⚃" #'dragonruby-image-crop "Numerical Crop (W H X Y)" '(:foreground "yellow"))
                   (if (> width 90) " " "")
-                  (dragonruby--adaptive-tool "PNG" "P" "⎙" #'dragonruby-image-to-png "Export to PNG" '(:foreground "yellow"))
+                  (dragonruby--adaptive-tool "PNG" "P" "⎙" #'dragonruby-image-to-png "Export to PNG" '(:foreground "yellow")))
+               "")
+
+             ;; GROUP: CREATIVE (Parent Button)
+             (if (> width 90) " " "")
+             (dragonruby--make-header-button 
+              (dragonruby--header-adaptive-label "CREATIVE" "C" "🎨" 'dragonruby--ui-group-creative)
+              (lambda (_e) (interactive "e") (dragonruby--toggle-ui-group "creative"))
+              "Creative Hub | Resources & Edit" 
+              (if dragonruby--ui-group-creative
+                  '(:foreground "#000000" :background "#55FF55" :height 0.9)
+                `(:foreground "#55FF55" :background "#222222" :height ,(if (> width 80) 1.2 0.9))))
+             (if dragonruby--ui-group-creative
+                 (list
+                  (if (> width 90) "  " " ")
+                  (unless (member "Graphite" dragonruby-hidden-creative-tools)
+                    (dragonruby--adaptive-tool "Graphite" "G" "🖥" 
+                                               (lambda (_e) (interactive "e") (browse-url "https://editor.graphite.art/"))
+                                               "Graphite Art (Web)" '(:foreground "#00FFFF")))
                   (if (> width 90) " " "")
-                  (dragonruby--adaptive-tool "Edit" "E" "✎" #'dragonruby-image-open-external "Open in External Editor" '(:foreground "#55FF55")))
+                  (unless (member "Photopea" dragonruby-hidden-creative-tools)
+                    (dragonruby--adaptive-tool "Photopea" "P" "📷" 
+                                               (lambda (_e) (interactive "e") (browse-url "https://www.photopea.com/"))
+                                               "Photopea (Web)" '(:foreground "#2196F3")))
+                  (if (> width 90) " " "")
+                  (unless (member "Piskel" dragonruby-hidden-creative-tools)
+                    (dragonruby--adaptive-tool "Piskel" "Px" "👾" 
+                                               (lambda (_e) (interactive "e") (browse-url "https://www.piskelapp.com/p/create/sprite/"))
+                                               "Piskel (Pixel Art)" '(:foreground "#8BC34A")))
+                  (if (> width 90) " " "")
+                  (unless (member "Lospec" dragonruby-hidden-creative-tools)
+                    (dragonruby--adaptive-tool "Lospec" "L" "🌈" 
+                                               (lambda (_e) (interactive "e") (browse-url "https://lospec.com/palette-list"))
+                                               "Lospec Palettes" '(:foreground "#FFEB3B")))
+                  (if (> width 90) " " "")
+                  (unless (member "Itch" dragonruby-hidden-creative-tools)
+                    (dragonruby--adaptive-tool "Itch" "I" "🎮" 
+                                               (lambda (_e) (interactive "e") (browse-url "https://itch.io/game-assets"))
+                                               "Itch.io Assets" '(:foreground "#9C27B0")))
+                  ;; USER-DEFINED TOOLS (dynamic)
+                  (mapconcat 
+                   (lambda (item)
+                     (let ((name (nth 0 item))
+                           (target (nth 1 item)))
+                       (concat 
+                        (if (> width 90) " " "")
+                        (dragonruby--adaptive-tool 
+                         name (substring name 0 (min 2 (length name))) "⭐"
+                         `(lambda (_e) (interactive "e")
+                            (if (string-prefix-p "http" ,target)
+                                (browse-url ,target)
+                              (if (file-exists-p ,target)
+                                  (progn
+                                    (customize-save-variable 'dragonruby-external-image-editor ,target)
+                                    (dragonruby-image-open-external))
+                                (message "File not found: %s" ,target))))
+                         (format "User: %s" target)
+                         (let ((color (or (nth 2 item) "#FF00FF")))
+                           `(:foreground ,color))))))
+                   dragonruby-user-creative-links "")
+                  (if (> width 90) " " "")
+                  ;; ADD BUTTON
+                  (dragonruby--adaptive-tool "+" "+" "➕" 
+                                             (lambda (_e) (interactive "e")
+                                               (if (active-minibuffer-window)
+                                                   (message "Close minibuffer first (C-g)")
+                                                 (let* ((name (read-string "Tool name: "))
+                                                        (target (read-string "URL or path: "))
+                                                        (random-color (format "#%02X%02X%02X" 
+                                                                              (+ 100 (random 156))
+                                                                              (+ 100 (random 156))
+                                                                              (+ 100 (random 156))))
+                                                        (color (read-string (format "Color [%s]: " random-color) nil nil random-color)))
+                                                   (when (and (not (string-empty-p name)) 
+                                                              (not (string-empty-p target)))
+                                                     (add-to-list 'dragonruby-user-creative-links (list name target color) t)
+                                                     (customize-save-variable 'dragonruby-user-creative-links dragonruby-user-creative-links)
+                                                     (force-mode-line-update)
+                                                     (message "✅ Added: %s (%s)" name color)))))
+                                             "Add Custom Tool" '(:foreground "#00FF00"))
+                  (if (> width 90) " " "")
+                  ;; REMOVE BUTTON
+                  (dragonruby--adaptive-tool "-" "-" "➖"
+                                             (lambda (_e) (interactive "e")
+                                               (if (active-minibuffer-window)
+                                                   (message "Close minibuffer first (C-g)")
+                                                 (let* ((predefined '("Graphite" "Photopea" "Piskel" "Lospec" "Itch"))
+                                                        (visible-predefined (cl-remove-if (lambda (x) (member x dragonruby-hidden-creative-tools)) predefined))
+                                                        (user-names (mapcar #'car dragonruby-user-creative-links))
+                                                        (all-names (append visible-predefined user-names)))
+                                                   (if (null all-names)
+                                                       (message "No tools to remove")
+                                                     (let ((choice (completing-read "Hide/Remove tool: " all-names nil t)))
+                                                       (if (member choice predefined)
+                                                           ;; Hide predefined
+                                                           (progn
+                                                             (add-to-list 'dragonruby-hidden-creative-tools choice)
+                                                             (customize-save-variable 'dragonruby-hidden-creative-tools dragonruby-hidden-creative-tools)
+                                                             (force-mode-line-update)
+                                                             (message "👁️ Hidden: %s (restore via customize)" choice))
+                                                         ;; Remove user tool
+                                                         (setq dragonruby-user-creative-links
+                                                               (cl-remove-if (lambda (x) (string= (car x) choice))
+                                                                             dragonruby-user-creative-links))
+                                                         (customize-save-variable 'dragonruby-user-creative-links dragonruby-user-creative-links)
+                                                         (force-mode-line-update)
+                                                         (message "🗑️ Removed: %s" choice)))))))
+                                             "Hide/Remove Tool" '(:foreground "#FF5555")))
                "")
 
              ;; METADATA (Hidden on small screens)
@@ -326,7 +418,9 @@ If no editor is set, prompts the user to select one."
                  (concat "  " (or (dragonruby--get-image-info-string) ""))
                ""))))))
 
+
 ;; Initialize history when image mode starts
 (add-hook 'image-mode-hook #'dragonruby-image-init-history)
 
 (provide 'dragonruby-image-ui)
+;;; dragonruby-image-ui.el ends here

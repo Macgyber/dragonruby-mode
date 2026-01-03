@@ -21,7 +21,7 @@ This command strictly follows the requested workflow:
       (if (dragonruby--inside-string-p)
           (let ((context (dragonruby--path-context)))
             (if (not context)
-                (message "💡 Point is not inside a valid path")
+                (dragonruby--notify 'path-context-hint "💡 Point is not inside a valid path" t)
               (let* ((start (nth 0 context))
                      (end (nth 1 context))
                      (type (nth 2 context))

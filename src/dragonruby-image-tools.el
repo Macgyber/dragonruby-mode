@@ -39,7 +39,7 @@
 
 (define-minor-mode dragonruby-image-mode
   "Local minor mode for DragonRuby image buffers."
-  :lighter " DR-Img"
+  :lighter " 🎨"
   :keymap dragonruby-image-mode-map)
 
 (defun dragonruby--image-mode-hook ()

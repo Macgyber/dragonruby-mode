@@ -72,7 +72,46 @@ Internal state and external connections.
 | `c` | `Crop` | **Crop**  | Numerical cropping (W H X Y). |
 | `p` | `PNG`  | **PNG**   | Export to PNG format. |
 | `R` | `RST`  | **Reset** | Hard Reset to Original version. |
-| `e` | `Edit` | **Artist Portal**| External editors & Web download links. |
+
+---
+
+## 🎨 CREATIVE Hub (Parent Button)
+
+The **CREATIVE** button is your portal to web-based editors, resources, and custom tools. Click it to expand and reveal all child buttons.
+
+### Default Web Tools
+
+| Button | URL | Description |
+|--------|-----|-------------|
+| `Graphite` | editor.graphite.art | Vector design tool |
+| `Photopea` | photopea.com | Photoshop alternative |
+| `Piskel` | piskelapp.com | Pixel art animator |
+| `Lospec` | lospec.com | Color palettes |
+| `Itch` | itch.io/game-assets | Game assets |
+
+### User Tool Management
+
+| Button | Action |
+|--------|--------|
+| **[+]** | Add a custom tool (name, URL/path, random color) |
+| **[-]** | Hide predefined tools OR remove your custom tools |
+
+When adding with **[+]**:
+1. Enter the tool name
+2. Enter the URL or local path
+3. Accept the random color or type your own (e.g., `#FF5500`)
+
+### Customization Variables
+
+```elisp
+;; Add your own tools (name, url/path, color)
+(setq dragonruby-user-creative-links
+      '(("Figma" "https://figma.com" "#A259FF")
+        ("Aseprite" "/Applications/Aseprite.app" "#7D929E")))
+
+;; Hide predefined tools you don't use
+(setq dragonruby-hidden-creative-tools '("Lospec" "Itch"))
+```
 
 ---
 
@@ -87,16 +126,16 @@ Every change you make (Trim, Rotate, Color) is **versioned**.
 
 ## 🛠️ Configuration
 
-### External Editor Presets
-You can select between presets like Aseprite, Photoshop, or GIMP by **Right-Clicking** the `[Edit]` button.
+### External Editor
+Add custom editors via the **[+]** button in the CREATIVE group, or set a global default:
 
-To set a global default in `init.el`:
 ```elisp
 (setq dragonruby-external-image-editor "/Applications/Aseprite.app/Contents/MacOS/aseprite")
 ```
 
 ### Smart Source Jumping
 If enabled, clicking a sprite path in code looks for the *source* (e.g., `.aseprite`, `.psd`) first.
+
 ```elisp
 (setq dragonruby-experimental-smart-jump t)
 ```

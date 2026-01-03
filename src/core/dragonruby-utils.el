@@ -33,6 +33,15 @@ Uses Emacs idle timers to ensure we wait for the user to \\='breathe\\='."
                                             (error (message "DragonRuby Debounce Error [%s]: %S" task-id err))))))))
              dragonruby--debounce-timers)))
 
+(defvar dragonruby--notified-messages nil
+  "List of messages already shown in this session.")
+
+(defun dragonruby--notify (id msg &optional once)
+  "Show MSG in the echo area. If ONCE is t, only show it once per session."
+  (unless (and once (member id dragonruby--notified-messages))
+    (message msg)
+    (when once (push id dragonruby--notified-messages))))
+
 (defvar dragonruby--warned-features nil
   "List of features that have already shown a development warning.")
 

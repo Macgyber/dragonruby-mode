@@ -33,14 +33,16 @@ R, G, B, A are color components (0-255). FORMAT is ignored."
                        :box (:line-width -1 :color "grey50")))
         (overlay-put ov 'priority dragonruby-colors-overlay-priority)
         (overlay-put ov 'dragonruby-color t)
-        (overlay-put ov 'keymap 
+        (overlay-put ov 'help-echo "Click to edit color")
+        (overlay-put ov 'keymap
                      (let ((map (make-sparse-keymap)))
-                       (define-key map [mouse-1] 
-                         (lambda () (interactive) 
+                       (define-key map [mouse-1]
+                         (lambda () (interactive)
                            (if (bound-and-true-p dragonruby-enable-picker)
                                (dragonruby-color-picker-edit start end nil) ;; format nil for now
-                             (dragonruby--warn-in-development "Selector de Color Interactivo"))))
+                             (message "Interactive color picker not enabled"))))
                        map))
         (push ov dragonruby--color-overlays)))))
 
 (provide 'dragonruby-color-visuals)
+;;; dragonruby-color-visuals.el ends here

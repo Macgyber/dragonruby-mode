@@ -88,6 +88,9 @@ When viewing images, a **Fluid Toolbar** appears:
 - **Responsive Design**: UI labels shrink (`TRANSFORM` -> `T`) on small windows.
 - **Timeline Navigation**: `Back (<)` and `Forward (>)` with automatic snapshotting.
 - **Debug Stage (INF)**: High-contrast background to reveal transparent margins.
+- **🎨 Creative Hub**: Quick access to web editors (Graphite, Photopea, Piskel) and resources.
+  - **[+]** Add your own tools (URLs or local apps) with custom colors.
+  - **[-]** Hide tools you don't use.
 
 ---
 
