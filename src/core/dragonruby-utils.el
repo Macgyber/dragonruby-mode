@@ -33,4 +33,17 @@ Uses Emacs idle timers to ensure we wait for the user to \\='breathe\\='."
                                             (error (message "DragonRuby Debounce Error [%s]: %S" task-id err))))))))
              dragonruby--debounce-timers)))
 
+(defvar dragonruby--warned-features nil
+  "List of features that have already shown a development warning.")
+
+(defun dragonruby--warn-in-development (feature)
+  "Show a brief warning that FEATURE is still in development.
+The warning is only shown once per session to avoid annoyance."
+  (interactive)
+  (unless (member feature dragonruby--warned-features)
+    (let ((msg (format "【 🚧 DragonRuby 】\n\n'%s' is still under DEVELOPMENT.\n\nDismiss notice?" feature)))
+      (read-multiple-choice msg
+                            '((?c "Close" "Dismiss notice")))
+      (push feature dragonruby--warned-features))))
+
 (provide 'dragonruby-utils)

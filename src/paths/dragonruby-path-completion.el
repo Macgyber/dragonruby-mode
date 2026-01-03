@@ -10,8 +10,14 @@ Low priority, contextual, and manual (triggered by user)."
     (when context
       (let* ((start (nth 0 context))
              (end (nth 1 context))
-             ;; Always provide all candidates to allow total project visibility
-             (candidates (dragonruby--collect-project-files nil)))
+             (type (nth 2 context))
+             ;; If the string already starts with "sprites/" or "spr/", force sprite type
+             (content (buffer-substring-no-properties start end))
+             (effective-type (if (or (string-prefix-p "sprites" content)
+                                      (string-prefix-p "spr" content))
+                                 'sprite
+                               type))
+             (candidates (dragonruby--collect-project-files effective-type)))
         (list start end candidates
               :exclusive 'no
               :company-kind (lambda (_) 'file)
@@ -26,13 +32,25 @@ Returns (START END TYPE) or nil."
     (when (nth 3 p) ; Inside string
       (let* ((string-start (nth 8 p))
              (start (1+ string-start)) ; Just after the opening quote
-             (end (point))
+             (end (save-excursion
+                    (goto-char string-start)
+                    (forward-sexp)
+                    (1- (point)))) ; Just before the closing quote
              (line-start (line-beginning-position))
+             (content (buffer-substring-no-properties start end))
              (before-string (buffer-substring-no-properties line-start string-start))
              (type (cond
                     ((string-match-p "\\(require\\|require_relative\\|load\\|load_script\\)" before-string) 'ruby)
                     ((string-match-p "\\(read_file\\|parse_json_file\\|parse_json\\|parse_xml_file\\)" before-string) 'data)
-                    (t 'data))))
+                    ((or (string-match-p "\\(sprites\\|primitives\\|labels\\|path:\\)" before-string)
+                         (string-prefix-p "sprites/" content)
+                         (string-prefix-p "spr/" content)
+                         (string-prefix-p ".png" content)
+                         (string-prefix-p ".jpg" content)
+                         (string-prefix-p ".gif" content)
+                         (string-prefix-p ".bmp" content)) 'sprite)
+                    ((string-match-p "\\(sounds\\|audio\\)" before-string) 'audio)
+                    (t nil)))) ; Default: Universal fallback
         (list start end type)))))
 
 (provide 'dragonruby-path-completion)

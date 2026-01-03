@@ -1,7 +1,7 @@
 ;;; dragonruby-mode.el --- Semantic tooling for DragonRuby -*- lexical-binding: t; -*-
 
 ;; Author: Macgyber <esteban3261g@gmail.com>
-;; Version: 0.5.1
+;; Version: 0.5.5
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: games, dragonruby, tools
 ;; URL: https://github.com/Macgyber/dragonruby-mode
@@ -87,6 +87,11 @@ When nil, color swatches are read-only."
   :type 'boolean
   :group 'dragonruby)
 
+(defcustom dragonruby-experimental-smart-jump nil
+  "Enable experimental Smart Source Jumping."
+  :type 'boolean
+  :group 'dragonruby)
+
 ;; Minor mode definition
 (define-minor-mode dragonruby-mode
   "Semantic assistance for DragonRuby projects."
@@ -102,7 +107,7 @@ When nil, color swatches are read-only."
             (when dragonruby-enable-docs (dragonruby-docs-mode 1))
             (when dragonruby-enable-concepts (dragonruby-concepts-mode 1)))
         (error
-         (message "DragonRuby Mode Error [%s]: Fallo en activación, abortando." err)
+         (dragonruby--warn-in-development (format "Error en Activación: %s" err))
          (dragonruby-mode -1)))
     ;; Always disable everything when turning off the main mode, just to be safe/clean
     (dragonruby-color-blocks-mode -1)

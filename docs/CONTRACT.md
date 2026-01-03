@@ -10,6 +10,8 @@ This document formalizes the responsibilities and interaction patterns for each 
 5.  **LSP-Safe**: Never interfere with LSP, Corfu, Company, or other completion frameworks.
 6.  **Multi-Channel Async Strategy**: Periodic scans (Paths, Colors, Sprites) must use isolated debounce timers (`task-id`) to prevent cross-module collisions. Every asynchronous task must protect Emacs state using `save-match-data` and `save-restriction`.
 7.  **Reactive Invalidation**: Any text modification in the buffer MUST immediately invalidate the visual overlays in the affected range to prevent "visual ghosts" or stale information. Reconstruction happens asynchronously during idle time.
+8.  **Modular Isolation (Strict)**: A feature or module MUST NOT depend on the presence or active state of another sibling module. All shared knowledge (e.g., file extensions, project root detection) must reside in the `src/core/` infrastructure.
+9.  **User Safety & Clarity**: If a feature is experimental or disabled, any user attempt to trigger it MUST produce a standardized "In Development" warning with a clear dismissal (Close) option. Crashing or failing silently is a violation of this contract.
 
 ---
 
@@ -107,4 +109,4 @@ src/
 - [x] **Architecture Verified**: All modules follow Facade/Submodule pattern.
 - [x] **Keyboard Navigation**: All overlays support RET.
 - [x] **LSP-Safe**: Paths uses minibuffer, Sprites CAPF at depth 100.
-- [x] **Contracts Updated**: 2026-01-02.
+- [x] **Contracts Updated**: 2026-01-03 (Added Modular Isolation & User Safety rules).

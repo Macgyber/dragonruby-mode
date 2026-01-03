@@ -98,7 +98,7 @@ Queries the `index.org` registry to match symbols to concepts.
 Defaults to showing the \\='definition\\=' section."
   (interactive)
   (if (not dragonruby-experimental-concepts-docs)
-      (message "🔒 Concept documentation is currently disabled (Experimental). Set `dragonruby-experimental-concepts-docs` to t to enable.")
+      (dragonruby--warn-in-development "Knowledge System (Docs)")
     (let* ((symbol (thing-at-point 'symbol t))
            (concept-file (when symbol (dragonruby-docs--find-concept-for-symbol symbol))))
       

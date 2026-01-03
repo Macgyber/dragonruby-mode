@@ -5,7 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.0] - 2026-01-03
+## [0.5.5] - 2026-01-03
+
+### 🧱 Final Modular Brick-Layer
+- **Core Refactor Completeness**: Moved Events and Registry into `src/core/`. The project root is now the "Brick-Layer" for all others.
+- **Dependency Elimination**: Absolute isolation between functional modules. Each part can be removed without affecting the mode's core stability.
+
+### 🤝 Transparency & Community
+- **Developer Mode Disclosure**: Added a "Micro-switches" section to the documentation for early-access testing.
+- **GitHub Issue Templates**: Standardized forms for Feature Requests and Experimental Feedback.
+- **Developer Documentation**: Revamped `CONTRIBUTING.md` to invite collaboration on "In Development" features.
+
+### 🧹 Clean Binaries Policy
+- **Byte-Compile Cleanup**: All `.elc` files are now deleted after audits/compilation tests to ensure a clean slate for users.
+
+## [0.5.4] - 2026-01-03
+
+### 🚧 User Safety & Clarity
+- **"In Development" Guard**: Implemented a standardized interactive warning system. Attempting to use experimental or disabled features now triggers a professional notice in Spanish with a "Close" button.
+- **Improved Fault Tolerance**: Activation errors in `dragonruby-mode` are now caught and reported via the interactive warning system instead of crashing silently.
+- **Interactive Color Guard**: Clicking on color swatches when the picker is disabled now informs the user about the feature's development status.
+
+## [0.5.3] - 2026-01-03
+
+### 🏗️ Architecture (Strict Isolation)
+- **Infrastructure Centralization**: Moved file extension definitions and project-wide asset knowledge to `src/core/dragonruby-assets.el`.
+- **Zero-Dependency Modules**: Refactored `paths` and `sprites` modules to remove cross-dependencies. They now communicate exclusively through the Core infrastructure.
+- **Backward Compatibility**: Maintained legacy aliases to ensure internal stability while moving to the new centralized model.
+
+## [0.5.2] - 2026-01-03
+
+### 🔍 Context-Aware Completion
+- **Intelligent Filtering**: The Path completion system now recognizes code context (`.sprites`, `.labels`, `.require`, etc.).
+- **Sprite-Only Mode**: Automatically filters out Ruby and Data files when a sprite-like path or context is detected, drastically reducing autocomplete noise.
+- **Simplified UI**: Autocomplete lists are now shorter and 100% relevant to the current typing context.
+
+## [0.5.1] - 2026-01-03
 
 ### 🖼️ Image Tools (Aesthetic & Logic Overhaul)
 - **Fluid & Adaptive UI**: Implementation of a "Liquid" header-line. Buttons and labels now dynamically shrink (`VIEW` -> `V` -> 👁️) and spacings collapse based on window width to prevent UI overflow.

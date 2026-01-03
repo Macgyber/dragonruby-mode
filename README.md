@@ -17,168 +17,110 @@ It is built for people who believe the editor should amplify thought, not interr
 
 ## 🏗️ Architecture
 
-**This package uses a fault-tolerant micro-module architecture with a Multi-channel Real-time Engine.**
+**This package uses a strict Fault-Tolerant Micro-Module architecture with Centralized Core Infrastructure.**
 
 | Module | Responsibility | Status |
 |--------|---------------|--------|
-| `dragonruby-colors` | RGB/Hex color visualization | ✅ Stable |
-| `dragonruby-sprites` | Image previews & navigation | ✅ Stable |
-| `dragonruby-paths` | `require`/`load` navigation | ✅ Stable |
-| `dragonruby-image-tools` | Image manipulation tools | 🟡 Beta |
-| `dragonruby-docs` | Built-in Documentation System | 🚧 In Development |
-| `dragonruby-concepts` | Keyword documentation links | 🚧 In Development |
+| `dragonruby-core` | Central knowledge (Assets, Projects, Events, Utils) | 🧱 Solid |
+| `dragonruby-colors` | RGB/Hex color visualization & Interactive Guards | ✅ Stable |
+| `dragonruby-sprites` | Image previews & navigation (Dependency-free) | ✅ Stable |
+| `dragonruby-paths` | Context-aware `require`/`load` navigation | ✅ Stable |
+| `dragonruby-image-tools` | Image manipulation tools & Timeline Navigation | 🟡 Beta |
+| `dragonruby-docs` | Built-in Knowledge System | 🚧 In Dev |
+| `dragonruby-concepts` | Keyword documentation links | 🚧 In Dev |
 
 ### Key Architectural Features:
-*   **Multi-channel Debounce**: Independent timers for Paths, Colors, and Sprites prevent collision and ensure instant reactivity while typing.
-*   **Buffer-Local Root Caching**: Zero disk I/O for project detection after the first scan.
-*   **LSP-Safe Integration**: Completion-at-point functions use `depth 100` and `:exclusive 'no'`, integrating seamlessly with Corfu, Company, or Ivy without hijacking your LSP.
-*   **Standard-Compliant**: Uses native Emacs overlays and standard `match-data` protection for a crash-free experience.
-
-**Users should only require `dragonruby-mode`**. Internal modules are managed automatically.
+*   **Strict Modular Isolation**: Modules *never* depend on each other. Disabling "Sprites" won't break "Paths". All shared logic resides in `src/core/`.
+*   **Infrastructure Facade**: `dragonruby-assets` acts as the single source of truth for file extensions and asset relationships.
+*   **Multi-channel Debounce**: Independent timers for different scan types ensure zero lag and prevent collisions.
+*   **Safety Guards**: Standardized interactive warnings for experimental or disabled features. No more silent failures.
 
 ---
 
-## What This Mode Does NOT Do
-
-- ❌ **It is not an IDE** — no project management, no build systems
-- ❌ **It does not replace LSP** — language intelligence belongs to LSP
-- ❌ **It does not interfere with completion** — runs at depth 100, uses `:exclusive 'no`
-- ❌ **It does not introduce popups** — uses overlays and minibuffer only
-
----
-
-## ✅ Stable Features
+## 🟢 Stable Features
 
 ### 🎨 Semantic Colors
-Detects, visualizes, and **edits** real DragonRuby color values directly in your code.
-
-```ruby
-[255, 0, 0]            # Arrays (RGB)
-[0, 255, 0, 128]       # Arrays (RGBA) with Transparency
-0xFF00FF               # Hexadecimal
-{ r: 255, g: 0, b: 0 } # Hashes
-```
-
-**Interaction (In Development)**: 
-- A visual color box `■` appears next to the value.
-- *Coming soon: Click to edit using a color picker.*
+Detects and visualizes real DragonRuby color values directly in your code.
+- **Visual Swatches**: High-contrast icons that scale with your font.
+- **Transparency Aware**: Proper blending for `[r,g,b,a]` and `{r:_, a:_}` values.
+- **Interactive Guard**: Clicking a color swatch in stable mode provides a clear "In Development" notice for the picker.
 
 ### 🖼️ Semantic Sprites
-Visualizes your game assets immediately.
+Visualizes your game assets immediately without leaving the code.
+- **Validation**: Cyan = Valid, Red = Missing, Orange = Unsupported.
+- **Hybrid Source Finder**: Automatically detects if a `.png` has a source `.aseprite` in the directory or `art/` folder.
+- **Deep Zoom**: Miniatures scale dynamically with Emacs text-zoom for total accessibility.
 
-- **Inline Thumbnails**: Tiny preview next to the filename (scales with zoom)
-- **Validation**: Cyan = Valid, Red = Missing, Orange = Unsupported
-- **Click to Open**: Opens file in Emacs image viewer
-- **Hover Tooltip**: Shows format and file size
+### 🗺️ Context-Aware Navigation (The Law)
+Turns your code into a hypertext web. Marks valid paths with **blue bold** styling.
 
-### 🗺️ Smart Path Navigation
-Turns your code into a hypertext web. **Real-time detection** marks valid paths with blue bold styling as you type.
+| Logic | Context Detection | Autocomplete Result |
+|-------|-------------------|---------------------|
+| `require` | Code requiring scripts | **Universal**: All files (app, lib, data, root) |
+| `.sprites` | Sprite assignments | **Strict**: Only images in `sprites/` |
+| `path:` | Hash property | **Strict**: Only images in `sprites/` |
+| `read_file`| Data loading | **Strict**: Only files in `data/` |
 
-| Shortcut | Action |
-|----------|--------|
-| `req` + `TAB` / `C-M-i` | Expands to `require ""` with cursor inside |
-| `C-M-i` (in string) | Universal Autocomplete (Lists all `.rb`, `.png`, `.json`, etc.) |
-| `C-c o` | **Global Jump:** Search and open any project file |
-| `RET` / **Click** | Follow the "Link" to open the target file |
-
-**Visual Feedback:**
-- **Blue Bold**: Valid project path. Interactive.
-- **Red Wave**: Broken link or missing file.
-
-**Available Snippets:**
-| Trigger | Expansion | Context |
-|---------|-----------|---------|
-| `req` | `require ""` | Ruby Code |
-| `reqr` | `require_relative ""` | Ruby Code |
-| `load` | `load ""` | Ruby Code |
-| `read` | `$gtk.read_file ""` | Data Files |
-| `json` | `$gtk.parse_json_file ""` | JSON Assets |
-| `script` | `load_script ""` | DragonRuby Script |
-| `spr` | `"sprites/.png"` | Assets |
-
-> **Universal Autocomplete**: Unlike other tools, our autocompletion doesn't filter by context — if you're inside quotes, you can pick *any* file in your project, from code to sound effects.
-
-### 🖼️ Image Tools
-When viewing images in a DragonRuby project, a **Fluid & Adaptive Toolbar** appears:
-- **Responsive Design**: UI automatically shrinks labels (`TRANSFORM` -> `T` -> 🧱) on small windows.
-- **Timeline Navigation**: Versioned `Back (<)` and `Forward (>)` navigation with automatic snapshotting.
-- **Accordion Logic**: Intelligent auto-collapse of menu groups to maximize space.
-- **Debug Room (INF)**: Toggles a high-contrast background to reveal hidden transparent margins.
-- **Magick Studio**: Professional tools (Trim, Compress, 2x Scaling, Grayscale, etc.) using `magick`.
-- **Deep Jump**: Right-click `[Edit]` to quickly switch between external editors (Aseprite, Photoshop, etc.).
-
-> Requires [ImageMagick](https://imagemagick.org/script/download.php#gsc.tab=0) installed.
+**Snippets & Interaction (The "Double C-M-i" Workflow):**
+- **Type `png` + `C-M-i`**: Expands to `".png"`.
+- **Press `C-M-i` again**: **Instant List** of all `.png` files in `sprites/`.
+- **Select**: Substitutes the filter with the full path: `"sprites/coin.png"`.
+- `C-c o`: **Global Jump**. Search and open *any* project file.
+- `RET` / **Click**: Follow the link or open the asset in the Emacs viewer.
 
 ---
 
-## 🚧 In Development
+## 🟡 Beta & Experimental (Developer Mode)
 
-### 🧠 Semantic Concepts
-Keywords like `args`, `state`, `inputs`, and `outputs` are highlighted.
-- Currently: Visual underline only
-- Coming: Click to open documentation
+We believe in radical transparency. Unfinished features are available in the codebase for developers who want to help us test.
 
-> This feature requires `docs/concepts/` org files which are not yet complete.
-
----
-
-## 🔮 Roadmap
-
-- **learnDR-mode**: Educational mode with Org-mode integration 🚧 *In Development*
-- **Hyper-Symbol Navigation**: `M-.` to jump to concept definitions 🚧 *In Development*
-
----
-
-## Installation
-
-Install using your preferred Emacs package manager (Straight, Doom, etc.).
-
-Then enable the mode:
+### 🧪 Unlocking the "Artist Portal"
+Add these to your configuration to enable early-access tools:
 
 ```elisp
-(add-hook 'ruby-mode-hook #'dragonruby-maybe-enable)
-(add-hook 'ruby-ts-mode-hook #'dragonruby-maybe-enable)
+(setq dragonruby-enable-picker t)             ; Interactive Color Picker ■
+(setq dragonruby-experimental-smart-jump t)   ; Jump to .aseprite from .png
+(setq dragonruby-experimental-concepts-docs t); Deep Documentation System (Org)
 ```
 
-### Configuration
-
-```elisp
-;; Enable/disable specific features
-(setq dragonruby-enable-colors t)       ; ✅ Stable
-(setq dragonruby-enable-sprites t)      ; ✅ Stable
-(setq dragonruby-enable-paths t)        ; ✅ Stable
-(setq dragonruby-enable-image-tools t)  ; 🟡 Beta
-(setq dragonruby-enable-docs nil)       ; 🚧 In Development
-(setq dragonruby-enable-concepts nil)   ; 🚧 In Development
-```
-
-> For detailed manual installation steps per OS, see [docs/INSTALLATION.md](docs/INSTALLATION.md).
+### 🖼️ Adaptive Image Tools
+When viewing images, a **Fluid Toolbar** appears:
+- **Responsive Design**: UI labels shrink (`TRANSFORM` -> `T`) on small windows.
+- **Timeline Navigation**: `Back (<)` and `Forward (>)` with automatic snapshotting.
+- **Debug Stage (INF)**: High-contrast background to reveal transparent margins.
 
 ---
 
-## Project Contract
+## 🔮 Roadmap (The "Ilusionamos" Section)
 
-Dragonruby-mode follows this contract:
-
-1. **Structure is stable** — Core files won't be reshuffled without justification.
-2. **Minor-mode first** — Always remains a buffer-local minor-mode.
-3. **No UI creep** — Visuals must remain overlays. No panels, no popups.
-4. **LSP is sacred** — Never replaces or interferes with LSP responsibilities.
-5. **Non-Interference Rule** — All CAPFs use `:exclusive 'no` and depth 100.
-6. **Visual Overlay Policy** — strictly follows the "Good Citizen" protocol (see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)).
-7. **Semantic over features** — New features must add meaning, not noise.
-
-> ⚠️ **Breaking this contract requires discussion, not impulse.**
+- **Hyper-Symbol Navigation**: `M-.` to jump to concept definitions 🚧
+- **learnDR-mode**: Educational mode with interactive Org-mode tutorials 🚧
+- **Real-time Pixel Sync**: Live updates between Aseprite and Emacs 🔮
 
 ---
 
-## Documentation
+## 🤝 Community & Feedback
 
-- [Technical Architecture](docs/ARCHITECTURE.md)
-- [Module Contract](docs/CONTRACT.md)
-- [Keyboard Shortcuts](docs/SHORTCUTS.md)
-- [Image Editor](docs/IMAGE_EDITOR.md)
-- [Installation](docs/INSTALLATION.md)
+We use **GitHub Issue Templates** to keep everything organized:
+- **💡 Solicitud de Mejora**: Have an idea? Fill out our structured feature request.
+- **🧪 Experimental Feedback**: Testing Dev Mode? Tell us what worked and what didn't.
+
+---
+
+---
+
+## 📚 Docs & Standards
+
+Explore the deep technical details and contribution guidelines:
+
+| Documentation | Description |
+|---------------|-------------|
+| 🛠️ [Installation](docs/INSTALLATION.md) | OS-specific manual setup guide. |
+| 🗺️ [Shortcuts](docs/SHORTCUTS.md) | Full cheatsheet for navigation and editing. |
+| 🧱 [Architecture](docs/ARCHITECTURE.md) | Explaining the "Brick-Layer" core refactor. |
+| 🛡️ [Project Contract](docs/CONTRACT.md) | Core rules (No UI Creep, LSP is Sacred). |
+| 🎨 [Image Editor](docs/IMAGE_EDITOR.md) | In-depth guide to ImageMagick tools. |
+| 🚧 [Contributing](docs/CONTRIBUTING.md) | How to help us test Developer Mode. |
 
 ---
 

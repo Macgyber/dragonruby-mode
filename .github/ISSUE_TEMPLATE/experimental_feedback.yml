@@ -1,0 +1,37 @@
+name: "🧪 Feedback de Funciones Experimentales"
+description: "Reporta tu experiencia probando los Feature Flags de desarrollo"
+title: "[LAB] <Función probada - Feedback>"
+labels: ["experimental", "feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por ser un Early Adopter! Tu feedback nos ayuda a mover estas funciones a la rama estable.
+  - type: dropdown
+    id: feature
+    attributes:
+      label: "¿Qué característica estabas probando?"
+      options:
+        - "Selector de Color (dragonruby-enable-picker)"
+        - "Smart Jump (dragonruby-experimental-smart-jump)"
+        - "Living Documentation (dragonruby-experimental-concepts-docs)"
+        - "Otro / Varios"
+    validations:
+      required: true
+  - type: textarea
+    id: experience
+    attributes:
+      label: "¿Cómo fue tu experiencia?"
+      description: "¿Funcionó como esperabas? ¿Qué te gustaría cambiar?"
+    validations:
+      required: true
+  - type: textarea
+    id: bug-dev
+    attributes:
+      label: "¿Encontraste algún error técnico?"
+      description: "Si algo falló o tiró error, pega el mensaje aquí."
+  - type: textarea
+    id: ideas
+    attributes:
+      label: "Sugerencias para esta función"
+      description: "¿Cómo podríamos hacer que esta función sea 'imprescindible'?"

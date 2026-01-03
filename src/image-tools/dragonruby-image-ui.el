@@ -27,8 +27,8 @@
   (cdr (assoc system-type dragonruby-external-editor-presets)))
 
 (defun dragonruby-select-external-editor ()
-  "Prompt the user to select an external editor from categorized presets.
-Includes direct web links for downloading tools, matching the sprite system philosophy."
+  "Select an external editor from categorized presets.
+Includes direct web links for downloading tools."
   (interactive)
   (if (active-minibuffer-window)
       (message "Minibuffer is already in use!")
@@ -110,7 +110,7 @@ Includes direct web links for downloading tools, matching the sprite system phil
 
 (defun dragonruby--toggle-ui-group (group)
   "Toggle a UI GROUP visibility and refresh header-line.
-Implements Accordion logic: opening one group closes the others to prevent overflow."
+Accordion logic: opening one group closes others to prevent overflow."
   (let* ((target-var (intern (concat "dragonruby--ui-group-" group)))
          (target-state (not (symbol-value target-var))))
     ;; Close all groups first
@@ -143,8 +143,8 @@ FULL is the desktop text, COMPACT is for laptops, ICON is for tiny screens."
      (t             (format " %s " icon)))))
 
 (defun dragonruby--make-header-button (label action help &optional face)
-  "Create a clickable button string with high visibility and professional dark theme.
-Reverted to Adobe Pro style: consistent dark background with neon labels."
+  "Create a clickable button string with high visibility.
+Consistent dark background with neon labels."
   (let* ((btn-bg "#282C34")
          (default-fg "#FFFFFF")
          (label-fg (or (plist-get face :foreground) default-fg)))

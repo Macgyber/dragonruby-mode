@@ -2,6 +2,8 @@
 
 (require 'dragonruby-color-utils)
 
+(declare-function dragonruby-color-picker-edit "dragonruby-color-picker" (start end format))
+
 (defvar-local dragonruby--color-overlays nil
   "List of active color overlays in the current buffer. (Legacy tracker)")
 
@@ -11,13 +13,13 @@
   :group 'dragonruby-colors)
 
 (defun dragonruby--clear-color-overlays ()
-  "Remove all color overlays from the current buffer using the \\='dragonruby-color property."
+  "Remove color overlays using the \\='dragonruby-color property."
   (remove-overlays (point-min) (point-max) 'dragonruby-color t)
   (setq dragonruby--color-overlays nil))
 
 (defun dragonruby--make-color-overlay (start end r g b &optional a format)
   "Create a color overlay for the range [START, END].
-R, G, B, A are color components (0-255). FORMAT is ignored (kept for API compatibility)."
+R, G, B, A are color components (0-255). FORMAT is ignored."
   (ignore format)
   (when (dragonruby--valid-rgba-p r g b a)
     (cl-destructuring-bind (rr gg bb)
@@ -31,6 +33,14 @@ R, G, B, A are color components (0-255). FORMAT is ignored (kept for API compati
                        :box (:line-width -1 :color "grey50")))
         (overlay-put ov 'priority dragonruby-colors-overlay-priority)
         (overlay-put ov 'dragonruby-color t)
+        (overlay-put ov 'keymap 
+                     (let ((map (make-sparse-keymap)))
+                       (define-key map [mouse-1] 
+                         (lambda () (interactive) 
+                           (if (bound-and-true-p dragonruby-enable-picker)
+                               (dragonruby-color-picker-edit start end nil) ;; format nil for now
+                             (dragonruby--warn-in-development "Selector de Color Interactivo"))))
+                       map))
         (push ov dragonruby--color-overlays)))))
 
 (provide 'dragonruby-color-visuals)

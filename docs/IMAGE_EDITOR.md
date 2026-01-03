@@ -60,20 +60,19 @@ Palette and tone modifications.
 |-----|--------|--------|----------|
 | `g` | `Gry`  | **Grayscale**| Convert sprite to B&W. |
 | `n` | `Inv`  | **Invert**   | Invert all color channels. |
-| `NBG`| `NBG`  | **No BG**    | Remove solid white backgrounds. |
-| `Tint`| `Tint` | **Tint**     | Apply a color wash (50% blend). |
+| `w` | `NBG`  | **No BG**    | Remove solid white backgrounds. |
+| `T` | `Tint` | **Tint**     | Apply a color wash (Minibuffer). |
 
 ### 📂 SYSTEM (Control & Meta)
 Internal state and external connections.
 
 | Key | Button | Action | Function |
 |-----|--------|--------|----------|
-| `i` | `Info` | **Debug** | Toggles metadata **PLUS** a "Visual Ray-X" mode. |
+| `i` | `Info` | **Debug** | Toggles metadata + Dark Background. |
 | `c` | `Crop` | **Crop**  | Numerical cropping (W H X Y). |
-| `T` | `Tint` | **Tint**  | Tint image with a specific color. |
-| `p` | `PNG`  | **PNG**   | Convert any file type to PNG. |
+| `p` | `PNG`  | **PNG**   | Export to PNG format. |
 | `R` | `RST`  | **Reset** | Hard Reset to Original version. |
-| `e` | `Edit` | **Artist Portal**| Selection menu with local editors + Web download links. |
+| `e` | `Edit` | **Artist Portal**| External editors & Web download links. |
 
 ---
 

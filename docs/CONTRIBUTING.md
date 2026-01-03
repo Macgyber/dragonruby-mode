@@ -16,6 +16,23 @@ Thank you for your interest in contributing! This document explains how to parti
 3. Mention if you use Doom/Spacemacs/vanilla
 4. Include a minimal reproducible example if possible
 
+## 🚧 Developer Mode & Experimental Features
+
+We don't hide our kitchen. Some features are shipped in the codebase but disabled by default to maintain stability. If you want to help us test, look at these "Micro-switches":
+
+### Enabling Experimental Features
+
+Add these to your `init.el` or `config.el` to unlock early-access tools:
+
+| Feature Flag | Description | Status |
+|--------------|-------------|--------|
+| `(setq dragonruby-enable-picker t)` | **Interactive Color Picker**: Click color boxes to edit. | 🟡 Beta |
+| `(setq dragonruby-experimental-smart-jump t)` | **Smart Source Jump**: Opens `.aseprite` from previews. | 🧪 Experimental |
+| `(setq dragonruby-experimental-concepts-docs t)` | **Living Documentation**: Symlinks code to `.org` docs. | 🧪 Experimental |
+
+### Your Feedback is Gold
+If you enable these and find a bug or have an idea, please use the **Experimental Feedback** template when opening an issue.
+
 ## Pull Requests
 
 ### Before submitting:

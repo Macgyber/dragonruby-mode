@@ -18,20 +18,5 @@ If TYPE is \\='require_relative, resolve relative to current file."
     (when (and path base-dir)
       (expand-file-name path base-dir))))
 
-(defun dragonruby--collect-project-files (&optional type)
-  "Return project files relative to root.
-TYPE can be \\='ruby, \\='data, or nil for all."
-  (let* ((root (dragonruby--find-project-root))
-         (ruby-exts dragonruby-ruby-extensions)
-         (data-exts dragonruby-data-extensions)
-         (extensions (pcase type
-                       ('ruby ruby-exts)
-                       ('data data-exts)
-                       (_ (append ruby-exts data-exts))))
-         (pattern (concat "\\.\\(" (regexp-opt extensions) "\\)$")))
-    (when (and root (file-directory-p root))
-      (let ((files (directory-files-recursively root pattern)))
-        (mapcar (lambda (f) (file-relative-name f root)) files)))))
-
 (provide 'dragonruby-path-fs)
 ;;; dragonruby-path-fs.el ends here

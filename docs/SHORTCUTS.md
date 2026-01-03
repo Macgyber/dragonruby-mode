@@ -111,34 +111,63 @@ Emacs uses its own notation for keys. Here's how to read it:
 ### Sprites
 | Notation | Keys | Action |
 |----------|------|--------|
-| `C-M-i` | Ctrl+Alt+i | Autocomplete sprite path (inside `"sprites/"`) |
-| `RET` | Enter | Open sprite in Emacs image viewer |
-| `C-c RET` | Ctrl+c, Enter | Open sprite (alternative) |
+| `C-M-i` | Ctrl+Alt+i | Smart Complete (Images only in `.sprites` context) |
+| `RET` | Enter | Open sprite source file (Aseprite/PNG) |
 | `C-c p` | Ctrl+c, p | Preview sprite in popup |
-| `mouse-1` | Left click | Open sprite in Emacs image viewer |
+| `S-mouse-1` | Shift + Click | Quick preview popup |
+| `mouse-1` | Left click | Open sprite in Emacs |
 
-### Paths (Smart Navigation)
+### Paths & Assets (The Law of Formats)
 | Notation | Keys | Action |
 |----------|------|--------|
 | **Snippets** | | |
-| `req` + `C-M-i` | Type req, Ctrl+Alt+i | Expands to `require ""` |
-| `reqr` + `C-M-i` | Type reqr, Ctrl+Alt+i | Expands to `require_relative ""` |
-| `load` + `C-M-i` | Type load, Ctrl+Alt+i | Expands to `load ""` |
-| `read` + `C-M-i` | Type read, Ctrl+Alt+i | Expands to `read_file("")` |
-| `json` + `C-M-i` | Type json, Ctrl+Alt+i | Expands to `parse_json_file("")` |
+| `req` + `C-M-i` | Type `req`, `C-M-i` | Expands to `require ""` |
+| `reqr` + `C-M-i`| Type `reqr`, `C-M-i`| Expands to `require_relative ""` |
+| `load` + `C-M-i`| Type `load`, `C-M-i`| Expands to `load ""` |
+| `script` + `C-M-i`| Type `script`, `C-M-i`| Expands to `load_script ""` |
+| `read` + `C-M-i`| Type `read`, `C-M-i`| Expands to `$gtk.read_file ""` |
+| `json` + `C-M-i`| Type `json`, `C-M-i`| Expands to `$gtk.parse_json_file ""` |
+| `spr` + `C-M-i` | Type `spr`, `C-M-i` | **Universal Sprite Filter** (`""`) |
+| `sou` + `C-M-i` | Type `sou`, `C-M-i` | **Audio Filter** (`".wav"`) |
 | **Inside Quotes** | | |
-| `C-M-i` | Ctrl+Alt+i | Open minibuffer file picker |
-| `C-c o` | Ctrl+c, o | Open any project file |
-| `RET` | Enter | Follow underlined path |
-| `C-c RET` | Ctrl+c, Enter | Follow path (alternative) |
-| `mouse-1` | Left click | Follow underlined path |
+| `C-M-i` | `Ctrl+Alt+i` | **The Law**: Instant list of files filtered by context. |
+| `C-c o` | `C-c o` | **Global Jump**: Open any file in the project. |
+| `RET` / `mouse-1` | Click/Enter | Follow underlined path or open image in Emacs. |
+
+---
+
+## 🚀 The workflow: "Double C-M-i" (PUM!)
+
+DragonRuby Mode uses a high-speed completion system called **"The Law"**.
+
+1. **Step 1 (The Snippet)**: Type `spr` and press `C-M-i`. It expands into empty quotes `""`.
+2. **Step 2 (The PUM!)**: Press `C-M-i` again **immediately**. 
+3. **The Result**: A clean, instant list appears in the minibuffer showing ALL images in `sprites/`.
+4. **Select**: Type a few letters or use arrows to pick your file. The system replaces your snippet with the correct project path: `"sprites/player.png"`.
+
+---
+
+## 🛠️ Adding your own Snippets
+
+You can add your own snippets to the system using the `dragonruby-registry`. Add this to your `.emacs` or `init.el`:
+
+```elisp
+(with-eval-after-load 'dragonruby-path-snippets
+  (dragonruby-registry-register 'user-snippets
+    '(:snippets (("mya"  . "args.outputs.sprites << ")
+                 ("tile" . "{ x: 0, y: 0, w: 128, h: 128, path: \"\" }")
+                 ("msg"  . "puts \"\"")))))
+```
+
+*Note: If your snippet contains `""`, the cursor will automatically move inside the quotes.*
+
+---
 
 ### Colors
 | Notation | Keys | Action |
 |----------|------|--------|
-| `RET` | Enter on `■` | Open color picker |
-| `C-c RET` | Ctrl+c, Enter on `■` | Open color picker (alternative) |
-| `mouse-1` | Left click on `■` | Open color picker |
+| `mouse-1` | Click on `■` | Open picker or Show Safety Warning |
+| `RET` | Enter on `■` | Open picker or Show Safety Warning |
 
 ### Mode Control
 | Notation | Keys | Action |
@@ -168,7 +197,9 @@ Emacs uses its own notation for keys. Here's how to read it:
 | Key | Button | Action |
 |-----|--------|--------|
 | `t` | `Trim` | Remove empty margins |
-| `z` | `Zip` | Compress image |
+| `z` | `Zip` | Compress image & Strip Metadata |
+| `2` | `2x` | Scale 2x (Optimized for Pixel Art) |
+| `5` | `.5` | Scale 0.5x |
 | `h` | `<>` | Flip Horizontal |
 | `v` | `/\` | Flip Vertical |
 
@@ -177,13 +208,16 @@ Emacs uses its own notation for keys. Here's how to read it:
 |-----|--------|--------|
 | `g` | `Gry` | Grayscale |
 | `n` | `Inv` | Invert Colors (Negative) |
+| `w` | `NBG` | Remove Solid Background |
+| `T` | `Tint` | Tint with color |
 
-### 📂 SYSTEM (Tools & Reset)
+### 📂 SYSTEM (Tools & Artist Portal)
+| Key | Button | Action |
+|-----|--------|--------|
 | `i` | `Info` | Toggle Info & Debug Stage |
-| `c` | `Crop` | Numerical Crop (Minibuffer) |
-| `T` | `Tint` | Tint with color (Minibuffer) |
-| `e` | `Edit` | **Artist Portal** (Editors + Web Links) |
-| `p` | `PNG` | Convert to PNG |
+| `c` | `Crop` | Numerical Crop |
+| `e` | `Edit` | Artist Portal |
+| `p` | `PNG` | Export to PNG |
 
 > Requires [ImageMagick](https://imagemagick.org) for advanced operations.
 
@@ -198,4 +232,4 @@ Emacs uses its own notation for keys. Here's how to read it:
 
 ---
 
-*DragonRuby Emacs Mode — v0.5.0*
+*DragonRuby Emacs Mode — v0.5.7*

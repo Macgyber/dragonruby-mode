@@ -8,9 +8,18 @@
     (audio . "audio")
     (code . "app")))
 
-(defconst dragonruby-image-exts '("png" "bmp" "jpg" "jpeg"))
-(defconst dragonruby-audio-exts '("wav" "ogg" "mp3"))
-(defconst dragonruby-code-exts  '("rb"))
+(defconst dragonruby-image-exts '("png" "bmp" "jpg" "jpeg" "gif")
+  "Supported image extensions for DragonRuby.")
+(defconst dragonruby-audio-exts '("wav" "ogg" "mp3")
+  "Supported audio extensions for DragonRuby.")
+(defconst dragonruby-code-exts  '("rb")
+  "Ruby source extensions for DragonRuby.")
+(defconst dragonruby-data-exts  '("json" "txt" "csv" "tsv" "xml" "yml" "yaml")
+  "Standard data and metadata extensions.")
+
+;; Unify with legacy names for backward compatibility across all modules
+(defvar dragonruby-supported-sprites dragonruby-image-exts)
+(defvar dragonruby-unsupported-sprites '("svg" "psd" "xcf" "ase" "aseprite"))
 
 (defcustom dragonruby-sprite-source-extensions '(".aseprite" ".ase" ".psd" ".xcf" ".graphite")
   "List of source extensions to prioritize when opening a sprite."
@@ -50,5 +59,47 @@ Checks:
               (when (and (not found) (file-exists-p source-path))
                 (setq found source-path)))))))
     found))
+
+(defun dragonruby--collect-project-files (&optional type)
+  "Return project files relative to root.
+Strictly limits search directories based on TYPE:
+- \\='ruby   : app/, lib/
+- \\='data   : data/
+- \\='sprite : sprites/
+- \\='audio  : sounds/
+- nil     : all standard directories."
+  (let* ((root (dragonruby--find-project-root))
+         (standard-dirs (pcase type
+                          ('ruby   '("app" "lib" "data" "sprites")) ; Universal Law
+                          ('data   '("data"))
+                          ('sprite '("sprites"))
+                          ('audio  '("sounds"))
+                          (_       '("app" "data" "lib" "sprites" "sounds"))))
+         (ruby-exts dragonruby-code-exts)
+         (sprite-exts (if (boundp 'dragonruby-supported-sprites)
+                          (append dragonruby-supported-sprites dragonruby-unsupported-sprites)
+                        dragonruby-image-exts))
+         (data-exts dragonruby-data-exts)
+         (extensions (pcase type
+                       ('ruby   (append ruby-exts sprite-exts data-exts dragonruby-audio-exts)) ; Law
+                       ('data   data-exts)
+                       ('sprite sprite-exts)
+                       ('audio  dragonruby-audio-exts)
+                       (_       (append ruby-exts sprite-exts data-exts dragonruby-audio-exts))))
+         (pattern (concat "\\.\\(" (regexp-opt extensions) "\\)$")))
+    (when (and root (file-directory-p root))
+      (let (all-files)
+        ;; 1. Collect files from specific subdirectories (recursively)
+        (dolist (dir standard-dirs)
+          (let ((full-dir (expand-file-name dir root)))
+            (when (file-directory-p full-dir)
+              (setq all-files (append all-files 
+                                     (directory-files-recursively full-dir pattern))))))
+        ;; 2. Always collect files from the root (main.rb, etc.)
+        (setq all-files (append all-files 
+                               (directory-files root t pattern t)))
+        ;; Convert to relative paths and remove duplicates/directories
+        (mapcar (lambda (f) (file-relative-name f root))
+                (cl-remove-if #'file-directory-p (delete-dups all-files)))))))
 
 (provide 'dragonruby-assets)

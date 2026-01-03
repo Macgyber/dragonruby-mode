@@ -1,0 +1,33 @@
+name: "💡 Solicitud de Mejora / Feature Request"
+description: "Sugiere una idea o mejora para DragonRuby Mode"
+title: "[FEAT] <Resumen de la mejora>"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por querer mejorar DragonRuby Mode! Describe tu idea con el mayor detalle posible.
+  - type: textarea
+    id: problem
+    attributes:
+      label: "¿Qué problema resuelve esta mejora?"
+      description: "Explica por qué esta característica es necesaria."
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: "Describe la solución que imaginas"
+      description: "Una descripción clara y concisa de lo que quieres que suceda."
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternativas consideradas"
+      description: "Describe cualquier solución alternativa o característica que hayas considerado."
+  - type: textarea
+    id: context
+    attributes:
+      label: "Contexto adicional"
+      description: "Añade aquí cualquier otra captura de pantalla o fragmento de código que ayude a entender la idea."

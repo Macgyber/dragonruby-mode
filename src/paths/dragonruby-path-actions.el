@@ -4,16 +4,48 @@
 (require 'dragonruby-path-fs)
 (require 'dragonruby-path-snippets)
 (require 'dragonruby-path-overlay)
+(require 'dragonruby-path-completion)
 
 (defun dragonruby-smart-complete ()
-  "Smart completion for paths.
-1. Try to expand a snippet (req, reqr, etc.)
-2. If inside a string, trigger the completion-at-point system."
+  "Smart completion for DragonRuby paths (The Law).
+Flow: req -> C-M-i (expand) -> C-M-i (Minibuffer List).
+
+This command strictly follows the requested workflow:
+1. Expands snippets if point is after a keyword (e.g., \\='req\\=').
+2. Triggers a minibuffer file selector with formatted candidates."
   (interactive)
-  (unless (dragonruby--try-expand-snippet)
-    (if (dragonruby--inside-string-p)
-        (completion-at-point)
-      (message "💡 Escribe 'req' y presiona C-M-i para insertar require"))))
+  ;; ESCUDO: Don't try to open a minibuffer if we are already in one
+  (if (minibufferp)
+      (minibuffer-complete)
+    (unless (dragonruby--try-expand-snippet)
+      (if (dragonruby--inside-string-p)
+          (let ((context (dragonruby--path-context)))
+            (if (not context)
+                (message "💡 Point is not inside a valid path")
+              (let* ((start (nth 0 context))
+                     (end (nth 1 context))
+                     (type (nth 2 context))
+                     (initial (buffer-substring-no-properties start end))
+                     ;; THE LAW: Respect context type (ruby, data, or sprite)
+                     (raw-candidates (dragonruby--collect-project-files type))
+                     ;; Create visual mapping
+                     (display-map (make-hash-table :test 'equal))
+                     (display-candidates
+                      (mapcar (lambda (path)
+                                (let* ((ext (or (file-name-extension path) "??"))
+                                       (display (format ".%-4s | %s" (downcase ext) path)))
+                                  (puthash display path display-map)
+                                  display))
+                              raw-candidates))
+                     ;; ULTRA-MINIMALIST: No labels, no clutter. Just the list.
+                     (prompt " ")
+                     ;; INSTANT LIST
+                     (choice (minibuffer-with-setup-hook
+                                 (lambda () (minibuffer-completion-help))
+                               (completing-read prompt display-candidates nil t initial))))
+                (when (and choice (gethash choice display-map))
+                  (delete-region start end)
+                  (insert (gethash choice display-map))))))))))
 
 (defun dragonruby-open-project-path ()
   "Open any supported project file using the minibuffer."

@@ -44,78 +44,47 @@ We never "win" visual wars.
 - ❌ No "stealing" of global keybindings.
 - ❌ No modifications to the buffer string (`inhibit-modification-hooks` is respected).
 
-## System Architecture
+## System Architecture (v0.5.5 Refactor)
+
+The system is now driven by a **Strict Modular Isolation** model. Logic for discovering files and assets has been moved from individual modules to the **Core Infrastructure**.
 
 ```text
 src/
-├── core/                    ;; CORE INFRASTRUCTURE
-│   ├── dragonruby-project.el   ;; Root finding
-│   ├── dragonruby-utils.el     ;; Helpers (debounce)
-│   ├── dragonruby-assets.el    ;; Asset rules
-│   └── dragonruby-events.el    ;; Event bus
-├── colors/                  ;; COLOR SUBSYSTEM
-│   ├── dragonruby-color-scanner.el ;; Regex logic (Hex/RGB/Hash/Alpha)
-│   ├── dragonruby-color-visuals.el ;; Overlays + Box Rendering
-│   ├── dragonruby-color-picker.el  ;; Interactive Edit Logic
-│   └── dragonruby-color-utils.el   ;; Math
-├── concepts/                ;; CONCEPT DOCUMENTATION (In Development)
-│   └── dragonruby-concept-visuals.el
-├── image-tools/             ;; EDITOR SUBSYSTEM
-│   ├── dragonruby-image-modify.el  ;; ImageMagick wrappers
-│   ├── dragonruby-image-view.el    ;; UI Controls
-│   └── dragonruby-image-ui.el      ;; Header/Buttons
-├── paths/                   ;; NAVIGATION SUBSYSTEM
-│   ├── dragonruby-path-model.el    ;; Data (extensions, snippets)
-│   ├── dragonruby-path-fs.el       ;; File System
-│   ├── dragonruby-path-snippets.el ;; Snippet expansion
-│   ├── dragonruby-path-overlay.el  ;; Overlays
-│   └── dragonruby-path-actions.el  ;; Interactive commands
-├── sprites/                 ;; SPRITE SUBSYSTEM
-│   ├── dragonruby-sprite-model.el
-│   ├── dragonruby-sprite-fs.el
-│   ├── dragonruby-sprite-overlay.el
-│   ├── dragonruby-sprite-completion.el
-│   └── dragonruby-sprite-actions.el
-├── dragonruby-mode.el       ;; ENTRY POINT
-├── dragonruby-core.el       ;; CORE FACADE
-├── dragonruby-colors.el     ;; COLOR FACADE
-├── dragonruby-sprites.el    ;; SPRITE FACADE
-├── dragonruby-paths.el      ;; PATH FACADE
-├── dragonruby-image-tools.el;; IMAGE FACADE
-├── dragonruby-concepts.el   ;; CONCEPT FACADE
-└── dragonruby-docs.el       ;; DOCS SYSTEM (In Development)
+├── core/                    ;; CORE INFRASTRUCTURE (Brick Layer)
+│   ├── dragonruby-project.el   ;; Root finding & caching
+│   ├── dragonruby-assets.el    ;; THE ENGINE: Extension knowledge & File collection
+│   ├── dragonruby-utils.el     ;; OS-level helpers, Debounce, & Safety Warnings
+│   ├── dragonruby-events.el    ;; Lightweight event bus
+│   └── dragonruby-registry.el  ;; Concept Census
+├── colors/                  ;; COLOR SUBSYSTEM (Consumer)
+├── image-tools/             ;; EDITOR SUBSYSTEM (Consumer)
+├── paths/                   ;; NAVIGATION SUBSYSTEM (Consumer)
+├── sprites/                 ;; SPRITE SUBSYSTEM (Consumer)
+├── dragonruby-mode.el       ;; Entry Point & Activation Guardian
+└── ... facades ...
 ```
 
 ## Module Breakdown
 
-### 1. Core (`src/core/`)
-**Responsibility**: Foundation of the universe.
-- **Projects**: Knowing where `app/main.rb` is.
-- **Assets**: Knowing that `.png` implies a `.aseprite` source exists nearby.
-- **Utils**: Debounce function for efficient rescanning.
+### 1. Core (`src/core/`) - The Single Source of Truth
+**Responsibility**: Foundation and shared intelligence.
+- **Projects**: Detects `app/main.rb`. Transparent caching prevents disk thrashing.
+- **Assets**: **The Engine**. Centralizes *all* file extensions (`.png`, `.rb`, `.json`). All modules ask this module for project files.
+- **Utils**: Standardized "In Development" warning system.
+- **Isolation Rule**: Modules (Paths, Sprites, Colors) *NEVER* depend on each other. They only depend on the Core.
 
 ### 2. Colors (`src/colors/`)
-**Responsibility**: Paint and Edit.
-- **Scanner**: Detects `[255, 0, 0, 128]`, `0xFF...`, `{r:...}`.
-- **Visuals**: Draws the background overlay AND the interactive `■` box.
-- **Picker**: Handles user input to modify the code in-place, respecting the original format.
+**Responsibility**: Visualization & Editing.
+- **Interaction**: If the interactive picker is disabled, it triggers a Core safety warning.
 
 ### 3. Paths (`src/paths/`)
-**Responsibility**: Navigate code structure and data files.
-- **Model**: Extension lists, snippet definitions.
-- **FS**: Resolve paths, collect project files.
-- **Snippets**: Expand `req` → `require ""`.
-- **Overlay**: Underline clickable paths.
-- **Actions**: Smart complete command, open project file.
-- **NOTE**: Uses minibuffer (NOT CAPF) to avoid LSP conflicts.
+**Responsibility**: Hypertext Navigation.
+- **Context-Awareness**: Detects if your cursor is near `.sprites`, `.labels`, or `require` and asks the Core Assets engine for the specific file types allowed in that context.
 
 ### 4. Sprites (`src/sprites/`)
-**Responsibility**: Asset visualization.
-- **Model**: Supported image extensions.
-- **FS**: Find sprites in project.
-- **Overlay**: Inline thumbnails, clickable paths.
-- **Completion**: CAPF for `sprites/` paths (depth 100, exclusive no).
-- **Actions**: Jump to source file.
+**Responsibility**: Visual Anchors.
+- **Model**: Pure metadata. Now lightweight as file discovery is handled by the Core.
+- **Overlay**: Inline thumbnails and source-jumping logic.
 
 ### 5. Image Tools (`src/image-tools/`)
 **Responsibility**: Content Modification.
@@ -151,3 +120,15 @@ All overlays support:
 - **Colors**: Modify `dragonruby-colors.el` to add named colors
 - **Sprites**: Add extensions to `dragonruby-sprite-source-extensions`
 - **Paths**: Add extensions to `dragonruby-data-extensions`
+
+## 🚀 Snippet & Completion Registry (v0.5.7)
+
+The completion system is now driven by a centralized **Snippet Registry** (`dragonruby-registry.el`). 
+
+- **Modular Registration**: Each module (Sprites, Audio, Paths) registers its own snippets during initialization.
+- **Context-Aware Completion**: `dragonruby-smart-complete` acts as a high-level router:
+  1. It first attempts to expand a snippet at the cursor.
+  2. If already inside a string, it detects the **Context Type** (`'ruby`, `'sprite`, `'data'`).
+  3. It queries the Core Assets engine for valid files and provides an **Instant List** in the minibuffer.
+- **The Law of Formats**: Candidates are formatted as `.ext | path` to ensure immediate visual identification of asset types.
+- **Extensible**: Users can register their own snippets by calling `dragonruby-registry-register` under the ID `'user-snippets`.

@@ -79,12 +79,18 @@ Designed for high-frequency execution during typing."
       (goto-char (point-min))
       (while (re-search-forward "\"\\([^\"\n!]+\\.[a-z0-9]+\\)\"" nil t)
         (let* ((raw (match-string 1))
-               (ext (file-name-extension raw))
+               (ext (downcase (or (file-name-extension raw) "")))
                (start (match-beginning 0))
                (end (match-end 0)))
-          (when (and ext (member (downcase ext) dragonruby-data-extensions))
+          (cond
+           ;; Image Files (The new Sprite Law)
+           ((member ext dragonruby-image-exts)
+            (let ((abs (dragonruby--resolve-path raw 'sprite)))
+              (dragonruby--make-path-overlay start end abs (file-exists-p abs))))
+           ;; Data Files
+           ((member ext dragonruby-data-extensions)
             (let ((abs (dragonruby--resolve-path raw 'data)))
-              (dragonruby--make-path-overlay start end abs (file-exists-p abs)))))))))
+              (dragonruby--make-path-overlay start end abs (file-exists-p abs))))))))))
 
 (provide 'dragonruby-path-overlay)
 ;;; dragonruby-path-overlay.el ends here
