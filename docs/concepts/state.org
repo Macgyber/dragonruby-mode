@@ -1,0 +1,38 @@
+* State
+:PROPERTIES:
+:ID: state
+:TYPE: concept
+:STATUS: stable
+:END:
+
+** 🧠 Concept
+**State** is a dynamic OpenStruct inside `args` used to store persistent game data frame-to-frame. 
+It allows you to define properties on the fly without creating classes.
+
+** ❓ What problem it solves
+Eliminates the boilerplate of defining classes for simple game entities or global variables. It persists automatically.
+
+** 🛠️ Usage
+Accessed via `args.state`. Properties are created upon assignment (`||=`).
+
+** 📝 Minimal Example
+#+begin_src ruby
+def tick args
+  # Initialize only once using ||=
+  args.state.player ||= { x: 0, y: 0, hp: 100 }
+  
+  # Access and modify freely
+  args.state.player.x += 1
+end
+#+end_src
+
+** ⚠️ Common Errors
+- **Resetting state**: Forgetting to use `||=` causes state to reset every tick (frame).
+- **Typos**: `args.state.plaeyr` will act as a new variable returning `nil`, not raise an error.
+
+** 🔗 Semantic Relations
+- [[id:args][Args]]
+
+** 🧠 Mental State
+- [ ] I understand `||=` is crucial for initialization.
+- [ ] I can store simple data in `args.state`.

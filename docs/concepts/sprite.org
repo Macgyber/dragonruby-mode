@@ -1,0 +1,69 @@
+#+TITLE: Sprite
+#+CONCEPT: sprite
+#+MODULE: rendering
+#+DR_VERSION: 5.x
+#+STATUS: stable
+
+* Sprite
+:PROPERTIES:
+:ID: sprite
+:KIND: concept
+:MODULE: rendering
+:DOC: sprite.org
+:SEARCH_TERMS: spr sprite image png
+:END:
+
+** What it is
+:PROPERTIES:
+:NAV-TARGET: definition
+:END:
+A Sprite is a 2D image rendered on screen using explicit coordinates and dimensions.
+
+** What it’s used for
+:PROPERTIES:
+:NAV-TARGET: intention
+:END:
+It is used to represent characters, objects, backgrounds, and interactive visual elements.
+
+** Minimal form
+:PROPERTIES:
+:NAV-TARGET: example
+:END:
+#+begin_src ruby
+args.outputs.sprites << {
+  x: 0, y: 0,
+  w: 64, h: 64,
+  path: "sprites/player.png"
+}
+#+end_src
+
+** Real usage
+:PROPERTIES:
+:NAV-TARGET: usage
+:END:
+In a typical game, sprites are updated on every tick to reflect movement, animation, or state.
+
+** Common errors
+:PROPERTIES:
+:NAV-TARGET: error
+:END:
+- Using incorrect paths (check for typos or missing directories).
+- Drawing outside the viewport (coordinates must be within 1280x720).
+- Forgetting dimensions (width and height are mandatory for correct scaling).
+
+** Semantic relationships
+:PROPERTIES:
+:NAV-TARGET: relation
+:END:
+- args
+- state
+- color
+- coordinates
+
+** State
+:PROPERTIES:
+:NAV-TARGET: state
+:END:
+- [ ] Seen
+- [ ] Understood
+- [ ] Mastered

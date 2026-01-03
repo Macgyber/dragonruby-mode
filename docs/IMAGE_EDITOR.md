@@ -1,12 +1,12 @@
-# Image Editor
+# Image Editor 🖼️
 
-DragonRuby Emacs Mode includes a built-in image editor that appears when you open any image file in a DragonRuby project.
+DragonRuby Emacs Mode includes a sophisticated, professional image toolset designed for rapid asset iteration. It provides a non-destructive workflow directly within your Emacs image-view buffers.
 
 ## Requirements
 
-**For basic features (view, rotate):** No dependencies
+**Basic Features (View, Rotate):** No external dependencies.
 
-**For advanced features (trim, resize, compress):** [ImageMagick](https://imagemagick.org)
+**Advanced Features (Trim, Resize, Compress, etc.):** Requires [ImageMagick](https://imagemagick.org/script/download.php#gsc.tab=0).
 
 ### Installing ImageMagick
 
@@ -14,85 +14,92 @@ DragonRuby Emacs Mode includes a built-in image editor that appears when you ope
 |--------|---------|
 | Windows | Download from [imagemagick.org](https://imagemagick.org/script/download.php#windows) |
 | macOS | `brew install imagemagick` |
-| Linux | `apt install imagemagick` or `pacman -S imagemagick` |
+| Linux | `apt install imagemagick` |
 
-## Toolbar Buttons
+---
 
-### View Controls
+## 🌊 Fluid & Adaptive UI
 
-| Button | Function |
-|--------|----------|
-| `[+]` | Zoom in |
-| `[-]` | Zoom out |
-| `[1:1]` | Reload image (reset all transformations) |
-| `[Rot]` | Rotate 90° |
-| `[Info]` | Toggle metadata display |
-| `[Edit]` | Open in external editor |
+The image toolbar is **responsive** and **context-aware**:
+- **Accordion Logic**: Opening one tool group automatically collapses others, keeping the interface clean.
+- **Dynamic Labels**: Labels automatically shrink (`VIEW` -> `V` -> 👁️) and spacings collapse to prevent UI overflow on smaller windows or split-screen views.
+- **Active Context**: Group headers "light up" (background color change) when expanded so you always know which area you're working in.
 
-### ImageMagick Operations
+---
 
-| Button | Function |
-|--------|----------|
-| `[Trim]` | Remove transparent/white edges |
-| `[Zip]` | Compress image |
-| `[2x]` | Double image size |
-| `[.5]` | Half image size |
-| `[<>]` | Flip horizontal |
-| `[/\]` | Flip vertical |
-| `[Gry]` | Convert to grayscale |
-| `[Inv]` | Invert colors |
-| `[NoBG]` | Remove white background |
-| `[Crop]` | Crop image (W H X Y) |
-| `[Tint]` | Tint image with a specific color |
-| `[PNG]` | Convert current file to PNG format |
+## Tool Groups
 
-### Safety Features
+### 📂 VIEW (Camera & Timeline)
+Focuses on how you see the asset and its history.
 
-| Button | Function |
-|--------|----------|
-| `[Undo]` | Revert to previous state (restores backup) |
+| Key | Button | Action | Function |
+|-----|--------|--------|----------|
+| `<` | `<` | **Back** | Travel backward in the edit timeline. |
+| `>` | `>` | **Forward**| Travel forward (Redo) in the edit timeline. |
+| `+` | `+` | **Zoom In**| Scale up the visual preview. |
+| `-` | `-` | **Zoom Out**| Scale down the visual preview. |
+| `1:1`| `1:1`| **Reset** | Reset zoom and reload original view. |
+| `r`  | `Rot`| **Rotate**| Rotate preview 90°. |
 
-> ℹ️ **Note**: Operations create a local `.bak` file. You can press `[Undo]` to restore the original image.
+### 📂 TRANSFORM (Geometry)
+Pixel-perfect scaling and flipping.
 
-## Custom External Editor
+| Key | Button | Action | Function |
+|-----|--------|--------|----------|
+| `t` | `Trim` | **Trim** | Removes transparent/white excess margins. |
+| `z` | `Zip` | **Compress**| Optimizes image size (strips metadata). |
+| `2x`| `2x`   | **Double** | 2x Sharp Scale (uses `-filter point`). |
+| `.5`| `.5`   | **Half**   | 0.5x Scale. |
+| `h` | `<>`   | **Flip H** | Mirror horizontally. |
+| `v` | `/\`   | **Flip V** | Mirror vertically. |
 
-Set your preferred image editor in your `init.el`:
+### 📂 COLOR (Adjustments)
+Palette and tone modifications.
 
+| Key | Button | Action | Function |
+|-----|--------|--------|----------|
+| `g` | `Gry`  | **Grayscale**| Convert sprite to B&W. |
+| `n` | `Inv`  | **Invert**   | Invert all color channels. |
+| `NBG`| `NBG`  | **No BG**    | Remove solid white backgrounds. |
+| `Tint`| `Tint` | **Tint**     | Apply a color wash (50% blend). |
+
+### 📂 SYSTEM (Control & Meta)
+Internal state and external connections.
+
+| Key | Button | Action | Function |
+|-----|--------|--------|----------|
+| `i` | `Info` | **Debug** | Toggles metadata **PLUS** a "Visual Ray-X" mode. |
+| `c` | `Crop` | **Crop**  | Numerical cropping (W H X Y). |
+| `T` | `Tint` | **Tint**  | Tint image with a specific color. |
+| `p` | `PNG`  | **PNG**   | Convert any file type to PNG. |
+| `R` | `RST`  | **Reset** | Hard Reset to Original version. |
+| `e` | `Edit` | **Artist Portal**| Selection menu with local editors + Web download links. |
+
+---
+
+## 🎞️ Non-Destructive Timeline
+
+Every change you make (Trim, Rotate, Color) is **versioned**.
+- **Snapshots**: Every edit saves a copy to a hidden `.dr_history` directory inside your project.
+- **Safety**: You can navigate through *every* step of your session using the `<` and `>` buttons. 
+- **Persistence**: The history is project-scoped, ensuring you can undo even after closing a session.
+
+---
+
+## 🛠️ Configuration
+
+### External Editor Presets
+You can select between presets like Aseprite, Photoshop, or GIMP by **Right-Clicking** the `[Edit]` button.
+
+To set a global default in `init.el`:
 ```elisp
-;; Windows example (Graphite)
-(setq dragonruby-external-image-editor "C:/Program Files/Graphite/Graphite.exe")
-
-;; macOS example (Aseprite)
 (setq dragonruby-external-image-editor "/Applications/Aseprite.app/Contents/MacOS/aseprite")
 ```
 
-If not set, `[Edit]` uses your system's default application.
-
-## Smart Source Jumping
-
-When you click on a sprite path (e.g., `"sprites/player.png"`) in your code, Dragonruby-mode can automatically look for the *source file* instead of the compiled image.
-
-By default, it checks for: `.aseprite`, `.graphite`, `.psd`, and `.xcf`.
-
-**Configuration:**
-
+### Smart Source Jumping
+If enabled, clicking a sprite path in code looks for the *source* (e.g., `.aseprite`, `.psd`) first.
 ```elisp
-;; Add or remove extensions to prioritize
-(setq dragonruby-sprite-source-extensions '(".aseprite" ".graphite" ".psd" ".xcf" ".kra"))
+(setq dragonruby-experimental-smart-jump t)
 ```
 
-If `sprites/player.aseprite` exists (or is found in the `art/` folder), clicking `"sprites/player.png"` will open the `.aseprite` file in your system's default editor (e.g., Aseprite). If no source is found, it opens the `.png` as usual.
-
-> 💡 **Pro Tip**: To keep your project clean, we recommend storing source files in an `art/` folder at the root of your project.
->
-> **Recommended Structure:**
-> - `mygame/sprites/hero.png`  (Used in code, exported asset)
-> - `mygame/art/hero.aseprite` (Source file - Detected automatically!)
-
-## Metadata Display
-
-The header shows: `FORMAT WIDTHxHEIGHT SIZE`
-
-Example: `PNG 32x32 1.5KB`
-
-Toggle with `[Info]` button.
+> 💡 **Pro Tip**: Use the **[Info]** button to reveal "Invisible" margins before using **[Trim]**. This ensures your sprite collisions are exactly as big as the artwork they represent.

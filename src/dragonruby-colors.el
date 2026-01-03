@@ -1,138 +1,48 @@
-;;; dragonruby-colors.el --- Professional Color Scanning (Refactored) -*- lexical-binding: t; -*-
-
-(require 'cl-lib)
+;;; dragonruby-colors.el --- Smart Color Scanning (RGBA-aware, Non-Intrusive) -*- lexical-binding: t; -*-
 
 (require 'dragonruby-core)
+(require 'dragonruby-color-utils)
+(require 'dragonruby-color-visuals)
+(require 'dragonruby-color-scanner)
 
-(defvar-local dragonruby--color-overlays nil
-  "List of color overlays in the current buffer.")
+(defgroup dragonruby-colors nil
+  "Color visualization for DragonRuby."
+  :group 'tools)
 
-
-;; --- OVERLAYS ---
-
-(defun dragonruby--clear-color-overlays ()
-  (mapc #'delete-overlay dragonruby--color-overlays)
-  (setq dragonruby--color-overlays nil))
-
-(defun dragonruby--get-contrast-color (r g b)
-  (if (< (+ (* r 0.299) (* g 0.587) (* b 0.114)) 128) "white" "black"))
-
-(defun dragonruby--rgb-to-hex (r g b)
-  (format "#%02x%02x%02x" (min 255 (max 0 r)) (min 255 (max 0 g)) (min 255 (max 0 b))))
-
-(defun dragonruby--make-color-overlay (start end r g b)
-  (let ((ov (make-overlay start end))
-        (hex (dragonruby--rgb-to-hex r g b))
-        (contrast (dragonruby--get-contrast-color r g b)))
-    (overlay-put ov 'face `(:background ,hex :foreground ,contrast :box (:line-width -1 :color "grey50")))
-    (overlay-put ov 'dragonruby-color t)
-    (push ov dragonruby--color-overlays)))
-
-(defun dragonruby--make-simple-overlay (start end hex)
-  (let ((ov (make-overlay start end)))
-    (overlay-put ov 'face `(:background ,hex :box (:line-width -1 :color "grey50")))
-    (overlay-put ov 'dragonruby-color t)
-    (push ov dragonruby--color-overlays)))
-
-;; --- SCANNERS ---
-
-(defun dragonruby--process-hash-match (match-start limit)
-  "Helper to process a potential hash starting at MATCH-START."
-  ;; Determine context (one-line vs multiline)
-  (let* ((matches '())
-          (r nil) (g nil) (b nil))
-
-    (save-excursion
-      (goto-char match-start)
-      ;; Search for r, g, b, and optional comma
-      (while (re-search-forward "\\b\\([rgb]\\):?\\s-*\\([0-9]+\\)\\s-*\\(,\\)?" limit t)
-        (push (list (match-beginning 0) (match-end 0) 
-                    (match-string 1) 
-                    (string-to-number (match-string 2))) 
-              matches))
-      
-      ;; Verify we have all three components
-      (dolist (m matches)
-        (cond
-         ((string= (nth 2 m) "r") (setq r (nth 3 m)))
-         ((string= (nth 2 m) "g") (setq g (nth 3 m)))
-         ((string= (nth 2 m) "b") (setq b (nth 3 m)))))
-      
-      (when (and r g b)
-        (let ((start (apply #'min (mapcar #'car matches)))
-              (end (apply #'max (mapcar #'cadr matches))))
-          ;; Semantic Check: Are they contiguous? 
-          ;; If the total range length is close to the sum of match lengths (allowing for some whitespace),
-          ;; we paint it as a single block. Otherwise, fragments.
-          (if (< (- end start) (+ (apply #'+ (mapcar (lambda (m) (- (cadr m) (car m))) matches)) 10)) 
-              ;; CONTIGUOUS: Paint the whole RGB block as one unit
-              (dragonruby--make-color-overlay start end r g b)
-            ;; SCATTERED: Paint fragments
-            (dolist (m matches)
-              (dragonruby--make-color-overlay (nth 0 m) (nth 1 m) r g b))))
-        ;; Return the limit to advance the main loop
-        limit))))
-
-(defun dragonruby--scan-colors ()
-  (dragonruby--clear-color-overlays)
-  (save-excursion
-    
-    ;; 1. ARRAYS
-    (goto-char (point-min))
-    (while (re-search-forward "\\[\\s-*\\([0-9]+\\)\\s-*,\\s-*\\([0-9]+\\)\\s-*,\\s-*\\([0-9]+\\)\\(?:\\s-*,\\s-*\\([0-9]+\\)\\)?\\s-*\\]" nil t)
-      (dragonruby--make-color-overlay (match-beginning 0) (match-end 0) 
-                                      (string-to-number (match-string 1))
-                                      (string-to-number (match-string 2))
-                                      (string-to-number (match-string 3))))
-
-    ;; 2. HEX
-    (goto-char (point-min))
-    (while (re-search-forward "0x\\([0-9A-Fa-f]\\{6\\}\\)" nil t)
-      (let* ((hex-str (match-string 1))
-             (r (string-to-number (substring hex-str 0 2) 16))
-             (g (string-to-number (substring hex-str 2 4) 16))
-             (b (string-to-number (substring hex-str 4 6) 16)))
-        (dragonruby--make-color-overlay (match-beginning 0) (match-end 0) r g b)))
-
-
-
-    ;; 4. HASHES (Refactored)
-    (goto-char (point-min))
-    (while (re-search-forward "\\b\\([rgb]\\):" nil t)
-      (let* ((start-pos (match-beginning 0))
-             ;; Find limit (brace or arbitrary)
-             (brace-end (save-excursion (ignore-errors (up-list 1) (point))))
-             (limit (if brace-end (min brace-end (+ (point) 300)) (+ (point) 300))))
-        
-        ;; Avoid double-processing if overlay exists
-        (unless (cl-some (lambda (ov) (and (<= (overlay-start ov) start-pos)
-                                           (>= (overlay-end ov) start-pos)))
-                         dragonruby--color-overlays)
-          
-          (let ((new-pos (dragonruby--process-hash-match start-pos limit)))
-            (when new-pos
-              (goto-char new-pos))))))))
-
-(defun dragonruby--after-color-change (_beg _end _len)
-  "Debounced color scanning after buffer change."
-  (dragonruby--debounce #'dragonruby--scan-colors 0.3))
+(defun dragonruby--after-color-change (beg end _len)
+  "Trigger color scan after buffer change with debounce.
+Cleans up overlays in the entire modified line factor to avoid 'visual ghosts' 
+of orphaned overlays in multiline hashes or arrays."
+  (save-match-data
+    (let ((line-beg (save-excursion (goto-char beg) (line-beginning-position)))
+          (line-end (save-excursion (goto-char end) (line-end-position))))
+      (remove-overlays line-beg line-end 'dragonruby-color t)))
+  (dragonruby--debounce 'colors #'dragonruby--scan-colors 0.25))
 
 (defun dragonruby--refresh-colors ()
-  "Refresh color overlays when buffer becomes visible."
-  (when (and dragonruby-color-blocks-mode
+  "Refresh colors when window configuration changes."
+  (when (and (bound-and-true-p dragonruby-color-blocks-mode)
              (eq (current-buffer) (window-buffer)))
     (dragonruby--scan-colors)))
 
+;;;###autoload
 (define-minor-mode dragonruby-color-blocks-mode
-  "Smart color highlighting."
+  "Passive color visualization for DragonRuby buffers."
   :lighter ""
   (if dragonruby-color-blocks-mode
       (progn
-        (add-hook 'after-change-functions #'dragonruby--after-color-change nil t)
-        (add-hook 'window-configuration-change-hook #'dragonruby--refresh-colors nil t)
-        (dragonruby--scan-colors))
-    (remove-hook 'after-change-functions #'dragonruby--after-color-change t)
-    (remove-hook 'window-configuration-change-hook #'dragonruby--refresh-colors t)
+        (add-hook 'after-change-functions
+                  #'dragonruby--after-color-change nil t)
+        (add-hook 'window-configuration-change-hook
+                  #'dragonruby--refresh-colors nil t)
+        ;; The initial scan is triggered after a short delay to ensure buffer is ready
+        (run-with-idle-timer 0.1 nil (lambda () 
+                                       (when (bound-and-true-p dragonruby-color-blocks-mode)
+                                         (dragonruby--scan-colors)))))
+    (remove-hook 'after-change-functions
+                 #'dragonruby--after-color-change t)
+    (remove-hook 'window-configuration-change-hook
+                 #'dragonruby--refresh-colors t)
     (dragonruby--clear-color-overlays)))
 
 (provide 'dragonruby-colors)

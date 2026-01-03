@@ -1,0 +1,36 @@
+* Concept Registry
+
+This file acts as the central nervous system for DragonRuby concepts.
+The plugin queries this map to connect symbols to living documentation.
+
+* Sprite
+:PROPERTIES:
+:ID: sprite
+:MODULE: rendering
+:DOC: sprite.org
+:SEARCH_TERMS: spr sprite png jpg args.outputs.sprites
+:END:
+
+* Color
+:PROPERTIES:
+:ID: color
+:MODULE: rendering
+:DOC: color.org
+:SEARCH_TERMS: color rgb hex args.outputs.solids
+:END:
+
+* Args
+:PROPERTIES:
+:ID: args
+:MODULE: core
+:DOC: args.org
+:SEARCH_TERMS: args tick inputs state outputs
+:END:
+
+* State
+:PROPERTIES:
+:ID: state
+:MODULE: core
+:DOC: state.org
+:SEARCH_TERMS: args.state entity store
+:END:

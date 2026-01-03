@@ -27,11 +27,11 @@ def tick args
   s12 = :magenta
 
   # Hashes (Single & Multiline)
-  h1 = { r: 255, g: 255, b: 0 }
+  h1 = { r: 25, g: 255, b: 100 }
   
   h2 = {
     r: 100,
-    g: 100,
+    g: 200,
     b: 100
   }
 
@@ -39,8 +39,8 @@ def tick args
 
   # --- 2. SPRITES (FASE 2) --------------------------------
   # Valid Sprites (Hover to see preview / path)
-  args.outputs.sprites << { x: 0, y: 0, w: 100, h: 100, path: "sprites/image.png" }
-  args.outputs.sprites << { x: 100, y: 0, w: 100, h: 100, path: "sprites/image2.png" }
+  args.outputs.sprites << { x: 0, y: 0, w: 100, h: 100, path: "sprites/potion.png"}
+  args.outputs.sprites << { x: 100, y: 0, w: 100, h: 100, path: "sprites/enemy.png" }
 
   # Missing Sprite (Should be marked as error/red)
   args.outputs.sprites << { path: "sprites/missing.png" }
@@ -52,11 +52,21 @@ def tick args
   # This previously caused the entire hash to be highlighted. Now only r/g/b should be.
   width = 100
   height = 100
-  args.outputs.sprites << { x: 0, y: 0, w: width, h: height, path: :pixel, r: 0, g: 0, b: 0 }
+  args.outputs.sprites << { x: 0, y: 0, w: width, h: height, path: :pixel, r: 0, g: 110, b: 70 }
 
   # --- 3. NAVIGATION (FASE 3) -----------------------------
-  # Click or press RET on the string below to jump to file
+  # Ruby requires (clickable paths)
   require "app/conecto.rb"
+  require_relative "helpers/utils"
+  load "app/tick.rb"
+
+  # Data files (clickable if they exist)
+  config = read_file("data/config.json")
+  levels = read_file("data/levels.csv")
+  text   = read_file("data/dialogue.txt")
+
+  # Non-existent files (should show red underline)
+  missing = read_file("data/missing.yml")
 
   # Render Text
   args.outputs.labels << [640, 360, "DragonRuby Emacs Mode Test", 1, 1]

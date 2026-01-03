@@ -1,126 +1,72 @@
-;;; dragonruby-paths.el --- Universal Code & Data Navigation with Autocomplete -*- lexical-binding: t; -*-
+;;; dragonruby-paths.el --- Universal Code & Data Navigation (Facade) -*- lexical-binding: t; -*-
 
-(require 'cl-lib)
+;; RULE: NO CAPF. Uses minibuffer to avoid conflicts with LSP/Corfu/Company.
+;; Priority: User's installed plugins > DragonRuby > Native Emacs
+
 (require 'dragonruby-core)
+(require 'dragonruby-path-model "paths/dragonruby-path-model")
+(require 'dragonruby-path-fs "paths/dragonruby-path-fs")
+(require 'dragonruby-path-snippets "paths/dragonruby-path-snippets")
+(require 'dragonruby-path-overlay "paths/dragonruby-path-overlay")
+(require 'dragonruby-path-actions "paths/dragonruby-path-actions")
+(require 'dragonruby-path-completion "paths/dragonruby-path-completion")
 
-(defvar-local dragonruby--path-overlays nil
-  "List of path overlays in the current buffer.")
-(defvar dragonruby-data-extensions '("json" "txt" "csv" "tsv" "xml" "yml" "yaml"))
+(defvar dragonruby-enable-path-completion)
 
-;; --- PATH RESOLUTION ---
-;; Note: dragonruby--find-project-root is now in dragonruby-core.el
+;; --------------------------------------------------
+;; MODE HOOKS
+;; --------------------------------------------------
 
-(defun dragonruby--resolve-path (raw-path type)
-  (let* ((root (dragonruby--find-project-root))
-         (candidate (if (and (eq type 'ruby) (not (string-suffix-p ".rb" raw-path)))
-                        (concat raw-path ".rb")
-                      raw-path)))
-    (expand-file-name candidate root)))
-
-;; --- AUTOCOMPLETE (CAPF) for Requires ---
-(defun dragonruby--get-all-ruby-files ()
-  "Recursively find all .rb files."
-  (let* ((root (dragonruby--find-project-root))
-         (files (directory-files-recursively root "\\.rb$")))
-    (mapcar (lambda (f) 
-              ;; Remove extension for require '...' style
-              (file-name-sans-extension (file-relative-name f root))) 
-            files)))
-
-(defun dragonruby-path-completion-at-point ()
-  "CAPF backend for Ruby Requires."
-  (let ((state (syntax-ppss)))
-    (when (nth 3 state) ;; Inside string?
-      (save-excursion
-        (goto-char (nth 8 state)) ;; Go to start of string
-        (backward-sexp 1) ;; Jump back to see if previous word is 'require'
-        (when (looking-at-p "\\(?:require\\|require_relative\\|load\\)")
-          (let* ((start (nth 8 state))
-                 (_end (point)))
-             (list (1+ start) (nth 1 (syntax-ppss))
-                   (completion-table-dynamic
-                    (lambda (_) (dragonruby--get-all-ruby-files)))
-                   :exclusive 'no)))))))
-
-;; --- OVERLAYS ---
-(defun dragonruby--clear-path-overlays ()
-  (mapc #'delete-overlay dragonruby--path-overlays)
-  (setq dragonruby--path-overlays nil))
-
-(defun dragonruby--make-path-overlay (start end _text real-path type valid)
-  (let* ((is-error (and (eq type 'ruby) (not valid)))
-         (face-props (if valid 
-                         '(:foreground "#61AFEF" :underline t)
-                       (if is-error '(:foreground "#E06C75" :underline (:style wave :color "#E06C75")) nil)))
-         (help (if valid (format "Jump to: %s" (file-relative-name real-path))
-                 (if is-error "❌ Ruby file not found" nil))))
-    
-    (when face-props
-      (let ((ov (make-overlay start end)))
-        (overlay-put ov 'face face-props)
-        (overlay-put ov 'help-echo help)
-        (overlay-put ov 'dragonruby-path t)
-        (when valid
-          (overlay-put ov 'keymap 
-                       (let ((map (make-sparse-keymap)))
-                         (define-key map [mouse-1] (lambda () (interactive) (find-file real-path)))
-                         map))
-          (overlay-put ov 'mouse-face 'highlight))
-        (push ov dragonruby--path-overlays)))))
-
-;; --- SCANNING ---
-(defun dragonruby--scan-paths ()
-  (dragonruby--clear-path-overlays)
-  (save-excursion
-    (goto-char (point-min))
-    ;; 1. RUBY REQUIRES
-    (while (re-search-forward "\\(?:require\\|require_relative\\|load\\)\\s-*[( ]\\s-*[\"']\\([^\"']+\\)[\"']" nil t)
-      (let* ((raw-path (match-string 1))
-             (start (match-beginning 1))
-             (end (match-end 1))
-             (abs-path (dragonruby--resolve-path raw-path 'ruby))
-             (exists (file-exists-p abs-path)))
-        (when (or exists (string-prefix-p "app/" raw-path) (string-match-p "/" raw-path))
-          (dragonruby--make-path-overlay start end raw-path abs-path 'ruby exists))))
-
-    ;; 2. DATA FILES
-    (goto-char (point-min))
-    (while (re-search-forward "\"\\([^\"\n]+\\)\"" nil t)
-      (let* ((raw-path (match-string 1))
-             (start (match-beginning 1))
-             (end (match-end 1))
-             (ext (file-name-extension raw-path)))
-        (when (and ext (member (downcase ext) dragonruby-data-extensions))
-          (let* ((abs-path (dragonruby--resolve-path raw-path 'data))
-                 (exists (file-exists-p abs-path)))
-            (when exists
-              (dragonruby--make-path-overlay start end raw-path abs-path 'data t))))))))
-
-(defun dragonruby--after-path-change (_beg _end _len)
-  "Debounced path scanning after buffer change."
-  (dragonruby--debounce #'dragonruby--scan-paths 0.3))
+(defun dragonruby--after-path-change (beg end _len)
+  "Fast path scanning after buffer change for immediate keyboard feedback."
+  (save-match-data
+    (let ((line-beg (save-excursion (goto-char beg) (line-beginning-position)))
+          (line-end (save-excursion (goto-char end) (line-end-position))))
+      (remove-overlays line-beg line-end 'dragonruby-path t)))
+  (dragonruby--debounce 'paths #'dragonruby--scan-paths 0.05))
 
 (defun dragonruby--refresh-paths ()
   "Refresh path overlays when buffer becomes visible."
-  (when (and dragonruby-paths-mode
+  (when (and (boundp 'dragonruby-paths-mode) dragonruby-paths-mode
              (eq (current-buffer) (window-buffer)))
     (dragonruby--scan-paths)))
 
-(defun dragonruby--setup-path-capf ()
-  (add-hook 'completion-at-point-functions #'dragonruby-path-completion-at-point nil t))
+;; --------------------------------------------------
+;; KEYMAP
+;; --------------------------------------------------
+
+(defvar dragonruby-paths-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c o") #'dragonruby-open-project-path)
+    (define-key map (kbd "C-M-i") #'dragonruby-smart-complete)
+    map)
+  "Keymap for dragonruby-paths-mode.")
+
+;; --------------------------------------------------
+;; MODE DEFINITION
+;; --------------------------------------------------
 
 (define-minor-mode dragonruby-paths-mode
-  "Universal Navigation."
+  "DragonRuby passive path navigation (minibuffer-based, LSP-safe).
+
+Keybindings:
+  C-M-i   Complete path at point (inside string)
+  C-c o   Open any project file"
   :lighter ""
+  :keymap dragonruby-paths-mode-map
   (if dragonruby-paths-mode
       (progn
         (add-hook 'after-change-functions #'dragonruby--after-path-change nil t)
         (add-hook 'window-configuration-change-hook #'dragonruby--refresh-paths nil t)
-        (dragonruby--setup-path-capf)
-        (dragonruby--scan-paths))
+        (when dragonruby-enable-path-completion
+          (add-hook 'completion-at-point-functions #'dragonruby-path-completion-at-point 90 t))
+        (run-with-idle-timer 0.1 nil (lambda ()
+                                       (when (bound-and-true-p dragonruby-paths-mode)
+                                         (dragonruby--scan-paths)))))
     (remove-hook 'after-change-functions #'dragonruby--after-path-change t)
     (remove-hook 'window-configuration-change-hook #'dragonruby--refresh-paths t)
     (remove-hook 'completion-at-point-functions #'dragonruby-path-completion-at-point t)
     (dragonruby--clear-path-overlays)))
 
 (provide 'dragonruby-paths)
+;;; dragonruby-paths.el ends here

@@ -111,55 +111,79 @@ Emacs uses its own notation for keys. Here's how to read it:
 ### Sprites
 | Notation | Keys | Action |
 |----------|------|--------|
-| `C-M-i` | Ctrl+Alt+i | Autocomplete sprite path |
-| `RET RET` | Enter, Enter | Confirm selection |
-| `mouse-1` | Left click | Open sprite file |
-| (hover) | Mouse over | Preview image tooltip |
+| `C-M-i` | Ctrl+Alt+i | Autocomplete sprite path (inside `"sprites/"`) |
+| `RET` | Enter | Open sprite in Emacs image viewer |
+| `C-c RET` | Ctrl+c, Enter | Open sprite (alternative) |
+| `C-c p` | Ctrl+c, p | Preview sprite in popup |
+| `mouse-1` | Left click | Open sprite in Emacs image viewer |
 
-### Navigation (Paths)
+### Paths (Smart Navigation)
 | Notation | Keys | Action |
 |----------|------|--------|
-| `mouse-1` | Left click | Follow require/path |
-| `RET` | Enter | Open file at point |
+| **Snippets** | | |
+| `req` + `C-M-i` | Type req, Ctrl+Alt+i | Expands to `require ""` |
+| `reqr` + `C-M-i` | Type reqr, Ctrl+Alt+i | Expands to `require_relative ""` |
+| `load` + `C-M-i` | Type load, Ctrl+Alt+i | Expands to `load ""` |
+| `read` + `C-M-i` | Type read, Ctrl+Alt+i | Expands to `read_file("")` |
+| `json` + `C-M-i` | Type json, Ctrl+Alt+i | Expands to `parse_json_file("")` |
+| **Inside Quotes** | | |
+| `C-M-i` | Ctrl+Alt+i | Open minibuffer file picker |
+| `C-c o` | Ctrl+c, o | Open any project file |
+| `RET` | Enter | Follow underlined path |
+| `C-c RET` | Ctrl+c, Enter | Follow path (alternative) |
+| `mouse-1` | Left click | Follow underlined path |
+
+### Colors
+| Notation | Keys | Action |
+|----------|------|--------|
+| `RET` | Enter on `■` | Open color picker |
+| `C-c RET` | Ctrl+c, Enter on `■` | Open color picker (alternative) |
+| `mouse-1` | Left click on `■` | Open color picker |
 
 ### Mode Control
 | Notation | Keys | Action |
 |----------|------|--------|
 | `M-x dragonruby-mode` | Alt+x, type command | Toggle mode on/off |
-| `M-x eval-buffer` | Alt+x, type command | Reload current file |
+
+### Development (Local .emacs)
+| Notation | Keys | Action |
+|----------|------|--------|
+| `F5` | F5 | Reload local .emacs |
+| `F6` | F6 | Hot reload all plugin modules |
 
 ---
 
-## Image Editor (in image buffers)
+### 📂 VIEW (Camera & Timeline)
+| Key | Button | Action |
+|-----|--------|--------|
+| `<` or `,` | `<` | **Back** (Undo) |
+| `S-r` (R) | `RST` | **Hard Reset** (Original) |
+| `>` or `.` | `>` | **Forward** (Redo) |
+| `+` | `+` | Zoom In |
+| `-` | `-` | Zoom Out |
+| `1:1` | `1:1` | Reset Zoom & Reload |
+| `r` | `Rot` | Rotate 90° |
 
-When viewing an image in a DragonRuby project, a toolbar appears with these buttons:
+### 📂 TRANSFORM (Geometry)
+| Key | Button | Action |
+|-----|--------|--------|
+| `t` | `Trim` | Remove empty margins |
+| `z` | `Zip` | Compress image |
+| `h` | `<>` | Flip Horizontal |
+| `v` | `/\` | Flip Vertical |
 
-### View Controls
-| Button | Action |
-|--------|--------|
-| `[+]` | Zoom in |
-| `[-]` | Zoom out |
-| `[1:1]` | Reload image (reset) |
-| `[Rot]` | Rotate 90° |
-| `[Info]` | Toggle metadata display |
-| `[Edit]` | Open in external editor |
+### 📂 COLOR (Adjustments)
+| Key | Button | Action |
+|-----|--------|--------|
+| `g` | `Gry` | Grayscale |
+| `n` | `Inv` | Invert Colors (Negative) |
 
-### ImageMagick Operations
-| Button | Action |
-|--------|--------|
-| `[Trim]` | Remove transparent/white edges |
-| `[Zip]` | Compress image |
-| `[2x]` | Double size |
-| `[.5]` | Half size |
-| `[<>]` | Flip horizontal |
-| `[/\]` | Flip vertical |
-| `[Gry]` | Grayscale |
-| `[Inv]` | Invert colors |
-| `[NoBG]` | Remove white background |
-| `[Crop]` | Crop with params |
-| `[Tint]` | Tint with color |
-| `[PNG]` | Convert to PNG |
-| `[Undo]` | **Revert changes** |
+### 📂 SYSTEM (Tools & Reset)
+| `i` | `Info` | Toggle Info & Debug Stage |
+| `c` | `Crop` | Numerical Crop (Minibuffer) |
+| `T` | `Tint` | Tint with color (Minibuffer) |
+| `e` | `Edit` | **Artist Portal** (Editors + Web Links) |
+| `p` | `PNG` | Convert to PNG |
 
 > Requires [ImageMagick](https://imagemagick.org) for advanced operations.
 
@@ -174,4 +198,4 @@ When viewing an image in a DragonRuby project, a toolbar appears with these butt
 
 ---
 
-*DragonRuby Emacs Mode — v0.2.0*
+*DragonRuby Emacs Mode — v0.5.0*

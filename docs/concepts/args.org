@@ -1,0 +1,73 @@
+#+TITLE: Args
+#+CONCEPT: args
+#+MODULE: core
+#+DR_VERSION: 5.x
+#+STATUS: stable
+
+* Args
+:PROPERTIES:
+:ID: args
+:KIND: concept
+:MODULE: core
+:DOC: args.org
+:SEARCH_TERMS: args tick context
+:END:
+
+** What it is
+:PROPERTIES:
+:NAV-TARGET: definition
+:END:
+The **Args** object is the context passed to the Game Loop (`tick`). 
+It is a hash that carries the entire world state: inputs from the player, the state of the game, and the outputs to the screen.
+
+** What it’s used for
+:PROPERTIES:
+:NAV-TARGET: intention
+:END:
+It centralizes all side-effects (Input/Output) and State into a single object, making the game loop a pure function of `args`.
+
+** Minimal form
+:PROPERTIES:
+:NAV-TARGET: example
+:END:
+#+begin_src ruby
+def tick args
+  # Read Input
+  if args.inputs.mouse.click
+    args.state.clicked = true # Mutate State
+  end
+
+  # Render Output
+  args.outputs.labels << [640, 360, "Hello World"]
+end
+#+end_src
+
+** Real usage
+:PROPERTIES:
+:NAV-TARGET: usage
+:END:
+It is passed automatically by DragonRuby to the `tick` method every frame (60 times per second) and is the only global context needed.
+
+** Common errors
+:PROPERTIES:
+:NAV-TARGET: error
+:END:
+- **Typo in naming**: Using `arg` instead of `args`.
+- **Nil check**: Accessing deeply nested properties without checking if they exist (though `args.state` handles this gracefully).
+
+** Semantic relationships
+:PROPERTIES:
+:NAV-TARGET: relation
+:END:
+- state
+- sprite
+- inputs
+- outputs
+
+** State
+:PROPERTIES:
+:NAV-TARGET: state
+:END:
+- [ ] Seen
+- [ ] Understood
+- [ ] Mastered

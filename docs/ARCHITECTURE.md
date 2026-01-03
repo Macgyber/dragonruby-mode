@@ -9,60 +9,145 @@
    - **Paths**: Clickable hyperlinks
 3. **Project-Aware**: All lookups are resolved relative to the DragonRuby project root.
 4. **Buffer-Local**: Each buffer is isolated — no global state leakage.
+5. **Keyboard-First**: All features accessible via keyboard (`RET`, `C-c RET`), mouse is optional.
+6. **Visual Overlay Policy**: A non-invasive approach to semantic visualization.
+
+## 🧘 Visual Overlay Policy (The "Good Citizen" Protocol)
+
+DragonRuby Mode follows a strict "Observe and Paint" philosophy. It acts as a fine varnish over your code, never a reconstruction.
+
+### 🧠 1. Reactivity (Hooks)
+No polling or aggressive loops. We use native Emacs reactivity:
+- `after-change-functions`: Reacts only when you type or delete.
+- `window-configuration-change-hook`: Ensures visibility when switching buffers.
+
+### 🎨 2. Dynamic Painting (Overlays)
+Visuals are NOT text. They use Emacs **Overlays**:
+- **Non-destructive**: They live "above" the text. Deleting the overlay never deletes your code.
+- **Dynamic**: Created on-the-fly and destroyed immediately when no longer needed.
+- **Immediate Invalidation Rule**: Any text change within an overlay's range MUST invalidate that overlay immediately to avoid "visual ghosts" or stale information.
+- **LSP-Safe**: Overlays do not interfere with buffer contents, so LSP, `company`, and `corfu` see raw, clean code.
+
+### ⏳ 3. Rhythm (Debounce)
+We don't scan on every keystroke. We wait for the user to "breathe":
+- **Multi-channel Debounce**: Independent timers for Colors (0.25s), Sprites (0.15s), and Paths (0.05s).
+- **Efficiency**: Avoids lag and visual flickering.
+
+### 🤝 4. Coexistence (Priority)
+We never "win" visual wars. 
+- **Low Priority**: All overlays use `priority -50`.
+- **Logic**: If another plugin (like `rainbow-mode` or `lsp-semantic-tokens`) wants to paint a zone, they win. Our visuals stay underneath or yield.
+
+### 🚫 5. Non-Interference
+- ❌ No redefinition of `font-lock-keywords`.
+- ❌ No modification of `syntax-table`.
+- ❌ No "stealing" of global keybindings.
+- ❌ No modifications to the buffer string (`inhibit-modification-hooks` is respected).
+
+## System Architecture
+
+```text
+src/
+├── core/                    ;; CORE INFRASTRUCTURE
+│   ├── dragonruby-project.el   ;; Root finding
+│   ├── dragonruby-utils.el     ;; Helpers (debounce)
+│   ├── dragonruby-assets.el    ;; Asset rules
+│   └── dragonruby-events.el    ;; Event bus
+├── colors/                  ;; COLOR SUBSYSTEM
+│   ├── dragonruby-color-scanner.el ;; Regex logic (Hex/RGB/Hash/Alpha)
+│   ├── dragonruby-color-visuals.el ;; Overlays + Box Rendering
+│   ├── dragonruby-color-picker.el  ;; Interactive Edit Logic
+│   └── dragonruby-color-utils.el   ;; Math
+├── concepts/                ;; CONCEPT DOCUMENTATION (In Development)
+│   └── dragonruby-concept-visuals.el
+├── image-tools/             ;; EDITOR SUBSYSTEM
+│   ├── dragonruby-image-modify.el  ;; ImageMagick wrappers
+│   ├── dragonruby-image-view.el    ;; UI Controls
+│   └── dragonruby-image-ui.el      ;; Header/Buttons
+├── paths/                   ;; NAVIGATION SUBSYSTEM
+│   ├── dragonruby-path-model.el    ;; Data (extensions, snippets)
+│   ├── dragonruby-path-fs.el       ;; File System
+│   ├── dragonruby-path-snippets.el ;; Snippet expansion
+│   ├── dragonruby-path-overlay.el  ;; Overlays
+│   └── dragonruby-path-actions.el  ;; Interactive commands
+├── sprites/                 ;; SPRITE SUBSYSTEM
+│   ├── dragonruby-sprite-model.el
+│   ├── dragonruby-sprite-fs.el
+│   ├── dragonruby-sprite-overlay.el
+│   ├── dragonruby-sprite-completion.el
+│   └── dragonruby-sprite-actions.el
+├── dragonruby-mode.el       ;; ENTRY POINT
+├── dragonruby-core.el       ;; CORE FACADE
+├── dragonruby-colors.el     ;; COLOR FACADE
+├── dragonruby-sprites.el    ;; SPRITE FACADE
+├── dragonruby-paths.el      ;; PATH FACADE
+├── dragonruby-image-tools.el;; IMAGE FACADE
+├── dragonruby-concepts.el   ;; CONCEPT FACADE
+└── dragonruby-docs.el       ;; DOCS SYSTEM (In Development)
+```
 
 ## Module Breakdown
 
-### [`dragonruby-mode.el`](file:///e:/ANTIGRAVITY/dragonruby-emacs/packages/dragonruby-mode/dragonruby-mode.el) (Entry Point)
-- Defines the minor mode
-- Coordinates module loading
-- Provides activation/deactivation hooks
+### 1. Core (`src/core/`)
+**Responsibility**: Foundation of the universe.
+- **Projects**: Knowing where `app/main.rb` is.
+- **Assets**: Knowing that `.png` implies a `.aseprite` source exists nearby.
+- **Utils**: Debounce function for efficient rescanning.
 
-### [`src/dragonruby-core.el`](file:///e:/ANTIGRAVITY/dragonruby-emacs/packages/dragonruby-mode/src/dragonruby-core.el) (Project Utilities)
-- Finds project root (dominating file `app/main.rb` or `.dragonruby/`)
-- **Smart Source Finding**: Resolves source files (`.aseprite`, `.graphite`) in local or `art/` directories.
-- Provides shared utilities and configuration for all modules.
+### 2. Colors (`src/colors/`)
+**Responsibility**: Paint and Edit.
+- **Scanner**: Detects `[255, 0, 0, 128]`, `0xFF...`, `{r:...}`.
+- **Visuals**: Draws the background overlay AND the interactive `■` box.
+- **Picker**: Handles user input to modify the code in-place, respecting the original format.
 
-### [`src/dragonruby-colors.el`](file:///e:/ANTIGRAVITY/dragonruby-emacs/packages/dragonruby-mode/src/dragonruby-colors.el) (The Painter)
-- **Scanning**: Hybrid approach
-  - One-liners → Full block painting (contiguous RGB/RGBA)
-  - Multiline → Fragment painting (respects indentation)
-- **Data Source**: Reads palettes from `src/data/palettes.json`
+### 3. Paths (`src/paths/`)
+**Responsibility**: Navigate code structure and data files.
+- **Model**: Extension lists, snippet definitions.
+- **FS**: Resolve paths, collect project files.
+- **Snippets**: Expand `req` → `require ""`.
+- **Overlay**: Underline clickable paths.
+- **Actions**: Smart complete command, open project file.
+- **NOTE**: Uses minibuffer (NOT CAPF) to avoid LSP conflicts.
 
-### [`src/dragonruby-sprites.el`](file:///e:/ANTIGRAVITY/dragonruby-emacs/packages/dragonruby-mode/src/dragonruby-sprites.el) (The Asset Manager)
-- **Dual Visualization**:
-  1. Inline: 20px thumbnail via `after-string` overlay
-  2. Hover: 300px image via `help-echo`
-- **Autocomplete (CAPF)**: Scans `.png/.jpg` files in project
-- **Validation**: Cyan = Valid, Red = Missing, Orange = Unsupported
-- **Smart Jump**: Opens source files instead of sprites if available (Experimental).
+### 4. Sprites (`src/sprites/`)
+**Responsibility**: Asset visualization.
+- **Model**: Supported image extensions.
+- **FS**: Find sprites in project.
+- **Overlay**: Inline thumbnails, clickable paths.
+- **Completion**: CAPF for `sprites/` paths (depth 100, exclusive no).
+- **Actions**: Jump to source file.
 
-### [`src/dragonruby-image-tools.el`](file:///e:/ANTIGRAVITY/dragonruby-emacs/packages/dragonruby-mode/src/dragonruby-image-tools.el) (The Editor)
-- **Header Toolbar**: Appears when viewing images
-  - View controls: zoom, rotate, reset, info
-  - ImageMagick operations: trim, compress, resize, flip, effects
-  - **External Edit**: Delegates to Aseprite/Graphite/System Default via `dragonruby-core` logic.
+### 5. Image Tools (`src/image-tools/`)
+**Responsibility**: Content Modification.
+- Provides a toolbar when viewing images inside Emacs.
+- Wraps ImageMagick CLI to perform non-destructive edits (Trim, Crop, Flip).
 
-### [`src/dragonruby-paths.el`](file:///e:/ANTIGRAVITY/dragonruby-emacs/packages/dragonruby-mode/src/dragonruby-paths.el) (The Navigator)
-- **Universal Linker**: Scans for Ruby `require` and data files
-- **Interaction**: Creates clickable hyperlinks to open files
+### 6. Concepts (`src/concepts/`) - In Development
+**Responsibility**: Knowledge Connection.
+- Detects keywords like `args`, `outputs`, `tick`.
+- Applies subtle interactive underlines for documentation lookups.
 
-## Execution Flow
+## Execution Flow (Multi-channel Real-time)
 
 ```
-User types → after-change-functions (debounced 0.3s)
-          → Scanners run (colors, sprites, paths)
-          → Paths resolved to absolute
-          → Overlays created/updated
-          → User interaction (click/hover)
+User types → after-change-functions
+           → Channel: Paths   (0.05s) → Resolve & Linkify
+           → Channel: Sprites (0.15s) → Create Thumbnails
+           → Channel: Colors  (0.30s) → UI Swatches
+           
+           * All channels run in parallel tasks protected by save-match-data. *
+           → User interaction (RET/click/hover)
 ```
 
-## Data Files
+## Keyboard Navigation
 
-| File | Purpose |
-|------|---------|
-| `src/data/palettes.json` | Named color definitions for symbols like `:red` |
+All overlays support:
+- `RET` - Activate (open file, edit color)
+- `C-c RET` - Alternative activation
+- `mouse-1` - Click activation
 
 ## Extensibility
 
-- **Colors**: Add entries to `src/data/palettes.json`
-- **Sprites**: Add extensions to `dragonruby-sprite-source-extensions` (e.g. `.kra`)
+- **Colors**: Modify `dragonruby-colors.el` to add named colors
+- **Sprites**: Add extensions to `dragonruby-sprite-source-extensions`
+- **Paths**: Add extensions to `dragonruby-data-extensions`

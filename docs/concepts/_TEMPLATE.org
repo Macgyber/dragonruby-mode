@@ -1,0 +1,41 @@
+#+TITLE: Concept Name
+#+CONCEPT: semantic_name
+#+MODULE: module_name
+#+DR_VERSION: 5.x
+#+STATUS: draft
+
+* Concept Name
+:PROPERTIES:
+:ID: concept-id
+:KIND: concept
+:MODULE: module_name
+:DOC: concept_filename.org
+:SEARCH_TERMS: term1 term2
+:END:
+
+** What it is
+A concise human-readable definition. No code.
+
+** What it’s used for
+The intention behind the concept. Why it exists.
+
+** Minimal form
+#+begin_src ruby
+# The atomic, correct example
+#+end_src
+
+** Real usage
+Contextual usage in a real game loop or scenario.
+
+** Common errors
+- Mistake 1
+- Mistake 2
+
+** Semantic relationships
+- related_concept_1
+- related_concept_2
+
+** State
+- [ ] Seen
+- [ ] Understood
+- [ ] Mastered
