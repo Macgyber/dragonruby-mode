@@ -24,7 +24,8 @@ It is built for people who believe the editor should amplify thought, not interr
 | `dragonruby-colors` | RGB/Hex color visualization | ✅ Stable |
 | `dragonruby-sprites` | Image previews & navigation | ✅ Stable |
 | `dragonruby-paths` | `require`/`load` navigation | ✅ Stable |
-| `dragonruby-image-tools` | Image manipulation tools | ✅ Stable |
+| `dragonruby-image-tools` | Image manipulation tools | 🟡 Beta |
+| `dragonruby-docs` | Built-in Documentation System | 🚧 In Development |
 | `dragonruby-concepts` | Keyword documentation links | 🚧 In Development |
 
 ### Key Architectural Features:
@@ -58,9 +59,9 @@ Detects, visualizes, and **edits** real DragonRuby color values directly in your
 { r: 255, g: 0, b: 0 } # Hashes
 ```
 
-**Interaction**: 
-- A clickable color box `■` appears next to the value.
-- Click it to **Edit** the color using a picker.
+**Interaction (In Development)**: 
+- A visual color box `■` appears next to the value.
+- *Coming soon: Click to edit using a color picker.*
 
 ### 🖼️ Semantic Sprites
 Visualizes your game assets immediately.
@@ -123,8 +124,8 @@ Keywords like `args`, `state`, `inputs`, and `outputs` are highlighted.
 
 ## 🔮 Roadmap
 
-- **learnDR-mode**: Educational mode with Org-mode integration
-- **Hyper-Symbol Navigation**: `M-.` to jump to concept definitions
+- **learnDR-mode**: Educational mode with Org-mode integration 🚧 *In Development*
+- **Hyper-Symbol Navigation**: `M-.` to jump to concept definitions 🚧 *In Development*
 
 ---
 
@@ -146,7 +147,8 @@ Then enable the mode:
 (setq dragonruby-enable-colors t)       ; ✅ Stable
 (setq dragonruby-enable-sprites t)      ; ✅ Stable
 (setq dragonruby-enable-paths t)        ; ✅ Stable
-(setq dragonruby-enable-image-tools t)  ; ✅ Stable
+(setq dragonruby-enable-image-tools t)  ; 🟡 Beta
+(setq dragonruby-enable-docs nil)       ; 🚧 In Development
 (setq dragonruby-enable-concepts nil)   ; 🚧 In Development
 ```
 
