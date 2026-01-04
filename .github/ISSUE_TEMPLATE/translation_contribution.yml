@@ -1,0 +1,45 @@
+name: "🌍 Translation Contribution"
+description: "Suggest a translation for the concept glossary or improve an existing one"
+title: "[TRANS] <Language> - <Term>"
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping make DragonRuby Mode accessible in more languages!
+        Please use this form to suggest new translations or correct existing ones.
+  - type: dropdown
+    id: language
+    attributes:
+      label: "Language"
+      description: "Select the language you're contributing to"
+      options:
+        - Spanish (Español)
+        - French (Français)
+        - German (Deutsch)
+        - Japanese (日本語)
+        - Chinese (中文)
+        - Other (Other)
+    validations:
+      required: true
+  - type: input
+    id: term
+    attributes:
+      label: "English Term"
+      description: "The original term that appears in the code or documentation"
+    validations:
+      required: true
+  - type: input
+    id: translation
+    attributes:
+      label: "Proposed Translation"
+      description: "Your suggestion for this term"
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: "Context or Justification"
+      description: "Why do you think this is the best translation? Include examples if necessary."
+    validations:
+      required: false

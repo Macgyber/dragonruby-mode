@@ -21,7 +21,7 @@
       (let* ((attrs (file-attributes path))
              (size (file-size-human-readable (file-attribute-size attrs)))
              (ext (upcase (file-name-extension path))))
-        (format "🖼️ %s | 📏 %s\n(C-c p or Shift-Click to preview)" ext size))
+        (format "🖼️ %s | 📏 %s\n(C-c C-o to open)" ext size))
     (if path "❌ File not found" "⚠️ Unsupported or Invalid Format")))
 
 (defun dragonruby--create-inline-thumb (path)
@@ -84,14 +84,12 @@ Scales dynamically with the current font size (Accessibility)."
         (when thumb (overlay-put ov 'after-string thumb)))
       (overlay-put ov 'keymap 
                    (let ((map (make-sparse-keymap)))
-                     (define-key map [mouse-1] (lambda () (interactive) (dragonruby-jump-to-sprite-source path)))
-                     ;; Shift-Click for Preview
-                     (define-key map [S-mouse-1] #'dragonruby-preview-sprite-at-point)
-                     (define-key map (kbd "RET") (lambda () (interactive) (dragonruby-jump-to-sprite-source path)))
-                     (define-key map (kbd "C-c RET") (lambda () (interactive) (dragonruby-jump-to-sprite-source path)))
-                     (define-key map (kbd "C-c p") #'dragonruby-preview-sprite-at-point)
+                     (define-key map (kbd "C-c C-o") 
+                       (lambda () (interactive) (dragonruby-jump-to-sprite-source path)))
+                     (define-key map (kbd "RET") 
+                       (lambda () (interactive) (dragonruby-jump-to-sprite-source path)))
                      map))
-      (overlay-put ov 'mouse-face 'highlight))
+      (overlay-put ov 'mouse-face '(:background "#2ECC71" :foreground "black")))
     (overlay-put ov 'priority -50)
     (push ov dragonruby--sprite-overlays)))
 

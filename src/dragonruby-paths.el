@@ -4,12 +4,12 @@
 ;; Priority: User's installed plugins > DragonRuby > Native Emacs
 
 (require 'dragonruby-core)
-(require 'dragonruby-path-model "paths/dragonruby-path-model")
-(require 'dragonruby-path-fs "paths/dragonruby-path-fs")
-(require 'dragonruby-path-snippets "paths/dragonruby-path-snippets")
-(require 'dragonruby-path-overlay "paths/dragonruby-path-overlay")
-(require 'dragonruby-path-actions "paths/dragonruby-path-actions")
-(require 'dragonruby-path-completion "paths/dragonruby-path-completion")
+(require 'dragonruby-path-model)
+(require 'dragonruby-path-fs)
+(require 'dragonruby-path-snippets)
+(require 'dragonruby-path-overlay)
+(require 'dragonruby-path-actions)
+(require 'dragonruby-path-completion)
 
 (defvar dragonruby-enable-path-completion)
 

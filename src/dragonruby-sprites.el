@@ -5,11 +5,11 @@
 (require 'dragonruby-core)
 
 ;; Load submodules
-(require 'dragonruby-sprite-model      "sprites/dragonruby-sprite-model")
-(require 'dragonruby-sprite-fs         "sprites/dragonruby-sprite-fs")
-(require 'dragonruby-sprite-actions    "sprites/dragonruby-sprite-actions")
-(require 'dragonruby-sprite-overlay    "sprites/dragonruby-sprite-overlay")
-(require 'dragonruby-sprite-completion "sprites/dragonruby-sprite-completion")
+(require 'dragonruby-sprite-model)
+(require 'dragonruby-sprite-fs)
+(require 'dragonruby-sprite-actions)
+(require 'dragonruby-sprite-overlay)
+(require 'dragonruby-sprite-completion)
 
 (define-minor-mode dragonruby-sprite-mode
   "Sprite previews."

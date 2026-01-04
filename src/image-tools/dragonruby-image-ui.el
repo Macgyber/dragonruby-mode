@@ -8,24 +8,20 @@
 (declare-function w32-shell-execute "w32fns.c")
 
 (defcustom dragonruby-external-editor-presets
-  '((darwin . (("Aseprite" . "/Applications/Aseprite.app/Contents/MacOS/aseprite")
-               ("Photoshop" . "/Applications/Adobe Photoshop 2024/Adobe Photoshop 2024.app/Contents/MacOS/Adobe Photoshop 2024")
-               ("Inkscape" . "/Applications/Inkscape.app/Contents/MacOS/inkscape")
-               ("Pixelmator Pro" . "/Applications/Pixelmator Pro.app/Contents/MacOS/Pixelmator Pro")
-               ("GIMP" . "/Applications/GIMP.app/Contents/MacOS/gimp")
+  '((darwin . (("GIMP" . "/Applications/GIMP.app/Contents/MacOS/gimp")
                ("Krita" . "/Applications/Krita.app/Contents/MacOS/krita")
-               ("Affinity Photo" . "/Applications/Affinity Photo 2.app/Contents/MacOS/Affinity Photo 2")))
-    (windows-nt . (("Aseprite" . "C:/Program Files/Aseprite/aseprite.exe")
-                   ("Photoshop" . "C:/Program Files/Adobe/Adobe Photoshop 2024/Photoshop.exe")
-                   ("Inkscape" . "C:/Program Files/Inkscape/bin/inkscape.exe")
-                   ("GIMP" . "C:/Program Files/GIMP 2/bin/gimp-2.10.exe")
-                   ("Paint.NET" . "C:/Program Files/paint.net/PaintDotNet.exe")))
+               ("Inkscape" . "/Applications/Inkscape.app/Contents/MacOS/inkscape")))
+    (windows-nt . (("GIMP" . "C:/Program Files/GIMP 2/bin/gimp-2.10.exe")
+                   ("Krita" . "C:/Program Files/Krita/bin/krita.exe")
+                   ("Inkscape" . "C:/Program Files/Inkscape/bin/inkscape.exe")))
     (gnu/linux . (("GIMP" . "/usr/bin/gimp")
                   ("Krita" . "/usr/bin/krita")
                   ("Inkscape" . "/usr/bin/inkscape"))))
-  "Presets for external image editors categorized by OS."
+  "Presets for free/libre external image editors categorized by OS.
+Users can add any editor (including commercial ones) via the [+] button."
   :type '(repeat (cons symbol (repeat (cons string string))))
   :group 'dragonruby)
+
 
 (defun dragonruby--get-os-presets ()
   "Get the list of editor presets for the current OS."
@@ -52,7 +48,7 @@ Example configuration in your init.el:
 
 (defcustom dragonruby-hidden-creative-tools nil
   "List of predefined Creative Hub tools to hide.
-Add tool names like \"Graphite\", \"Photopea\", \"Piskel\", \"Lospec\", \"Itch\".
+Add tool names like \"Graphite\", \"Piskel\", \"Lospec\", \"Itch\".
 
 Example:
   (setq dragonruby-hidden-creative-tools \\='(\"Lospec\" \"Itch\"))"
@@ -322,11 +318,7 @@ If no editor is set, prompts the user to select one."
                     (dragonruby--adaptive-tool "Graphite" "G" "🖥" 
                                                (lambda (_e) (interactive "e") (browse-url "https://editor.graphite.art/"))
                                                "Graphite Art (Web)" '(:foreground "#00FFFF")))
-                  (if (> width 90) " " "")
-                  (unless (member "Photopea" dragonruby-hidden-creative-tools)
-                    (dragonruby--adaptive-tool "Photopea" "P" "📷" 
-                                               (lambda (_e) (interactive "e") (browse-url "https://www.photopea.com/"))
-                                               "Photopea (Web)" '(:foreground "#2196F3")))
+
                   (if (> width 90) " " "")
                   (unless (member "Piskel" dragonruby-hidden-creative-tools)
                     (dragonruby--adaptive-tool "Piskel" "Px" "👾" 
@@ -389,7 +381,7 @@ If no editor is set, prompts the user to select one."
                                              (lambda (_e) (interactive "e")
                                                (if (active-minibuffer-window)
                                                    (message "Close minibuffer first (C-g)")
-                                                 (let* ((predefined '("Graphite" "Photopea" "Piskel" "Lospec" "Itch"))
+                                                 (let* ((predefined '("Graphite" "Piskel" "Lospec" "Itch"))
                                                         (visible-predefined (cl-remove-if (lambda (x) (member x dragonruby-hidden-creative-tools)) predefined))
                                                         (user-names (mapcar #'car dragonruby-user-creative-links))
                                                         (all-names (append visible-predefined user-names)))

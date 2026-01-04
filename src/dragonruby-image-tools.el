@@ -2,9 +2,9 @@
 
 ;; Facade that exposes the public interface for image tools.
 
-(require 'dragonruby-image-modify "image-tools/dragonruby-image-modify")
-(require 'dragonruby-image-view "image-tools/dragonruby-image-view")
-(require 'dragonruby-image-ui "image-tools/dragonruby-image-ui")
+(require 'dragonruby-image-modify)
+(require 'dragonruby-image-view)
+(require 'dragonruby-image-ui)
 
 (defvar dragonruby-image-mode-map
   (let ((map (make-sparse-keymap)))

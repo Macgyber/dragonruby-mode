@@ -12,6 +12,3 @@
 
 # Build artifacts
 /dist/
-
-# Development tools (private)
-/dev/

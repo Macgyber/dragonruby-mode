@@ -9,8 +9,12 @@ def tick args
   c2 = [0, 255, 0, 128]
   
   # Hexadecimal
+  # Hexadecimal Litearals (Ruby Numbers)
   hex1 = 0xFF00FF
   hex2 = 0x0000FF
+
+  # UNSUPPORTED (No coloring expected)
+  hex3 = "6b5256" # Hex no string support
 
   # Symbols (Complete List)
   s1 = :red
@@ -37,8 +41,12 @@ def tick args
 
   h3 = { r: 50, g: 0, b: 50 } # Compact
 
-  # --- 2. SPRITES (FASE 2) --------------------------------
-  # Valid Sprites (Hover to see preview / path)
+  # --- 2. SPRITES (FASE 2: DRAGONS & VISUALS) ------------
+  # New Dragon Sprites (Hover to see preview)
+  args.outputs.sprites << { x: 200, y: 100, w: 128, h: 128, path: "sprites/dragon_red.png" }
+  args.outputs.sprites << { x: 400, y: 100, w: 128, h: 128, path: "sprites/dragon_blue.png" }
+  
+  # Classic Sprites
   args.outputs.sprites << { x: 0, y: 0, w: 100, h: 100, path: "sprites/potion.png"}
   args.outputs.sprites << { x: 100, y: 0, w: 100, h: 100, path: "sprites/enemy.png" }
 
@@ -67,6 +75,34 @@ def tick args
 
   # Non-existent files (should show red underline)
   missing = read_file("data/missing.yml")
+
+  # --- 4. FONTS (FASE 4) ---------------------------------
+  # ✅ Valid Fonts (Hover to see live preview icon)
+  args.outputs.labels << {
+    x: 640, y: 500,
+    text: "Game Title",
+    font: "fonts/title_font.otf",
+    size_enum: 20
+  }
+
+  args.outputs.labels << {
+    x: 640, y: 400,
+    text: "Press Start",
+    font: "fonts/main_font.ttf"
+  }
+
+  # ❌ Invalid Fonts (Should show RED wave underline / Error tooltip)
+  args.outputs.labels << { font: "fonts/ghost_font.ttf" }
+  args.outputs.labels << { font: "fonts/unsupported.woff" }
+
+  # --- 5. AUDIO (FASE 5) ---------------------------------
+  # ✅ Valid Audio (Hover to see info / Look for 🔊 icon)
+  args.outputs.sounds << "sounds/background_music.ogg"
+  args.audio[:sfx] = "sounds/jump.wav"
+
+  # ❌ Invalid Audio (Should show RED wave underline)
+  args.outputs.sounds << "sounds/missing_track.mp3"
+  args.audio[:explosion] = "sounds/error.wav"
 
   # Render Text
   args.outputs.labels << [640, 360, "DragonRuby Emacs Mode Test", 1, 1]

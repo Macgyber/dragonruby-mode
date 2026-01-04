@@ -1,175 +1,179 @@
-# Manual Installation Guide
+# Complete Installation Guide 🚀
 
-This guide contains detailed, OS-specific instructions for manually installing `dragonruby-mode`. 
+**DragonRuby Emacs Mode** supports **all Emacs package managers and configurations**. Choose the method that best fits your workflow.
 
-> 💡 **Note**: We recommend using your preferred Emacs package manager (Straight, Doom, etc.) if possible. This guide is for those who need manual configuration.
+---
 
-## Configure Emacs
+## 🎯 Quick Methods (Recommended)
 
-### 📍 Finding Your Path
-You need to know where you cloned `dragonruby-mode`.
-
-| Where you saved it | Your path would be |
-|-------------------|-------------------|
-| Desktop (Windows) | `C:/Users/YourName/Desktop/dragonruby-mode` |
-| Downloads (Windows) | `C:/Users/YourName/Downloads/dragonruby-mode` |
-| Home (Linux/Mac) | `~/dragonruby-mode` |
-| Projects folder | `~/projects/dragonruby-mode` |
-| Custom location | Wherever you ran `git clone` |
-
-### 🪟 Windows
-
-1. Press `Win + R` to open Run dialog
-2. Type `%appdata%` and press Enter
-3. Scroll down to find the `.emacs` file (it's in the root, not in a folder)
-4. Open it with any text editor (Notepad, VS Code, etc.)
-5. Add this configuration at the end:
-
+### Doom Emacs
 ```elisp
-;; DragonRuby Mode
-;; ⚠️ CHANGE THIS PATH to where YOU saved dragonruby-mode!
-;; Examples:
-;;   "C:/Users/YourName/Desktop/dragonruby-mode"
-;;   "C:/Users/YourName/Downloads/dragonruby-mode"
-;;   "D:/projects/dragonruby-mode"
-(add-to-list 'load-path "C:/Users/YourName/Desktop/dragonruby-mode")
-(require 'dragonruby-mode)
+;; packages.el
+(package! dragonruby-mode :recipe (:host github :repo "Macgyber/dragonruby-mode"))
 
-;; Smart activation: only enables in DragonRuby projects
+;; config.el
+(use-package! dragonruby-mode
+  :hook ((ruby-mode . dragonruby-maybe-enable)
+         (ruby-ts-mode . dragonruby-maybe-enable)))
+```
+
+### straight.el
+```elisp
+(straight-use-package
+ '(dragonruby-mode :type git :host github :repo "Macgyber/dragonruby-mode"))
+
+(use-package dragonruby-mode
+  :straight t
+  :hook ((ruby-mode . dragonruby-maybe-enable)
+         (ruby-ts-mode . dragonruby-maybe-enable)))
+```
+
+---
+
+## 🌟 Other Supported Methods
+
+### Spacemacs
+```elisp
+;; dotspacemacs/layers
+(setq-default dotspacemacs-additional-packages
+              '((dragonruby-mode :location (recipe :fetcher github
+                                                    :repo "Macgyber/dragonruby-mode"))))
+
+;; dotspacemacs/user-config
+(use-package dragonruby-mode
+  :hook ((ruby-mode . dragonruby-maybe-enable)
+         (ruby-ts-mode . dragonruby-maybe-enable)))
+```
+
+### use-package (Vanilla Emacs)
+```elisp
+(use-package dragonruby-mode
+  :ensure t
+  :vc (:fetcher github :repo "Macgyber/dragonruby-mode")
+  :hook ((ruby-mode . dragonruby-maybe-enable)
+         (ruby-ts-mode . dragonruby-maybe-enable)))
+```
+
+### package-vc (Emacs 29.1+)
+```elisp
+(package-vc-install "https://github.com/Macgyber/dragonruby-mode")
+
+;; Luego añade a tu init.el:
 (add-hook 'ruby-mode-hook #'dragonruby-maybe-enable)
 (add-hook 'ruby-ts-mode-hook #'dragonruby-maybe-enable)
 ```
 
-6. Save and restart Emacs
+### Quelpa
+```elisp
+(quelpa '(dragonruby-mode :fetcher github :repo "Macgyber/dragonruby-mode"))
 
-> ⚠️ **Use forward slashes `/` in paths, not backslashes `\`**
+(use-package dragonruby-mode
+  :hook ((ruby-mode . dragonruby-maybe-enable)
+         (ruby-ts-mode . dragonruby-maybe-enable)))
+```
 
-### 🐧 Linux
+### el-get
+```elisp
+(el-get-bundle Macgyber/dragonruby-mode)
 
-1. Open a terminal
-2. Edit your config file:
+(use-package dragonruby-mode
+  :hook ((ruby-mode . dragonruby-maybe-enable)
+         (ruby-ts-mode . dragonruby-maybe-enable)))
+```
 
+### borg (Emacs Collective)
 ```bash
-# Modern Emacs (29+)
-nano ~/.config/emacs/init.el
-
-# Traditional Emacs
-nano ~/.emacs
+cd ~/.emacs.d/.emacs.d/lib
+git submodule add https://github.com/Macgyber/dragonruby-mode.git
+git submodule init
 ```
-
-3. Add this configuration:
 
 ```elisp
-;; DragonRuby Mode
-;; ⚠️ CHANGE THIS PATH to where YOU saved dragonruby-mode!
-;; Examples:
-;;   "~/dragonruby-mode"              (if in home folder)
-;;   "~/Downloads/dragonruby-mode"    (if in Downloads)
-;;   "~/projects/dragonruby-mode"     (if in projects folder)
-(add-to-list 'load-path "~/Downloads/dragonruby-mode")
-(require 'dragonruby-mode)
-
-;; Smart activation: only enables in DragonRuby projects
-(add-hook 'ruby-mode-hook #'dragonruby-maybe-enable)
-(add-hook 'ruby-ts-mode-hook #'dragonruby-maybe-enable)
+(use-package dragonruby-mode
+  :hook ((ruby-mode . dragonruby-maybe-enable)
+         (ruby-ts-mode . dragonruby-maybe-enable)))
 ```
 
-4. Save (`Ctrl+O`, `Enter`) and exit (`Ctrl+X`)
-5. Restart Emacs
+---
 
-### 🍎 macOS
+## 🔮 Coming Soon
 
-1. Open Terminal
-2. Edit your config file:
+### MELPA
+```elisp
+;; Cuando esté disponible en MELPA:
+(use-package dragonruby-mode
+  :ensure t
+  :hook ((ruby-mode . dragonruby-maybe-enable)
+         (ruby-ts-mode . dragonruby-maybe-enable)))
+```
 
+---
+
+## ⚙️ Manual Installation
+
+### git clone
 ```bash
-# Using nano
-nano ~/.emacs
-
-# Or for modern Emacs
-nano ~/.config/emacs/init.el
+cd ~/.emacs.d/
+git clone https://github.com/Macgyber/dragonruby-mode.git
 ```
 
-3. Add this configuration:
-
 ```elisp
-;; DragonRuby Mode
-;; ⚠️ CHANGE THIS PATH to where YOU saved dragonruby-mode!
-;; Examples:
-;;   "~/dragonruby-mode"              (if in home folder)
-;;   "~/Downloads/dragonruby-mode"    (if in Downloads)
-;;   "/Users/YourName/Desktop/dragonruby-mode"
-(add-to-list 'load-path "~/Downloads/dragonruby-mode")
+;; Add to your init.el:
+(add-to-list 'load-path "~/.emacs.d/dragonruby-mode")
 (require 'dragonruby-mode)
-
-;; Smart activation: only enables in DragonRuby projects
 (add-hook 'ruby-mode-hook #'dragonruby-maybe-enable)
 (add-hook 'ruby-ts-mode-hook #'dragonruby-maybe-enable)
 ```
 
-4. Save and restart Emacs
+### Direct Download (ZIP)
+1. Download the [ZIP file](https://github.com/Macgyber/dragonruby-mode/archive/refs/heads/main.zip)
+2. Extract to `~/.emacs.d/dragonruby-mode/`
+3. Follow the "git clone" instructions above
 
-## 🛠️ Advanced Configuration (Optional)
+---
 
-If you want to customize the external image editor or enable Smart Source Jumping, use this full configuration block in your `init.el`.
+## 🛠️ Post-Installation Setup
 
-This example includes English comments explaining each part.
+### Automatic Activation
+The plugin activates automatically when it detects a DragonRuby project (looks for `app/main.rb`).
 
+### Manual Activation
+If you want to force activation on any Ruby file:
 ```elisp
-;; -------------------------------------------------------------------------
-;; 🐉 DRAGONRUBY MODE CONFIGURATION
-;; -------------------------------------------------------------------------
-
-;; 1. Load the package (adjust path to where you cloned/downloaded it)
-;; NOTE: If you use Doom/Spacemacs, this might differ slightly.
-(add-to-list 'load-path "/path/to/dragonruby-mode")
-(require 'dragonruby-mode)
-
-;; 2. Automatically enable in Ruby files (only activates if DragonRuby is detected)
-(add-hook 'ruby-mode-hook #'dragonruby-maybe-enable)
-(add-hook 'ruby-ts-mode-hook #'dragonruby-maybe-enable)
-
-;; 3. (OPTIONAL) Configure your favorite External Image Editor
-;; If left nil, it uses the system default (Preview, Photos, etc).
-;; Uncomment the line for your OS/Editor:
-
-;; [MacOS] Aseprite Example
-;; (setq dragonruby-external-image-editor "/Applications/Aseprite.app/Contents/MacOS/aseprite")
-
-;; [Windows] Graphite Example
-;; (setq dragonruby-external-image-editor "C:/Program Files/Graphite/Graphite.exe")
-
-;; 4. (OPTIONAL) Configure Smart Source Jumping
-;; Defines which source files to look for when clicking a sprite (.png).
-;; Defaults are: .aseprite, .graphite, .psd, .xcf
-;; Add extensions here if you use other tools (e.g., Krita .kra)
-;; (setq dragonruby-sprite-source-extensions '(".aseprite" ".graphite" ".psd" ".xcf" ".kra"))
-
-;; -------------------------------------------------------------------------
+M-x dragonruby-mode
 ```
 
-## Troubleshooting
-
-### 🔍 Finding Your Config from Inside Emacs
-
-If you're unsure which config file Emacs is using:
-
-1. Press `M-:` (Alt + Shift + ;)
-2. Type: `(find-file user-init-file)`
-3. Press Enter
-
-This opens the exact file Emacs is reading on startup.
-
-### 🔍 Finding Where You Saved dragonruby-mode
-
-If you forgot where you cloned the repository:
-
-**Windows:**
-1. Open File Explorer
-2. Search for `dragonruby-mode.el`
-3. The folder containing this file is your path
-
-**Linux/macOS:**
-```bash
-find ~ -name "dragonruby-mode.el" 2>/dev/null
+### Disable in Specific Projects
+```elisp
+;; In .dir-locals.el of your regular Ruby project:
+((ruby-mode . ((eval . (dragonruby-mode -1)))))
 ```
+
+---
+
+## 🐛 Troubleshooting
+
+### Plugin doesn't load
+1. **Check installation**: `M-x list-packages` (look for dragonruby-mode)
+2. **Check load-path**: `C-h v load-path`
+3. **Review startup errors**: `*Messages*` buffer
+
+### Doesn't activate automatically
+- **Check you're in a DragonRuby project** (`app/main.rb` must exist)
+- **Activate manually**: `M-x dragonruby-mode`
+
+### Conflicts with other modes
+- Review the **Compatibility** section in the main README
+- [Report incompatibilities](https://github.com/Macgyber/dragonruby-mode/issues)
+
+---
+
+## 📚 Additional Resources
+
+- **[Main README](../README.md)**: Features and philosophy
+- **[Compatibility](../README.md#-compatibility-with-other-plugins)**: Supported plugins table
+- **[Contributing](CONTRIBUTING.md)**: Guide for contributors
+
+---
+
+**DragonRuby Emacs Mode — Universal Installation v0.5.0**

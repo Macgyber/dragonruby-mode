@@ -6,7 +6,7 @@ This document formalizes the responsibilities and interaction patterns for each 
 1.  **Guiding Principle**: A module must fit entirely in your head. If you can't explain it in one sentence, it's too big.
 2.  **Semantic First**: We provide semantic meaning (color, sprites, paths), not just syntax highlighting.
 3.  **Modular Responsibility**: One module, one job. Modules should not leak responsibilities.
-4.  **Keyboard First**: All features must be accessible via keyboard. Mouse is optional.
+4.  **Keyboard First**: All features must be accessible via keyboard. Mouse is optional (reserved for native OS/Emacs window management or precision tools).
 5.  **LSP-Safe**: Never interfere with LSP, Corfu, Company, or other completion frameworks.
 6.  **Multi-Channel Async Strategy**: Periodic scans (Paths, Colors, Sprites) must use isolated debounce timers (`task-id`) to prevent cross-module collisions. Every asynchronous task must protect Emacs state using `save-match-data` and `save-restriction`.
 7.  **Reactive Invalidation**: Any text modification in the buffer MUST immediately invalidate the visual overlays in the affected range to prevent "visual ghosts" or stale information. Reconstruction happens asynchronously during idle time.
@@ -20,7 +20,7 @@ This document formalizes the responsibilities and interaction patterns for each 
 ### 0. Core Infrastructure (`src/core/`)
 **Responsibility**: The immutable foundation.
 *   **Projects (`dragonruby-project.el`)**: Reliable root detection (`app/main.rb`).
-*   **Assets (`dragonruby-assets.el`)**: Knowledge of file types and source relations (`.png` -> `.aseprite`).
+*   **Assets (`dragonruby-assets.el`)**: Knowledge of file types and source relations (`.png` → `.kra`, `.psd`, etc.).
 *   **Utils (`dragonruby-utils.el`)**: Debounce function for efficient rescanning.
 *   **Events (`dragonruby-events.el`)**: Lightweight event bus.
 
@@ -35,9 +35,9 @@ This document formalizes the responsibilities and interaction patterns for each 
 *   **Contract**:
     *   **Detection**: Parse strings starting with `sprites/`.
     *   **Visualization**: Inline thumbnails, color-coded underlines.
-    *   **Interaction**: `RET`, `C-c RET`, `mouse-1` to open.
-    *   **Preview**: `C-c p` for popup preview.
-    *   **NON-INTERFERENCE**: CAPF uses `:exclusive 'no`, depth 100.
+    *   **Interaction**: `C-c C-o` to open.
+    *   **Preview**: `C-c p` for popup preview (Manual).
+    *   **NON-INTERFERENCE**: `RET` key is never hijacked by overlays. CAPF uses `:exclusive 'no`, depth 100.
 
 ### 2. Path & Require System (`src/paths/`)
 **Responsibility**: Navigate code structure and data files.
@@ -50,7 +50,7 @@ This document formalizes the responsibilities and interaction patterns for each 
 *   **Contract**:
     *   **Snippets**: `req`, `reqr`, `load`, `read`, `json` + `C-M-i`.
     *   **Completion**: Minibuffer-based (NOT CAPF) to avoid LSP conflicts.
-    *   **Navigation**: `RET`, `C-c RET`, `mouse-1` to follow.
+    *   **Navigation**: `C-c C-o` to follow.
     *   **Open**: `C-c o` to open any project file.
 
 ### 3. Color System (`src/colors/`)
@@ -59,8 +59,9 @@ This document formalizes the responsibilities and interaction patterns for each 
 *   **Contract**:
     *   **Detection**: RGB arrays, RGBA, hashes, hex.
     *   **Visualization**: Background overlay + interactive `■` box.
-    *   **Interaction**: `RET`, `C-c RET`, `mouse-1` to edit.
+    *   **Interaction**: `C-c C-o` or Mouse-1 (precision) to edit.
     *   **Format Preservation**: Edits maintain original code format.
+    *   **Safety**: `RET` is preserved for normal line breaks.
 
 ### 4. Image Tools (`src/image-tools/`)
 **Responsibility**: Manipulate specific image assets.
@@ -75,7 +76,7 @@ This document formalizes the responsibilities and interaction patterns for each 
 *   **Contract**:
     *   **Detection**: Keywords (`args`, `state`, `tick`).
     *   **Visualization**: Subtle interactive underline.
-    *   **Interaction**: `RET`, `mouse-1` opens documentation.
+    *   **Interaction**: `C-c C-o` opens documentation.
 
 ---
 
@@ -85,9 +86,9 @@ ALL interactive overlays MUST support:
 
 | Key | Action |
 |-----|--------|
-| `RET` | Activate overlay (primary) |
-| `C-c RET` | Activate overlay (alternative) |
-| `mouse-1` | Click activation (optional) |
+| `C-c C-o` | Activate Overlay (Open, Edit, Navigate) |
+| `mouse-1` | Activate Overlay (Open, Edit, Navigate) |
+| `RET` | Preserved for line breaks / Normal Emacs behavior |
 
 ---
 
@@ -110,3 +111,7 @@ src/
 - [x] **Keyboard Navigation**: All overlays support RET.
 - [x] **LSP-Safe**: Paths uses minibuffer, Sprites CAPF at depth 100.
 - [x] **Contracts Updated**: 2026-01-03 (Added Modular Isolation & User Safety rules).
+
+---
+
+*DragonRuby Emacs Mode — v0.5.0*

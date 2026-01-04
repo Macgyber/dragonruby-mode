@@ -73,6 +73,7 @@ Returns the end position of the scanned block to allow jumping."
            (string-to-number (match-string 4))))))
 
     ;; 2. Hexadecimal (0xRRGGBB and #RRGGBB)
+    ;; Note: DragonRuby usually doesn't use these for primitives, but they are common in Ruby.
     (goto-char (point-min))
     (while (re-search-forward "\\(?:0x\\|#\\)\\([0-9A-Fa-f]\\{6\\}\\)" nil t)
       (when (dragonruby--in-code-p)

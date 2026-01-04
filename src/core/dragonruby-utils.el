@@ -55,4 +55,20 @@ The warning is only shown once per session to avoid annoyance."
                             '((?c "Close" "Dismiss notice")))
       (push feature dragonruby--warned-features))))
 
+(defun dragonruby--resolve-path (raw-path type)
+  "Resolve RAW-PATH based on TYPE (\\='require, \\='require_relative, \\='load, \\='font, \\='audio).
+If TYPE is \\='require or \\='load, resolve relative to project root.
+If TYPE is \\='require_relative, resolve relative to current file."
+  (let* ((root (dragonruby--find-project-root))
+         (current-dir (file-name-directory (or buffer-file-name default-directory)))
+         (base-dir (if (eq type 'require_relative)
+                       current-dir
+                     (or root current-dir))) ; Fallback to current dir if root not found
+         (ensure-rb (memq type '(require require_relative)))
+         (path (if (and ensure-rb (not (string-suffix-p ".rb" raw-path)))
+                   (concat raw-path ".rb")
+                 raw-path)))
+    (when (and path base-dir)
+      (expand-file-name path base-dir))))
+
 (provide 'dragonruby-utils)

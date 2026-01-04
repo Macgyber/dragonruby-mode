@@ -23,7 +23,16 @@ Low priority, contextual, and manual (triggered by user)."
               :company-kind (lambda (_) 'file)
               :annotation-function (lambda (c) 
                                      (let ((ext (file-name-extension c)))
-                                       (format " [%s]" (or ext "file")))))))))
+                                       (format " [%s]" (or ext "file"))))
+              :exit-function (lambda (_str status)
+                               (when (memq status '(finished sole))
+                                 (let ((p (syntax-ppss)))
+                                   (when (nth 3 p) ; Still inside string?
+                                     (let ((end-pos (save-excursion
+                                                      (goto-char (nth 8 p))
+                                                      (forward-sexp)
+                                                      (point))))
+                                       (goto-char end-pos)))))))))))
 
 (defun dragonruby--path-context ()
   "Determine if point is in a path context.

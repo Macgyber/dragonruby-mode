@@ -113,7 +113,8 @@ User types → after-change-functions
 All overlays support:
 - `RET` - Activate (open file, edit color)
 - `C-c RET` - Alternative activation
-- `mouse-1` - Click activation
+- `RET` - Keyboard activation
+- `C-c C-o` - Alternative activation
 
 ## Extensibility
 
@@ -132,3 +133,7 @@ The completion system is now driven by a centralized **Snippet Registry** (`drag
   3. It queries the Core Assets engine for valid files and provides an **Instant List** in the minibuffer.
 - **The Law of Formats**: Candidates are formatted as `.ext | path` to ensure immediate visual identification of asset types.
 - **Extensible**: Users can register their own snippets by calling `dragonruby-registry-register` under the ID `'user-snippets`.
+
+---
+
+*DragonRuby Emacs Mode — v0.5.0*

@@ -84,8 +84,8 @@ The **CREATIVE** button is your portal to web-based editors, resources, and cust
 | Button | URL | Description |
 |--------|-----|-------------|
 | `Graphite` | editor.graphite.art | Vector design tool |
-| `Photopea` | photopea.com | Photoshop alternative |
 | `Piskel` | piskelapp.com | Pixel art animator |
+| `DaFont` | dafont.com | Fonts & Typography |
 | `Lospec` | lospec.com | Color palettes |
 | `Itch` | itch.io/game-assets | Game assets |
 
@@ -107,7 +107,7 @@ When adding with **[+]**:
 ;; Add your own tools (name, url/path, color)
 (setq dragonruby-user-creative-links
       '(("Figma" "https://figma.com" "#A259FF")
-        ("Aseprite" "/Applications/Aseprite.app" "#7D929E")))
+        ("Krita" "/usr/bin/krita" "#3BABFF")))
 
 ;; Hide predefined tools you don't use
 (setq dragonruby-hidden-creative-tools '("Lospec" "Itch"))
@@ -130,14 +130,28 @@ Every change you make (Trim, Rotate, Color) is **versioned**.
 Add custom editors via the **[+]** button in the CREATIVE group, or set a global default:
 
 ```elisp
-(setq dragonruby-external-image-editor "/Applications/Aseprite.app/Contents/MacOS/aseprite")
+(setq dragonruby-external-image-editor "/usr/bin/krita")
 ```
 
 ### Smart Source Jumping
-If enabled, clicking a sprite path in code looks for the *source* (e.g., `.aseprite`, `.psd`) first.
+If enabled, clicking a sprite path in code looks for the *source* (e.g., `.kra`, `.psd`, `.xcf`) first.
 
 ```elisp
 (setq dragonruby-experimental-smart-jump t)
 ```
 
 > 💡 **Pro Tip**: Use the **[Info]** button to reveal "Invisible" margins before using **[Trim]**. This ensures your sprite collisions are exactly as big as the artwork they represent.
+
+---
+
+## 🚀 Speed Feedback: Help us make it perfect!
+
+We want these tools to be lightning-fast and error-free. If something breaks or you have an idea for a "God-tier" feature:
+
+- 🐞 **[Report a Bug / Tool Failure](https://github.com/Macgyber/dragonruby-mode/issues/new?template=bug_report.yml)** — *If a button doesn't react or ImageMagick fails.*
+- ✨ **[Request a New Feature](https://github.com/Macgyber/dragonruby-mode/issues/new?template=feature_request.yml)** — *Tell us what tool is missing from your workflow.*
+- 🧪 **[Experimental Feedback](https://github.com/Macgyber/dragonruby-mode/issues/new?template=experimental_feedback.yml)** — *Tell us how the new Creative Hub feels.*
+
+---
+
+*DragonRuby Emacs Mode — v0.5.0*

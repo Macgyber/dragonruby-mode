@@ -15,12 +15,13 @@
 (defun dragonruby--make-path-overlay (start end abs-path valid)
   "Create overlay from START to END for ABS-PATH.
 VALID indicates if file exists."
-  (let* ((face (if valid
-                   '(:foreground "#2196f3" :weight bold :underline t)
-                 '(:underline (:style wave :color "red"))))
-         (help (if valid
-                   (format "Click to open: %s" (file-relative-name abs-path))
-                 "❌ File not found")))
+  (let* ((exists (and abs-path (file-exists-p abs-path)))
+         (face (cond (exists '(:foreground "#2196f3" :weight bold :underline t))
+                     ((null abs-path) nil) ; Silence if we can't even resolve it
+                     (t '(:underline (:style wave :color "red")))))
+         (help (cond (exists (format "C-c C-o to open: %s" (file-relative-name abs-path)))
+                     ((null abs-path) "⚠️ Context unknown")
+                     (t "❌ File not found"))))
     (let ((ov (make-overlay start end)))
       (overlay-put ov 'face face)
       (overlay-put ov 'help-echo help)
@@ -28,14 +29,12 @@ VALID indicates if file exists."
       (when valid
         (overlay-put ov 'keymap
                      (let ((map (make-sparse-keymap)))
-                       (define-key map [mouse-1]
+                       (define-key map (kbd "C-c C-o")
                          (lambda () (interactive) (find-file abs-path)))
                        (define-key map (kbd "RET")
                          (lambda () (interactive) (find-file abs-path)))
-                       (define-key map (kbd "C-c RET")
-                         (lambda () (interactive) (find-file abs-path)))
                        map))
-        (overlay-put ov 'mouse-face 'highlight))
+        (overlay-put ov 'mouse-face '(:background "#2ECC71" :foreground "black")))
       (overlay-put ov 'priority -50)
       (push ov dragonruby--path-overlays))))
 

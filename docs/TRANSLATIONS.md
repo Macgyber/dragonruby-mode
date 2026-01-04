@@ -13,8 +13,20 @@ We're translating **concept files** (`.org`) that explain DragonRuby concepts li
 | 🇺🇸 English | In progress | `docs/concepts/en/` |
 | 🇪🇸 Español | In progress | `docs/concepts/es/` |
 | 🇨🇳 中文 | Planned | `docs/concepts/zh/` |
+| 🇯🇵 日本語 | Planned | `docs/concepts/ja/` |
+| 🇫🇷 Français | Planned | `docs/concepts/fr/` |
+| 🇩🇪 Deutsch | Planned | `docs/concepts/de/` |
 
 ## How to Contribute
+
+There are two ways to contribute:
+
+### Method A: Use GitHub Issues (Easiest)
+If you want to suggest a translation for a specific term or correct an existing one without dealing with git/files:
+1. **[Click here to open the Translation Form on GitHub](https://github.com/Macgyber/dragonruby-mode/issues/new?template=translation_contribution.yml)**
+2. Fill out the form and submit!
+
+### Method B: Manual Translation (For .org files)
 
 ### Step 1: Pick a concept to translate
 
@@ -84,8 +96,13 @@ Example: `[Translation] Español: tick.org`
 
 ## Questions?
 
-Open an issue with the `translation` label.
+- Open an issue using the **Translation Contribution** template.
+- Reach out to the community in the DragonRuby Discord.
 
 ---
 
 *Thank you for making DragonRuby accessible to everyone!* 🐉
+
+---
+
+*DragonRuby Emacs Mode — v0.5.0*

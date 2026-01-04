@@ -2,129 +2,139 @@
 
 ![DragonRuby Emacs Mode](docs/emacs-image.jpg)
 
-> **Fault-Tolerant Micro-Module Architecture**
-> Each feature is isolated and can be enabled/disabled without affecting others.
+> **"Code is clay. This is your forge."**
+> A high-performance semantic interface for DragonRuby developers who demand absolute control over their creative environment.
 
 ---
 
-## Why This Exists
+## 🏛️ The Manifesto: Beyond Text, Towards Meaning
 
-DragonRuby Emacs Mode exists to let developers **see meaning directly in code** — without turning Emacs into an IDE, without popups, without breaking flow.
-
-It is built for people who believe the editor should amplify thought, not interrupt it.
+Standard editors treat code as dead weight: a sea of gray strings and silent variables. **DragonRuby Emacs Mode** breaks this illusion. We believe your editor should be a **living conduit** between your thoughts and your game.
 
 ---
 
-## 🏗️ Architecture
+## ⚔️ The Stable Arsenal (The Foundational Base)
 
-**This package uses a strict Fault-Tolerant Micro-Module architecture with Centralized Core Infrastructure.**
+### 🎨 Level 1: Semantic Spectrum (Colors)
+Visualize the invisible. Your game's palette, always present.
+- **Visual Swatches**: High-contrast icons that scale with your environment.
+- **Precise Technical Detection**: Support for Hex literals (`0xFF00FF`), RGB/RGBA Arrays `[255, 0, 0]`, and Hashes `{r: 255, g: 0, b:0}`.
+- **Smart Guards**: Prevents accidental edits on visual markers while keeping code accessible.
 
-| Module | Responsibility | Status |
-|--------|---------------|--------|
-| `dragonruby-core` | Central knowledge (Assets, Projects, Events, Utils) | 🧱 Solid |
-| `dragonruby-colors` | RGB/Hex color visualization & Interactive Guards | ✅ Stable |
-| `dragonruby-sprites` | Image previews & navigation (Dependency-free) | ✅ Stable |
-| `dragonruby-paths` | Context-aware `require`/`load` navigation | ✅ Stable |
-| `dragonruby-image-tools` | Image manipulation tools & Timeline Navigation | 🟡 Beta |
-| `dragonruby-docs` | Built-in Knowledge System | 🚧 In Dev |
-| `dragonruby-concepts` | Keyword documentation links | 🚧 In Dev |
+### 🖼️ Level 2: Reconnaissance Operations (Sprites)
+Stop coding blind. See your world as you build it.
+- **Inline Intelligence**: High-definition thumbnails embedded directly in your code.
+- **The Validation Law**: Cyan = Ready, Red = Missing, Orange = Illegal Format.
+- **"Double C-M-i" Workflow** (CAPF):
+  - Type `spr` + `C-M-i` → Expands to `""` (cursor inside).
+  - Press `C-M-i` again → The minibuffer shows **only valid sprites** from your project.
+  - **Without plugin**: You'd see all project files mixed together.
+  - **With plugin**: You see only files from the `sprites/` folder with valid extensions (PNG, BMP, JPG, etc.).
 
-### Key Architectural Features:
-*   **Strict Modular Isolation**: Modules *never* depend on each other. Disabling "Sprites" won't break "Paths". All shared logic resides in `src/core/`.
-*   **Infrastructure Facade**: `dragonruby-assets` acts as the single source of truth for file extensions and asset relationships.
-*   **Multi-channel Debounce**: Independent timers for different scan types ensure zero lag and prevent collisions.
-*   **Safety Guards**: Standardized interactive warnings for experimental or disabled features. No more silent failures.
+### 🎨 The Forge: Integrated Image Editor
 
----
+Press `RET` or `C-c C-o` on any sprite in your code and the header-line transforms into a **complete workstation**. You'll have access to a professional arsenal with non-destructive timeline, tool groups (VIEW, TRANSFORM, COLOR, SYSTEM, CREATIVE), and over 15 operations: remove backgrounds, trim margins, pixel-perfect scaling (2x/0.5x), apply effects, rotate, invert, compress, and much more. All without leaving Emacs.
 
-## 🟢 Stable Features
+**→ [📖 Complete Image Editor Guide](docs/IMAGE_EDITOR.md)** (Timeline, Tool groups, Creative Hub)
 
-### 🎨 Semantic Colors
-Detects and visualizes real DragonRuby color values directly in your code.
-- **Visual Swatches**: High-contrast icons that scale with your font.
-- **Transparency Aware**: Proper blending for `[r,g,b,a]` and `{r:_, a:_}` values.
-- **Interactive Guard**: Clicking a color swatch in stable mode provides a clear "In Development" notice for the picker.
 
-### 🖼️ Semantic Sprites
-Visualizes your game assets immediately without leaving the code.
-- **Validation**: Cyan = Valid, Red = Missing, Orange = Unsupported.
-- **Hybrid Source Finder**: Automatically detects if a `.png` has a source `.aseprite` in the directory or `art/` folder.
-- **Deep Zoom**: Miniatures scale dynamically with Emacs text-zoom for total accessibility.
-
-### 🗺️ Context-Aware Navigation (The Law)
-Turns your code into a hypertext web. Marks valid paths with **blue bold** styling.
-
-| Logic | Context Detection | Autocomplete Result |
-|-------|-------------------|---------------------|
-| `require` | Code requiring scripts | **Universal**: All files (app, lib, data, root) |
-| `.sprites` | Sprite assignments | **Strict**: Only images in `sprites/` |
-| `path:` | Hash property | **Strict**: Only images in `sprites/` |
-| `read_file`| Data loading | **Strict**: Only files in `data/` |
-
-**Snippets & Interaction (The "Double C-M-i" Workflow):**
-- **Type `png` + `C-M-i`**: Expands to `".png"`.
-- **Press `C-M-i` again**: **Instant List** of all `.png` files in `sprites/`.
-- **Select**: Substitutes the filter with the full path: `"sprites/coin.png"`.
-- `C-c o`: **Global Jump**. Search and open *any* project file.
-- `RET` / **Click**: Follow the link or open the asset in the Emacs viewer.
+### ⚡ Level 3: Curvature Navigation (The Law)
+Eliminate journey friction. Move at the speed of thought.
+- **Contextual Intelligence**: The plugin knows when you're in a `require`, a `read_file`, or a `path:` assignment and filters your destinations accordingly.
+- **Dimensional Links**: Every path is a portal. `C-c C-o` or `RET` to jump directly to any file or asset.
+- **CAPF Completion**: Press `C-M-i` inside a string to see files of the correct type based on context.
 
 ---
 
-## 🟡 Beta & Experimental (Developer Mode)
+## 💎 Tactical Arsenal (New in v0.5.0)
 
-We believe in radical transparency. Unfinished features are available in the codebase for developers who want to help us test.
+### 🔊 The Resonance Engine (Audio)
+Audio components are no longer silent text. Feel your game's heartbeat.
+- **Emerald Pulse**: Valid assets shine with vibrant green energy (`#2ECC71`).
+- **Format Sentinel**: Instant suppression of weak formats. `.mp3` is marked and neutralized.
+- **Chronicle Tooltips**: Instant file size information on hover.
 
-### 🧪 Unlocking the "Artist Portal"
-Add these to your configuration to enable early-access tools:
+### 🅰️ The Glyph Engine (Fonts)
 
+Press `RET` on any font in your code and access a **complete interactive viewer**: test pangrams in 5 languages, review the full alphabet (ABCs), visualize custom text, and confirm each character renders correctly. Inline thumbnails adapt to your theme (dark/light) automatically, and the **Creative Hub** connects you with Google Fonts, DaFont, and your own personal repositories.
+
+**→ [📖 Complete Font System Guide](docs/FONTS.md)** (ABC/Pangram Viewer, Typography resources, Troubleshooting)
+
+### 🤝 Compatibility with Other Plugins
+
+Designed to **not interfere** with your existing configuration:
+
+| Plugin/System | Status | Notes |
+|---------------|--------|-------|
+| **LSP** (eglot, lsp-mode) | ✅ Stable | Non-exclusive CAPF, low priority (90-100) |
+| **Company** | ✅ Stable | Compatible with `:exclusive 'no` |
+| **Vertico/Ivy/Helm** | ✅ Stable | Doesn't affect minibuffer system |
+| **Flycheck/Flymake** | ✅ Stable | Low priority overlays (-50) |
+| **Evil Mode** | ✅ Stable | Doesn't modify standard keymaps |
+| **Corfu** | 🧪 To test | Should work (same CAPF system) |
+| **Doom Emacs** | 🧪 To test | Compatible with individual components |
+
+💡 **Philosophy**: We add capabilities without replacing your workflow.
+
+⚠️ **Community Testing**: This table is subject to continuous verification. If you find any incompatibility, **[report a bug on GitHub Issues](https://github.com/Macgyber/dragonruby-mode/issues)** so we can improve the plugin's stability.
+
+---
+
+## 📦 Installation
+
+### Doom Emacs
 ```elisp
-(setq dragonruby-enable-picker t)             ; Interactive Color Picker ■
-(setq dragonruby-experimental-smart-jump t)   ; Jump to .aseprite from .png
-(setq dragonruby-experimental-concepts-docs t); Deep Documentation System (Org)
+;; packages.el
+(package! dragonruby-mode :recipe (:host github :repo "Macgyber/dragonruby-mode"))
+
+;; config.el
+(use-package! dragonruby-mode
+  :hook ((ruby-mode . dragonruby-maybe-enable)
+         (ruby-ts-mode . dragonruby-maybe-enable)))
 ```
 
-### 🖼️ Adaptive Image Tools
-When viewing images, a **Fluid Toolbar** appears:
-- **Responsive Design**: UI labels shrink (`TRANSFORM` -> `T`) on small windows.
-- **Timeline Navigation**: `Back (<)` and `Forward (>)` with automatic snapshotting.
-- **Debug Stage (INF)**: High-contrast background to reveal transparent margins.
-- **🎨 Creative Hub**: Quick access to web editors (Graphite, Photopea, Piskel) and resources.
-  - **[+]** Add your own tools (URLs or local apps) with custom colors.
-  - **[-]** Hide tools you don't use.
+### straight.el
+```elisp
+(straight-use-package
+ '(dragonruby-mode :type git :host github :repo "Macgyber/dragonruby-mode"))
+
+(use-package dragonruby-mode
+  :straight t
+  :hook ((ruby-mode . dragonruby-maybe-enable)
+         (ruby-ts-mode . dragonruby-maybe-enable)))
+```
+
+**→ [📖 Complete Installation Guide](docs/INSTALLATION.md)** (Spacemacs, use-package, package-vc, Quelpa, el-get, borg, manual)
 
 ---
 
-## 🔮 Roadmap (The "Ilusionamos" Section)
+## 🏗️ Architecture: The Iron Chassis
 
-- **Hyper-Symbol Navigation**: `M-.` to jump to concept definitions 🚧
-- **learnDR-mode**: Educational mode with interactive Org-mode tutorials 🚧
-- **Real-time Pixel Sync**: Live updates between Aseprite and Emacs 🔮
+Built on a framework of **Fault-Tolerant Micro-Modules**. Each system is isolated, hardened, and independent.
 
----
-
-## 🤝 Community & Feedback
-
-We use **GitHub Issue Templates** to keep everything organized:
-- **💡 Solicitud de Mejora**: Have an idea? Fill out our structured feature request.
-- **🧪 Experimental Feedback**: Testing Dev Mode? Tell us what worked and what didn't.
-
----
+| System | Deployment Level |
+|--------|--------------------|
+| `dragonruby-core` | 🧱 FOUNDATIONAL (Rock solid) |
+| `dragonruby-colors`| ✅ DEPLOYED (Stable) |
+| `dragonruby-sprites`| ✅ DEPLOYED (Stable) |
+| `dragonruby-paths` | ✅ DEPLOYED (Stable) |
+| `dragonruby-fonts` | 🟢 AWAKENING (New) |
+| `dragonruby-audio` | 🟢 AWAKENING (New) |
 
 ---
 
-## 📚 Docs & Standards
+## 📚 Documentation and Resources
 
-Explore the deep technical details and contribution guidelines:
-
-| Documentation | Description |
-|---------------|-------------|
-| 🛠️ [Installation](docs/INSTALLATION.md) | OS-specific manual setup guide. |
-| 🗺️ [Shortcuts](docs/SHORTCUTS.md) | Full cheatsheet for navigation and editing. |
-| 🧱 [Architecture](docs/ARCHITECTURE.md) | Explaining the "Brick-Layer" core refactor. |
-| 🛡️ [Project Contract](docs/CONTRACT.md) | Core rules (No UI Creep, LSP is Sacred). |
-| 🎨 [Image Editor](docs/IMAGE_EDITOR.md) | In-depth guide to ImageMagick tools. |
-| 🚧 [Contributing](docs/CONTRIBUTING.md) | How to help us test Developer Mode. |
+- **[📖 IMAGE_EDITOR.md](docs/IMAGE_EDITOR.md)**: Complete image editor guide
+- **[📖 FONTS.md](docs/FONTS.md)**: Font system and typography
+- **[📖 INSTALLATION.md](docs/INSTALLATION.md)**: All installation methods
+- **[🤝 CONTRIBUTING.md](docs/CONTRIBUTING.md)**: Guide for contributors
+- **[💬 GitHub Issues](https://github.com/Macgyber/dragonruby-mode/issues)**: Report bugs or request features
 
 ---
 
-*Built with ❤️ for the DragonRuby Community.*
+*Forged for creators who refuse to settle. Forged for DragonRuby.*
+
+**DragonRuby Emacs Mode — v0.5.0**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

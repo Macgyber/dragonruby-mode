@@ -1,7 +1,7 @@
 ;;; dragonruby-mode.el --- Semantic tooling for DragonRuby -*- lexical-binding: t; -*-
 
 ;; Author: Macgyber <esteban3261g@gmail.com>
-;; Version: 0.5.5
+;; Version: 0.5.0
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: games, dragonruby, tools
 ;; URL: https://github.com/Macgyber/dragonruby-mode
@@ -33,7 +33,10 @@
     (add-to-list 'load-path sprites-dir)
     (add-to-list 'load-path (expand-file-name "paths" src-dir))
     (add-to-list 'load-path (expand-file-name "image-tools" src-dir))
-    (add-to-list 'load-path (expand-file-name "concepts" src-dir))))
+    (add-to-list 'load-path (expand-file-name "concepts" src-dir))
+    (add-to-list 'load-path (expand-file-name "font-tools" src-dir))
+    (add-to-list 'load-path (expand-file-name "font" src-dir))
+    (add-to-list 'load-path (expand-file-name "audio" src-dir))))
 
 ;; Require modules from src/
 (require 'dragonruby-core)
@@ -43,6 +46,8 @@
 (require 'dragonruby-image-tools)
 (require 'dragonruby-docs)
 (require 'dragonruby-concepts)
+(require 'dragonruby-fonts)
+(require 'dragonruby-audio)
 
 ;; --- FEATURE FLAGS ---
 
@@ -87,6 +92,16 @@ When nil, color swatches are read-only."
   :type 'boolean
   :group 'dragonruby)
 
+(defcustom dragonruby-enable-fonts t
+  "Enable font previews and navigation."
+  :type 'boolean
+  :group 'dragonruby)
+
+(defcustom dragonruby-enable-audio t
+  "Enable audio services."
+  :type 'boolean
+  :group 'dragonruby)
+
 (defcustom dragonruby-experimental-smart-jump nil
   "Enable experimental Smart Source Jumping."
   :type 'boolean
@@ -105,7 +120,9 @@ When nil, color swatches are read-only."
             (when dragonruby-enable-paths (dragonruby-paths-mode 1))
             (when dragonruby-enable-image-tools (dragonruby-image-tools-mode 1))
             (when dragonruby-enable-docs (dragonruby-docs-mode 1))
-            (when dragonruby-enable-concepts (dragonruby-concepts-mode 1)))
+            (when dragonruby-enable-concepts (dragonruby-concepts-mode 1))
+            (when dragonruby-enable-fonts (dragonruby-font-mode 1))
+            (when dragonruby-enable-audio (dragonruby-audio-mode 1)))
         (error
          (dragonruby--warn-in-development (format "Error en Activación: %s" err))
          (dragonruby-mode -1)))
@@ -116,6 +133,8 @@ When nil, color swatches are read-only."
     (dragonruby-image-tools-mode -1)
     (dragonruby-docs-mode -1)
     (dragonruby-concepts-mode -1)
+    (dragonruby-font-mode -1)
+    (dragonruby-audio-mode -1)
     (setq dragonruby--project-root-cache nil)))
 
 ;;;###autoload

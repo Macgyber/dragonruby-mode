@@ -112,10 +112,8 @@ Emacs uses its own notation for keys. Here's how to read it:
 | Notation | Keys | Action |
 |----------|------|--------|
 | `C-M-i` | Ctrl+Alt+i | Smart Complete (Images only in `.sprites` context) |
-| `RET` | Enter | Open sprite source file (Aseprite/PNG) |
-| `C-c p` | Ctrl+c, p | Preview sprite in popup |
-| `S-mouse-1` | Shift + Click | Quick preview popup |
-| `mouse-1` | Left click | Open sprite in Emacs |
+| `C-c C-o` | Ctrl+c, Ctrl+o | Open sprite source file (if Smart Jump enabled) |
+
 
 ### Paths & Assets (The Law of Formats)
 | Notation | Keys | Action |
@@ -131,8 +129,12 @@ Emacs uses its own notation for keys. Here's how to read it:
 | `sou` + `C-M-i` | Type `sou`, `C-M-i` | **Audio Filter** (`".wav"`) |
 | **Inside Quotes** | | |
 | `C-M-i` | `Ctrl+Alt+i` | **The Law**: Instant list of files filtered by context. |
-| `C-c o` | `C-c o` | **Global Jump**: Open any file in the project. |
-| `RET` / `mouse-1` | Click/Enter | Follow underlined path or open image in Emacs. |
+| `C-c C-o` | `Ctrl+c, Ctrl+o` | Follow underlined path or open file. |
+
+### 🪟 UI Layout (Docs Side Window)
+| Notation | Keys | Action |
+|----------|------|--------|
+| `C-x {` / `C-x }` | | Shrink / Enlarge window (Keyboard) |
 
 ---
 
@@ -163,11 +165,6 @@ You can add your own snippets to the system using the `dragonruby-registry`. Add
 
 ---
 
-### Colors
-| Notation | Keys | Action |
-|----------|------|--------|
-| `mouse-1` | Click on `■` | Open picker or Show Safety Warning |
-| `RET` | Enter on `■` | Open picker or Show Safety Warning |
 
 ### Mode Control
 | Notation | Keys | Action |
@@ -232,4 +229,4 @@ You can add your own snippets to the system using the `dragonruby-registry`. Add
 
 ---
 
-*DragonRuby Emacs Mode — v0.5.7*
+*DragonRuby Emacs Mode — v0.5.0*

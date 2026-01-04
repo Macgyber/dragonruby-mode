@@ -6,12 +6,15 @@
   '((sprite . "sprites")
     (background . "sprites")
     (audio . "audio")
+    (font . "fonts")
     (code . "app")))
 
 (defconst dragonruby-image-exts '("png" "bmp" "jpg" "jpeg" "gif")
   "Supported image extensions for DragonRuby.")
 (defconst dragonruby-audio-exts '("wav" "ogg" "mp3")
   "Supported audio extensions for DragonRuby.")
+(defconst dragonruby-font-exts  '("ttf" "otf")
+  "Supported font extensions for DragonRuby.")
 (defconst dragonruby-code-exts  '("rb")
   "Ruby source extensions for DragonRuby.")
 (defconst dragonruby-data-exts  '("json" "txt" "csv" "tsv" "xml" "yml" "yaml")
@@ -19,22 +22,22 @@
 
 ;; Unify with legacy names for backward compatibility across all modules
 (defvar dragonruby-supported-sprites dragonruby-image-exts)
-(defvar dragonruby-unsupported-sprites '("svg" "psd" "xcf" "ase" "aseprite"))
+(defvar dragonruby-unsupported-sprites '("svg" "psd" "xcf" "ase" "graphite"))
 
-(defcustom dragonruby-sprite-source-extensions '(".aseprite" ".ase" ".psd" ".xcf" ".graphite")
+(defcustom dragonruby-sprite-source-extensions '(".ase" ".psd" ".xcf" ".graphite" ".kra")
   "List of source extensions to prioritize when opening a sprite."
   :type '(repeat string)
   :group 'dragonruby)
 
 (defcustom dragonruby-experimental-smart-jump nil
   "Enable experimental Smart Source Jumping.
-If non-nil, clicking a sprite or [Edit] opens the source file (e.g. .aseprite)
+If non-nil, clicking a sprite or [Edit] opens the source file (e.g. .psd, .kra)
 if found in the same directory or \\='art/\\=' folder."
   :type 'boolean
   :group 'dragonruby)
 
 (defun dragonruby--find-source-file (path)
-  "Find a source file (e.g. .aseprite) for the given image PATH.
+  "Find a source file (e.g. .psd, .kra, .xcf) for the given image PATH.
 Checks:
 1. The same directory as PATH.
 2. The \\='art/\\=' directory at project root."
@@ -70,22 +73,24 @@ Strictly limits search directories based on TYPE:
 - nil     : all standard directories."
   (let* ((root (dragonruby--find-project-root))
          (standard-dirs (pcase type
-                          ('ruby   '("app" "lib" "data" "sprites")) ; Universal Law
+                          ('ruby   '("app" "lib" "data" "sprites" "audio" "fonts")) ; Universal Law
                           ('data   '("data"))
                           ('sprite '("sprites"))
-                          ('audio  '("sounds"))
-                          (_       '("app" "data" "lib" "sprites" "sounds"))))
+                          ('audio  '("audio"))
+                          ('font   '("fonts"))
+                          (_       '("app" "data" "lib" "sprites" "audio" "fonts"))))
          (ruby-exts dragonruby-code-exts)
          (sprite-exts (if (boundp 'dragonruby-supported-sprites)
                           (append dragonruby-supported-sprites dragonruby-unsupported-sprites)
                         dragonruby-image-exts))
          (data-exts dragonruby-data-exts)
          (extensions (pcase type
-                       ('ruby   (append ruby-exts sprite-exts data-exts dragonruby-audio-exts)) ; Law
+                       ('ruby   (append ruby-exts sprite-exts data-exts dragonruby-audio-exts dragonruby-font-exts)) ; Law
                        ('data   data-exts)
                        ('sprite sprite-exts)
                        ('audio  dragonruby-audio-exts)
-                       (_       (append ruby-exts sprite-exts data-exts dragonruby-audio-exts))))
+                       ('font   dragonruby-font-exts)
+                       (_       (append ruby-exts sprite-exts data-exts dragonruby-audio-exts dragonruby-font-exts))))
          (pattern (concat "\\.\\(" (regexp-opt extensions) "\\)$")))
     (when (and root (file-directory-p root))
       (let (all-files)

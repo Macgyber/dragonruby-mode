@@ -57,39 +57,52 @@ Refers to the \\='Living Documentation\\=' system."
   "Open documentation FILENAME (e.g. sprite.org).
 If ANCHOR is provided, it is treated as a semantic intent (e.g. \\='definition\\=',
 \\='example\\='). The function searches for a :NAV-TARGET: property matching ANCHOR.
-Falls back to searching for a header matching ANCHOR title if no property found."
+Falls back to searching for a header matching ANCHOR title if no property found.
+
+Opens in a persistent side window on the right."
   (let ((path (expand-file-name filename dragonruby-docs-directory)))
     (if (file-exists-p path)
         (progn
-          (find-file path)
-          (when anchor
-            (goto-char (point-min))
-            ;; 1. Try Semantic Property Search (:NAV-TARGET: anchor)
-            (let ((target-found nil))
-              (while (and (not target-found) (re-search-forward (format ":NAV-TARGET: +%s" (regexp-quote anchor)) nil t))
-                (save-excursion
-                  (if (re-search-backward "^\\*+ " nil t)
-                      (setq target-found (point))
-                    (setq target-found nil))))
-              
-              (if target-found
-                  (progn
-                    (goto-char target-found)
-                    (recenter-top-bottom 0)
-                    (if (fboundp 'org-fold-show-entry)
-                        (org-fold-show-entry)
-                      (with-no-warnings (org-show-entry))))
-                
-                ;; 2. Fallback: Search for Header Title exact match
+          ;; Open in side window (right side, persistent)
+          (let ((buf (find-file-noselect path)))
+            (display-buffer buf
+                            '(display-buffer-in-side-window
+                              (side . right)
+                              (slot . 0)
+                              (window-width . 0.35)
+                              (window-parameters . ((no-delete-other-windows . t)
+                                                   (no-other-window . nil)))))
+            ;; Switch to the doc buffer to navigate to anchor
+            (with-current-buffer buf
+              (visual-line-mode 1) ;; Wrap text to window width
+              (when anchor
                 (goto-char (point-min))
-                (if (re-search-forward (format "^\\*+ %s" (regexp-quote anchor)) nil t)
-                    (progn
-                      (recenter-top-bottom 0)
-                      (if (fboundp 'org-fold-show-entry)
-                          (org-fold-show-entry)
-                        (with-no-warnings (org-show-entry))))
-                  (message "⚠️ Section for intention '%s' not found in %s" anchor filename)))))
-          (message "📖 Opened knowledge node: %s" filename))
+                ;; 1. Try Semantic Property Search (:NAV-TARGET: anchor)
+                (let ((target-found nil))
+                  (while (and (not target-found) (re-search-forward (format ":NAV-TARGET: +%s" (regexp-quote anchor)) nil t))
+                    (save-excursion
+                      (if (re-search-backward "^\\*+ " nil t)
+                          (setq target-found (point))
+                        (setq target-found nil))))
+                  
+                  (if target-found
+                      (progn
+                        (goto-char target-found)
+                        (recenter-top-bottom 0)
+                        (if (fboundp 'org-fold-show-entry)
+                            (org-fold-show-entry)
+                          (with-no-warnings (org-show-entry))))
+                    
+                    ;; 2. Fallback: Search for Header Title exact match
+                    (goto-char (point-min))
+                    (if (re-search-forward (format "^\\*+ %s" (regexp-quote anchor)) nil t)
+                        (progn
+                          (recenter-top-bottom 0)
+                          (if (fboundp 'org-fold-show-entry)
+                              (org-fold-show-entry)
+                            (with-no-warnings (org-show-entry))))
+                      (message "⚠️ Section for intention '%s' not found in %s" anchor filename)))))))
+          (message "📖 Opened knowledge node: %s (side window)" filename))
       (message "❌ Documentation file missing: %s" filename))))
 
 (defun dragonruby-docs-visit-at-point ()

@@ -1,0 +1,83 @@
+name: "🐛 Bug Report"
+description: "Report an error or unexpected behavior in DragonRuby Mode"
+title: "[BUG] <Brief description of the error>"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting this bug. Your report helps us improve DragonRuby Mode for everyone.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: "What happened?"
+      description: "Describe the bug you found. What did you expect to happen vs what actually happened?"
+      placeholder: "Example: When opening a .rb file in my DragonRuby project, Emacs shows an error..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: "Steps to reproduce"
+      description: "How can we recreate this bug?"
+      placeholder: |
+        1. Open Emacs
+        2. Load a DragonRuby project
+        3. Click on X
+        4. Observe the error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-message
+    attributes:
+      label: "Error message (if applicable)"
+      description: "Paste any error message or stacktrace from Emacs here"
+      placeholder: |
+        Debugger entered--Lisp error: (error "...")
+      render: text
+
+  - type: dropdown
+    id: emacs-version
+    attributes:
+      label: "Emacs Version"
+      description: "Run `M-x emacs-version` and select your version"
+      options:
+        - "Emacs 29.x"
+        - "Emacs 28.x"
+        - "Emacs 27.x"
+        - "Doom Emacs (specify in additional context)"
+        - "Spacemacs (specify in additional context)"
+        - "Other (specify in additional context)"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: "Operating System"
+      options:
+        - "macOS"
+        - "Linux"
+        - "Windows (WSL)"
+        - "Windows (native)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: dragonruby-config
+    attributes:
+      label: "DragonRuby Mode Configuration"
+      description: "Paste your dragonruby-mode configuration from your init.el here (if you use feature flags or custom configuration)"
+      placeholder: |
+        (setq dragonruby-enable-picker t)
+        (setq dragonruby-experimental-smart-jump nil)
+      render: elisp
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: "Additional context"
+      description: "Any other information that might help (screenshots, project structure, etc.)"

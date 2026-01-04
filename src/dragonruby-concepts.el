@@ -1,6 +1,6 @@
 ;;; dragonruby-concepts.el --- Concept Recognition Facade -*- lexical-binding: t; -*-
 
-(require 'dragonruby-concept-visuals "concepts/dragonruby-concept-visuals")
+(require 'dragonruby-concept-visuals)
 
 (defcustom dragonruby-enable-concepts t
   "Enable semantic concept highlighting."

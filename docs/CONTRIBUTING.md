@@ -27,7 +27,7 @@ Add these to your `init.el` or `config.el` to unlock early-access tools:
 | Feature Flag | Description | Status |
 |--------------|-------------|--------|
 | `(setq dragonruby-enable-picker t)` | **Interactive Color Picker**: Click color boxes to edit. | 🟡 Beta |
-| `(setq dragonruby-experimental-smart-jump t)` | **Smart Source Jump**: Opens `.aseprite` from previews. | 🧪 Experimental |
+| `(setq dragonruby-experimental-smart-jump t)` | **Smart Source Jump**: Opens source files (`.psd`, `.kra`) from previews. | 🧪 Experimental |
 | `(setq dragonruby-experimental-concepts-docs t)` | **Living Documentation**: Symlinks code to `.org` docs. | 🧪 Experimental |
 
 ### Your Feedback is Gold
@@ -36,8 +36,8 @@ If you enable these and find a bug or have an idea, please use the **Experimenta
 ## Pull Requests
 
 ### Before submitting:
-- Read the [Design Philosophy](README.md#design-philosophy)
-- Ensure your change aligns with the [Project Contract](README.md#project-contract)
+- Read the [Architecture](ARCHITECTURE.md) and [Project Contract](CONTRACT.md)
+- Ensure your change aligns with the project's design philosophy
 
 ### Good PRs:
 - Fix bugs without changing architecture
@@ -68,3 +68,7 @@ emacs --batch -l run-tests.el
 ## Questions?
 
 Open an issue with the `question` label.
+
+---
+
+*DragonRuby Emacs Mode — v0.5.0*

@@ -31,7 +31,7 @@
     (overlay-put ov 'face '(:underline (:color "#61AFEF" :style line)))
     
     ;; Tooltip
-    (overlay-put ov 'help-echo (format "Concept: %s (Click or RET to view docs)" concept-name))
+    (overlay-put ov 'help-echo (format "Concept: %s (C-c C-o to view docs)" concept-name))
     
     ;; Semantic Property
     (overlay-put ov 'dragonruby-concept t)
@@ -39,14 +39,10 @@
     ;; Priority (The Shield): Ensure it sits above basic font-lock but doesn't block everything
     (overlay-put ov 'priority 50)
     
-    ;; Interaction Map
+    ;; Interaction Map - Keyboard only (no accidental clicks)
     (let ((map (make-sparse-keymap)))
-      ;; Mouse Interaction
-      (define-key map [mouse-1] 
-        (lambda () (interactive) (dragonruby--activate-concept concept-name)))
-      
-      ;; Keyboard Interaction (Enter key when cursor is on the overlay)
-      (define-key map (kbd "RET") 
+      ;; Keyboard Interaction
+      (define-key map (kbd "C-c C-o") 
         (lambda () (interactive) (dragonruby--activate-concept concept-name)))
       
       (overlay-put ov 'keymap map))
