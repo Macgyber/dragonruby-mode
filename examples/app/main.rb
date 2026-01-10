@@ -4,14 +4,18 @@ def tick args
   # ========================================================
 
   # --- 1. COLORS (FASE 1) ---------------------------------
-  # Arrays (RGB & RGBA)
-  c1 = [255, 0, 0]
-  c2 = [0, 255, 0, 128]
-  
+  # Arrays (RGB & RGBA, hexadecimal, hash)
+  c1 =   [255, 0, 0]
+  c2 =   [250, 25, 0, 128]
+  h1 = { r: 255, g: 255, b: 100 }
+  hex1 = 0xFF80FF
+  hex2 = 0x2700FF
+   args.outputs.sprites << { x: 0, y: 0, w: width, h: height, path: :pixel, r:100, g: 110, b: 70 }
+
   # Hexadecimal
   # Hexadecimal Litearals (Ruby Numbers)
-  hex1 = 0xFF00FF
-  hex2 = 0x0000FF
+  hex1 = 0xFF80FF
+  hex2 = 0x2700FF
 
   # UNSUPPORTED (No coloring expected)
   hex3 = "6b5256" # Hex no string support
@@ -31,15 +35,15 @@ def tick args
   s12 = :magenta
 
   # Hashes (Single & Multiline)
-  h1 = { r: 25, g: 255, b: 100 }
+  h1 = { r: 255, g: 255, b: 100 }
   
   h2 = {
     r: 100,
-    g: 200,
+    g: 210,
     b: 100
   }
 
-  h3 = { r: 50, g: 0, b: 50 } # Compact
+  h3 = { r: 150, g: 0, b: 50 } # Compact
 
   # --- 2. SPRITES (FASE 2: DRAGONS & VISUALS) ------------
   # New Dragon Sprites (Hover to see preview)
@@ -60,7 +64,7 @@ def tick args
   # This previously caused the entire hash to be highlighted. Now only r/g/b should be.
   width = 100
   height = 100
-  args.outputs.sprites << { x: 0, y: 0, w: width, h: height, path: :pixel, r: 0, g: 110, b: 70 }
+  args.outputs.sprites << { x: 0, y: 0, w: width, h: height, path: :pixel, r:100, g: 110, b: 70 }
 
   # --- 3. NAVIGATION (FASE 3) -----------------------------
   # Ruby requires (clickable paths)
@@ -80,15 +84,15 @@ def tick args
   # ✅ Valid Fonts (Hover to see live preview icon)
   args.outputs.labels << {
     x: 640, y: 500,
-    text: "Game Title",
+    text: "Gae Title",
     font: "fonts/title_font.otf",
     size_enum: 20
   }
 
   args.outputs.labels << {
     x: 640, y: 400,
-    text: "Press Start",
-    font: "fonts/main_font.ttf"
+    text: "Pres Start",
+    font: "fonts/1.ttf"
   }
 
   # ❌ Invalid Fonts (Should show RED wave underline / Error tooltip)
@@ -106,4 +110,5 @@ def tick args
 
   # Render Text
   args.outputs.labels << [640, 360, "DragonRuby Emacs Mode Test", 1, 1]
+  args.inputs.controller
 end

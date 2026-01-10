@@ -35,3 +35,9 @@ body:
     attributes:
       label: "Suggestions for this feature"
       description: "How could we make this feature 'essential'?"
+
+  - type: textarea
+    id: visual-feedback
+    attributes:
+      label: "Visual Feedback (Images/Videos)"
+      description: "If you want to show how a feature looks (or fails to look) in your setup, paste it here."

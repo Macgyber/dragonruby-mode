@@ -13,7 +13,8 @@ The DragonRuby Emacs Mode Font System allows you to **visualize, validate, and m
 When you write a font path in your code (e.g., `font: "fonts/main.ttf"`), the plugin:
 
 - **✅ Valid font (TTF/OTF)**: Highlighted in **bright cyan** (`#00FFFF`)
-- **🖼️ Inline thumbnail**: A small preview appears at the end of the line showing "DragonRuby" in that font
+- **🖼️ Inline thumbnail**: A small preview appears at the end of the line
+- **✨ Context Preview**: The plugin is smart! It reads nearby `text:`, `label:`, or `string:` values and uses **that text** to render the preview instead of a generic "DragonRuby". If you write `text: "Game Over"`, the thumbnail will show those exact words in your font!
 - **❌ Unsupported format (WOFF/WOFF2/EOT)**: Highlighted in **orange** with an explanatory tooltip
 - **🔴 Missing file**: Highlighted in **red**
 

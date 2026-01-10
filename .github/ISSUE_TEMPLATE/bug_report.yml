@@ -77,7 +77,14 @@ body:
       render: elisp
 
   - type: textarea
+    id: visual-evidence
+    attributes:
+      label: "Visual Evidence (Screenshots/Video)"
+      description: "Drag and drop or paste images/videos here to show the bug. This is EXTREMELY helpful for UI issues."
+      placeholder: "Paste screenshot here..."
+
+  - type: textarea
     id: additional-context
     attributes:
       label: "Additional context"
-      description: "Any other information that might help (screenshots, project structure, etc.)"
+      description: "Any other information that might help (project structure, logs, etc.)"

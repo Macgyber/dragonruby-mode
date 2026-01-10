@@ -1,0 +1,88 @@
+# DragonRuby API Contract - v0.1 (Validated)
+# Frozen: 2026-01-08
+roots:
+  - args
+  # - $gtk      # <--- Global Toolkit
+  # - @player   # <--- Instance variables
+  # - MyClass   # <--- Constants/Classes
+  # - Enemies   # <--- Modules
+
+trees:
+  # --- Global Toolkit ($gtk) ---
+  $gtk:
+    args: t
+    console: t
+    reset: t
+    request_quit: t
+
+  # --- Game Arguments (args) ---
+  args:
+    # Phase 2: Common State (Engine + Custom examples)
+    state:
+      tick_count: t
+      frame_index: t
+      score: t
+      lives: t
+      
+    # Phase 3: Inputs (Navigable)
+    inputs:
+      keyboard:
+        key_down: t
+        key_held: t
+        key_up: t
+      mouse:
+        x: t
+        y: t
+        click: t
+        button_left: t
+        button_right: t
+      controller:
+        one:
+          left_analog_x: t
+          left_analog_y: t
+          a: t
+          b: t
+        two:
+          left_analog_x: t
+          left_analog_y: t
+      
+    # Phase 4 & 5: Outputs (Deepened)
+    outputs:
+      sprites:
+        x: t
+        y: t
+        w: t
+        h: t
+        path: t
+        angle: t
+        a: t
+        r: t
+        g: t
+        b: t
+        source_x: t
+        source_y: t
+        source_w: t
+        source_h: t
+      solids: t
+      borders: t
+      labels: t
+      lines: t
+      background_color: t
+
+    # Separated Domain: Audio
+    audio: 
+      play: t
+      stop: t
+
+    # Context: Grid
+    grid:
+      w: t
+      h: t
+      center_x: t
+      center_y: t
+      left: t
+      right: t
+      top: t
+      bottom: t
+      origin_center: t
+      origin_bottom_left: t

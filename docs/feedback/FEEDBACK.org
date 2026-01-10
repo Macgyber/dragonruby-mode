@@ -1,0 +1,25 @@
+#+TITLE: DragonRuby Mode - User Feedback & Bug Reports
+#+AUTHOR: Macgyber
+#+STARTUP: content indent
+
+* Active Inbox [/]
+  :PROPERTIES:
+  :CATEGORY: Feedback
+  :END:
+  /Paste new reports here. Use C-c C-c to mark as done./
+
+* Categorized Issues
+** UI / Visuals
+** Fonts
+** Audio
+** Sprite Tools
+** Core / Performance
+
+* Implementation Logs
+  /Brief record of fixed issues for the next CHANGELOG.md/
+
+* Guidelines for Local Feedback
+  1. Create a new heading under *Active Inbox* for each report.
+  2. Include the user's name/handle.
+  3. Paste links to screenshots or logs.
+  4. Use Org-mode tags (e.g., :BUG: :FEAT:) for filtering.
