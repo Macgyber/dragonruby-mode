@@ -24,10 +24,9 @@ This is our contribution to the craft. This is the new baseline.
 ## ⚔️ The Stable Arsenal (The Foundational Base)
 
 ### 🎨 Level 1: Semantic Spectrum (Colors)
-Visualize the invisible. Your game's palette, always present.
-- **Visual Swatches**: High-contrast icons that scale with your environment.
-- **Precise Technical Detection**: Support for Hex literals (`0xFF00FF`), RGB/RGBA Arrays `[255, 0, 0]`, and Hashes `{r: 255, g: 0, b:0}`.
-- **Interactive Picker (Optional)**: Enable `dragonruby-enable-picker` to unlock the click-to-edit feature (`■`). By default, swatches are read-only to prevent accidental edits.
+Visualize the invisible. Your game's palette, alive in your code.
+- **Living Color Blocks**: Hex literals (`0xFF00FF`), RGB/RGBA Arrays `[255, 0, 0]`, and Hashes `{r: 255, g: 0, b:0}` — the moment you type them, they transform into visual beacons revealing their true color. Multi-line hashes handled with surgical precision.
+- **Contrast Intelligence**: Text automatically adapts (black or white) to ensure readability on any background.
 
 <div align="center">
   <img src="docs/colors-preview.png" alt="Color Detection Preview" width="60%">
@@ -40,9 +39,15 @@ Stop coding blind. See your world as you build it.
 - **The Validation Law**: Cyan = Ready, Red = Missing, Orange = Illegal Format.
 - **"Double C-M-i" Workflow** (CAPF):
   - Type `spr` + `C-M-i` → Expands to `""` (cursor inside).
-  - Press `C-M-i` again → The minibuffer shows **only valid sprites** from your project.
+  - Press `C-M-i` again → You'll see **only valid sprites** from your project.
   - **Without plugin**: You'd see all project files mixed together.
   - **With plugin**: You see only files from the `sprites/` folder with valid extensions (PNG, BMP, JPG, etc.).
+
+> 💡 **Immersive UI**: By default, suggestions appear in the minibuffer. For a **floating popup** experience like modern IDEs, install **`company-mode`**. The plugin automatically feeds it your sprites, fonts, and paths.
+> ```elisp
+> M-x package-install RET company
+> (global-company-mode)
+> ```
 
 ### 🎨 The Forge: Integrated Image Editor
 
@@ -53,7 +58,7 @@ Press `RET` or `C-c C-o` on any sprite in your code and the header-line transfor
   <br><em>VIEW, TRANSFORM, COLOR, SYSTEM, CREATIVE — Five tool groups, infinite power.</em>
 </div>
 
-### 🌐 Level 4: The Creative Hub (New in v0.5.0)
+### 🌐 Level 4: The Creative Hub (Beta)
 Your bridge to the ecosystem. Located within the Image Editor header-line:
 - **Instant Web Tools**: One-click access to **Graphite**, **Piskel**, **Lospec**, **Itch.io**, and the DragonRuby Discord.
 - **Customizable**: Add your own tools (Web URLs or Local Executables) via the `[+]` button.
@@ -66,13 +71,13 @@ Your bridge to the ecosystem. Located within the Image Editor header-line:
 Eliminate journey friction. Move at the speed of thought.
 - **Contextual Intelligence**: The plugin knows when you're in a `require`, a `read_file`, or a `path:` assignment and filters your destinations accordingly.
 - **Dimensional Links**: Every path is a portal. `C-c C-o` or `RET` to jump directly to any file or asset.
-- **CAPF Completion**: Press `C-M-i` inside a string to see files of the correct type based on context.
+- **CAPF Completion**: Press `C-M-i` inside a string to see files of the correct type based on context. With **`company-mode`** installed, suggestions appear in a floating IDE-style popup.
 
 ---
 
-## 💎 Tactical Arsenal (New in v0.5.0)
+## 💎 Tactical Arsenal (Beta)
 
-### 🔊 The Resonance Engine (Audio)
+### 🔊 The Resonance Engine (Audio) — Beta
 Audio components are no longer silent text. Feel your game's heartbeat.
 - **Emerald Pulse**: Valid assets shine with vibrant green energy (`#2ECC71`).
 - **Format Sentinel**: Instant suppression of weak formats. `.mp3` is marked and neutralized.
@@ -80,14 +85,19 @@ Audio components are no longer silent text. Feel your game's heartbeat.
 
 ### 🅰️ The Glyph Engine (Fonts)
 
-Press `RET` on any font in your code and access a **complete interactive viewer**: test pangrams in 5 languages, review the full alphabet (ABCs), visualize custom text, and confirm each character renders correctly. Inline thumbnails adapt to your theme (dark/light) automatically, and the **Creative Hub** connects you with Google Fonts, DaFont, and your own personal repositories.
+> ⚠️ **Requires [ImageMagick](https://imagemagick.org/)** to render previews.
 
-**✨ Context Preview**: The plugin reads nearby `text:` values and uses them to render the font preview. Write `text: "Press Start"` near your font, and the thumbnail will show that exact phrase rendered in your font!
+Did you pick the right font? Why doesn't it look like you expected? Stop guessing. Press `RET` on any font and visualize it **in real-time** with your own text, pangrams in 5 languages, or the full alphabet.
+
+- **Smart Thumbnails**: Automatically adapt to your theme (dark/light).
+- **Context Preview**: The plugin reads nearby `text:` values (limited to 11 characters to prevent overflow). Write `text: "Press Start"` near your font, and the thumbnail shows that phrase.
 
 <div align="center">
   <img src="docs/font-context-preview.png" alt="Font Context Preview" width="60%">
-  <br><em>The plugin reads "Pres Start" from the nearby text: and renders it in the font.</em>
+  <br><em>The plugin reads "Press Start" from nearby text: and renders it in the font.</em>
 </div>
+
+- **Creative Hub**: Explore fonts from within the editor. Available buttons: **Google Fonts**, **DaFont**, **Font Squirrel**. Add `[+]` or remove `[-]` your own links to customize.
 
 **→ [📖 Complete Font System Guide](docs/FONTS.md)** (ABC/Pangram Viewer, Typography resources, Troubleshooting)
 
@@ -111,7 +121,7 @@ Designed to **not interfere** with your existing configuration:
 
 ---
 
-### 🏭 The Industrial Standard (New in v0.6.0)
+### 🏭 The Industrial Standard
 **"The visible speed is born from the invisible order."**
 
 We have re-engineered the core to meet **SRE & Performance Engineering** standards:
@@ -123,34 +133,23 @@ We have re-engineered the core to meet **SRE & Performance Engineering** standar
 
 ## 📦 Installation
 
+Choose your preferred method. For a quick setup in **Doom Emacs**, simply copy these blocks:
 
-### Doom Emacs
 ```elisp
-;; packages.el
+;; 1. In ~/.doom.d/packages.el
 (package! dragonruby-mode :recipe (:host github :repo "Macgyber/dragonruby-mode"))
 
-;; config.el
+;; 2. In ~/.doom.d/config.el
 (use-package! dragonruby-mode
   :hook ((ruby-mode . dragonruby-maybe-enable)
          (ruby-ts-mode . dragonruby-maybe-enable)))
 ```
 
-### straight.el
-```elisp
-(straight-use-package
- '(dragonruby-mode :type git :host github :repo "Macgyber/dragonruby-mode"))
-
-(use-package dragonruby-mode
-  :straight t
-  :hook ((ruby-mode . dragonruby-maybe-enable)
-         (ruby-ts-mode . dragonruby-maybe-enable)))
-```
-
-**→ [📖 Complete Installation Guide](docs/INSTALLATION.md)** (Spacemacs, use-package, package-vc, Quelpa, el-get, borg, manual)
+**→ [📖 Complete Installation Guide](docs/INSTALLATION.md)** (Detailed instructions for Doom Emacs, straight.el, Spacemacs, use-package, manual, and more)
 
 ---
 
-## 🏗️ Architecture: The Lego System (v0.7.0)
+## 🏗️ Architecture: The Lego System (Beta)
 "Complexity is the enemy. Modularity is the shield."
 
 We have re-forged the core into a **Lego Architecture**. The system is no longer a monolith; it is a collection of independent, intelligent pieces orchestrated by a central Kernel.
@@ -164,44 +163,47 @@ The Kernel is the central nervous system. It strictly enforces the **Three Laws*
 ### 🧱 Assembling Your Legos
 You have total control. Enable or disable individual pieces in your config. The Kernel handles the wiring automatically.
 
+To customize your experience, add these lines to your `config.el` (Doom) or `init.el` (Vanilla) **before** loading the mode:
+
 ```elisp
 ;; Example: Minimalist Setup (Code Only)
 (setq dragonruby-enable-sprites nil)      ; Disable graphics
 (setq dragonruby-enable-audio nil)        ; Disable audio
-(setq dragonruby-enable-completion t)     ; Keep strict contract completion
+(setq dragonruby-enable-completion t)     ; Keep schema-based autocomplete
 (setq dragonruby-enable-paths t)          ; Keep fast navigation
 ```
 
 | Lego Piece | Capability | Default |
 |------------|------------|---------|
-| `sprites` | Visual rendering, thumbnails | ✅ ON |
-| `sprite-tools` | Image Editor, transformations | ✅ ON |
-| `fonts` | TTF/OTF visuals, pangram viewer | ✅ ON |
-| `audio` | Sound file detection, size info | ✅ ON |
-| `colors` | Hex/RGB highlighting | ✅ ON |
-| `concepts` | Educational concept popups | ✅ ON |
-| `paths` | Project navigation, file jumping | ✅ ON |
-| `completion` | Strict YAML API Contract | ✅ ON |
-| `docs` | Documentation lookup interface | ✅ ON |
+| `sprites` | Visual rendering, thumbnails | 🔴 OFF |
+| `sprite-tools` | Image Editor, transformations | 🔴 OFF |
+| `fonts` | TTF/OTF visuals, pangram viewer | 🔴 OFF |
+| `audio` | Sound file detection, size info | 🔴 OFF |
+| `colors` | Hex/RGB highlighting | 🔴 OFF |
+| `concepts` | Educational concept popups | 🔴 OFF |
+| `paths` | Project navigation, file jumping | 🔴 OFF |
+| `completion` | Strict YAML API Schema | ✅ ON |
+| `docs` | Documentation lookup interface | 🔴 OFF |
 
 If you disable a parent (e.g., `sprites`), the Kernel **automatically** powers down its children (`sprite-tools`) to prevent errors. You don't have to manage dependencies. Just build your perfect editor.
 
 ---
 
-### 📜 Level 5: The Contract (v0.1 Validated)
+### 📜 Level 5: The Schema (v0.1 Validated)
 **"No magic. Just truth."**
 
-An artisan autocompletion system that respects your definitions. It is **NOT** an LSP. It does not infer, guess, or think. It simply allows you to define a contract for your API, and the editor honors it.
+An artisan autocompletion system that respects your definitions. It is **NOT** an LSP. It does not infer, guess, or think. It simply allows you to define a schema for your API, and the editor honors it.
 
-- **Strict YAML Contract**: Define your API in `dragonruby_api.yml` using a strict, artisan-friendly schema (2-space indent, maps only).
+- **Strict YAML Schema**: Define your API in `dragonruby_api.yml` using a strict, artisan-friendly format (2-space indent, maps only).
 - **Zero Hallucination**: It only completes what you explicitly define as a root (e.g. `args.`). It never guesses types.
-- **Fail-Safe**: If your contract is invalid, the system silently steps aside. It never interrupts your flow with errors.
+- **Fail-Safe**: If your schema is invalid, the system silently steps aside. It never interrupts your flow with errors.
 - **Introspection**: Use `M-x dragonruby-inspect-contract` to visualize the active knowledge tree.
+- **Automatic Detection**: The system looks for `dragonruby_api.yml` in your project root. If missing, it automatically uses the global schema residing in the plugin's own folder.
 
-**→ [📖 Complete Contract Guide](docs/CONTRACT.md)** (Schema, Examples, Philosophy)
 
-### 🧠 Autocomplete Experience (New in v0.6.1)
+### 🧠 Autocomplete Experience
 - **Fluid Typing**: Type `arg` -> Select `args` -> System auto-inserts `.` -> Type `st` -> Select `state`.
+- **Smart Dot**: Typing a `.` after a valid contract keyword (like `args`) triggers the completion menu **automatically**.
 - **Shortcuts**: Use `C-M-i` (Standard) or **`C-.`** (Windows-friendly) to trigger completion manually.
 - **UI Recommendation**: For a "Google-like" popup experience, we highly recommend installing **`company-mode`**. The backend will automatically feed it data.
   - `M-x package-install RET company`
@@ -213,7 +215,6 @@ An artisan autocompletion system that respects your definitions. It is **NOT** a
 
 - **[📖 IMAGE_EDITOR.md](docs/IMAGE_EDITOR.md)**: Complete image editor guide
 - **[📖 FONTS.md](docs/FONTS.md)**: Font system and typography
-- **[📖 CONTRACT.md](docs/CONTRACT.md)**: The Master Philosophy & Design Contract
 - **[📜 MANIFESTO.md](docs/MANIFESTO.md)**: The Project's Existential Boundaries
 - **[📖 INSTALLATION.md](docs/INSTALLATION.md)**: All installation methods
 - **[🤝 CONTRIBUTING.md](docs/CONTRIBUTING.md)**: Guide for contributors
@@ -223,6 +224,6 @@ An artisan autocompletion system that respects your definitions. It is **NOT** a
 
 *Forged for creators who refuse to settle. Forged for DragonRuby.*
 
-**DragonRuby Emacs Mode — v0.7.0**
+**DragonRuby Emacs Mode — v0.7.1**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

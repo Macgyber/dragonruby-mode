@@ -55,7 +55,7 @@ This is the ultimate expression of our philosophy. It is **NOT** a Language Serv
 1.  **Strict Definition**: You define the API structure in `dragonruby_api.yml`.
 2.  **Zero Inference**: `a = args; a.` will never trigger completion. Only explicit roots (`args.`) work.
 3.  **Literal Paths**: Only visible, literal paths are traversed.
-4.  **Fallback Strategy**: The system looks for `dragonruby_api.yml` in the project root. If missing, it uses the global fallback contract (v0.1) bundled with the plugin.
+4.  **Fallback Strategy**: The system searches for `dragonruby_api.yml` in your project root first (Local Contract). If not found, it automatically detects and loads the version stored in the plugin's installation directory (Global Contract).
 
 ### The Schema
 We strictly respect the 2-space indented YAML contract. If it is not in the YAML, it does not exist for the editor.

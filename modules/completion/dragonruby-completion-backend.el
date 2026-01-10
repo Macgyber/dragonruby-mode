@@ -138,5 +138,20 @@ RENAMED: To avoid conflict with dragonruby--resolve-path in utils."
           (hash-table-keys v1-children)
         (hash-table-keys node)))))
 
+(defun dragonruby-completion-backend-valid-chain-p (chain-str)
+  "Return t if CHAIN-STR is a valid root or part of a valid chain in the contract."
+  (when (and dragonruby-completion--contract chain-str)
+    (let* ((parts (split-string chain-str "\\."))
+           (root (car parts))
+           (path (cdr parts)))
+      (if (null path)
+          ;; Simple root check
+          (let ((trees (gethash "trees" dragonruby-completion--contract)))
+            (if trees
+                (gethash root trees)
+              (gethash root dragonruby-completion--contract)))
+        ;; Full chain resolution
+        (dragonruby-completion--resolve-component root path)))))
+
 (provide 'dragonruby-completion-backend)
 ;;; dragonruby-completion-backend.el ends here

@@ -22,15 +22,26 @@
     (require 'dragonruby-mode)
   (error (message "❌ Error cargando dragonruby-mode: %s" err)))
 
-;; Activar features opcionales por defecto para testing
-(setq dragonruby-enable-sprites t)
-(setq dragonruby-enable-sprite-tools t)
-(setq dragonruby-enable-colors t)
-(setq dragonruby-enable-paths t)
-(setq dragonruby-enable-concepts t)
-(setq dragonruby-enable-completion t)
-(setq dragonruby-enable-docs t)
-(setq dragonruby-concepts-debug t) ;; Debug Atómico activado
+;; -----------------------------------------------------------------------------
+;; ⚙️ Perfil de Usuario (Legos)
+;; -----------------------------------------------------------------------------
+;; El núcleo de dragonruby-mode (v0.7.1) arranca ultra-ligero por defecto.
+;; Forzamos el apagado de todo excepto lo que tú desees activar:
+
+(setq dragonruby-enable-completion t)      ; ✅ ON (Motor de Autocompletado)
+
+;; Descomenta la que necesites (esto sobrescribe el default del núcleo):
+(setq dragonruby-enable-colors nil)        ; 🔴 OFF
+(setq dragonruby-enable-sprites nil)       ; 🔴 OFF
+(setq dragonruby-enable-sprite-tools nil)  ; 🔴 OFF
+(setq dragonruby-enable-fonts nil)         ; 🔴 OFF
+(setq dragonruby-enable-font-tools nil)    ; 🔴 OFF
+(setq dragonruby-enable-audio nil)         ; 🔴 OFF
+(setq dragonruby-enable-paths nil)         ; 🔴 OFF
+(setq dragonruby-enable-concepts nil)      ; 🔴 OFF
+(setq dragonruby-enable-docs nil)          ; 🔴 OFF
+
+(setq dragonruby-concepts-debug nil)       ; Debug Atómico DESACTIVADO
 
 ;; ============================================================
 ;; 2. AUTO-ENABLE EN BUFFERS YA ABIERTOS
@@ -91,19 +102,6 @@
     (setenv "PATH" (concat magick-path ";" (getenv "PATH")))
     (message "🖼️ ImageMagick Configurado: %s" magick-path)))
 
-;; ============================================================
-;; 5. 🧪 LEGO TEST - MODO MINIMALISTA (Solo Autocompletado)
-;; ============================================================
-
-(setq dragonruby-enable-sprites nil)       ; 🔴 OFF
-(setq dragonruby-enable-fonts nil)         ; 🔴 OFF
-(setq dragonruby-enable-audio nil)         ; 🔴 OFF
-(setq dragonruby-enable-colors nil)        ; 🔴 OFF
-(setq dragonruby-enable-paths nil)         ; 🔴 OFF
-(setq dragonruby-enable-concepts nil)      ; 🔴 OFF
-;; (setq dragonruby-enable-completion nil) ; ✅ ON - AUTOCOMPLETADO ACTIVO
-(setq dragonruby-enable-docs nil)          ; 🔴 OFF
-
-;; ⬆️ Comenta las líneas para reconectar módulos y presiona F5.
-
 (message "🚀 DragonRuby Mode Cargado")
+
+;;; .emacs ends here

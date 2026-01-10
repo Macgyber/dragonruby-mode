@@ -56,6 +56,27 @@
   (message "🐉 [Contract] Completion Disabled"))
 
 ;; -----------------------------------------------------------------------------
+;; ⚡ Smart Triggers
+;; -----------------------------------------------------------------------------
+
+(defun dragonruby-completion-self-insert-dot (arg)
+  "Insert a dot and trigger completion if it follows a valid contract chain."
+  (interactive "p")
+  (let* ((line-start (line-beginning-position))
+         (prefix-before (buffer-substring-no-properties line-start (point))))
+    (self-insert-command arg)
+    (when (and dragonruby-mode 
+               dragonruby-enable-completion
+               (not (nth 8 (syntax-ppss)))) ;; Not in string or comment
+      ;; Check for a valid chain match RIGHT BEFORE the dot we just inserted
+      (when (string-match "\\(?:^\\|[^a-zA-Z0-9_$@]\\)\\([a-zA-Z0-9_$@]+\\(\\.[a-zA-Z0-9_$@]+\\)*\\)\\.$" 
+                          (buffer-substring-no-properties line-start (point)))
+        (let* ((full-match (match-string 1 (buffer-substring-no-properties line-start (point))))
+               (clean-chain (substring full-match 0 -1))) ;; Remove the trailing dot
+          (when (dragonruby-completion-backend-valid-chain-p clean-chain)
+            (completion-at-point)))))))
+
+;; -----------------------------------------------------------------------------
 ;; 📜 Manifest
 ;; -----------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
 
 ## 🏗️ Core Philosophy: Lego Architecture
 
-The system (v0.7.0+) is built on a **Kernel-Driven Modular Architecture**.
+The system (v0.7.1+) is built on a **Kernel-Driven Modular Architecture**.
 It is not a monolithic plugin; it is a collection of independent modules ("Legos") orchestrated by a central Kernel.
 
 ## 🧠 The Kernel (`modules/core/dragonruby-kernel.el`)
@@ -59,4 +59,4 @@ DragonRuby Mode follows a strict "Observe and Paint" philosophy.
 
 ---
 
-*DragonRuby Emacs Mode — v0.7.0*
+*DragonRuby Emacs Mode — v0.7.1*

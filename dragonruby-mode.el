@@ -1,7 +1,7 @@
 ;;; dragonruby-mode.el --- Semantic tooling for DragonRuby (Kernel Architecture) -*- lexical-binding: t; -*-
 
 ;; Author: Macgyber <esteban3261g@gmail.com>
-;; Version: 0.7.0
+;; Version: 0.7.1
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: games, dragonruby, tools
 ;; URL: https://github.com/Macgyber/dragonruby-mode
@@ -67,16 +67,16 @@
 ;; ⚙️ Configuration (Feature Flags)
 ;; -----------------------------------------------------------------------------
 
-(defcustom dragonruby-enable-sprites t "Enable sprite system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-sprite-tools t "Enable sprite tools." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-fonts t "Enable font system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-font-tools t "Enable font tools." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-audio t "Enable audio system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-colors t "Enable color system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-paths t "Enable path system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-concepts t "Enable concept system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-sprites nil "Enable sprite system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-sprite-tools nil "Enable sprite tools." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-fonts nil "Enable font system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-font-tools nil "Enable font tools." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-audio nil "Enable audio system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-colors nil "Enable color system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-paths nil "Enable path system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-concepts nil "Enable concept system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-completion t "Enable completion system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-docs t "Enable documentation system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-docs nil "Enable documentation system." :type 'boolean :group 'dragonruby)
 
 ;; -----------------------------------------------------------------------------
 ;; 🎮 Session Manager (The Mode)
@@ -89,6 +89,8 @@
   :group 'dragonruby
   :keymap (let ((map (make-sparse-keymap)))
             (define-key map (kbd "C-.") #'completion-at-point)
+            (define-key map (kbd "C-M-i") #'completion-at-point)
+            (define-key map (kbd ".") #'dragonruby-completion-self-insert-dot)
             map)
   (if dragonruby-mode
       (dragonruby--boot-session)
@@ -102,16 +104,63 @@
         (dragonruby-scheduler-enable)
         
         ;; 2. Kernel Activation (Global Services)
-        (when dragonruby-enable-sprites (dragonruby-enable 'sprites))
-        (when dragonruby-enable-sprite-tools (dragonruby-enable 'sprite-tools))
-        (when dragonruby-enable-fonts (dragonruby-enable 'fonts))
-        (when dragonruby-enable-font-tools (dragonruby-enable 'font-tools))
-        (when dragonruby-enable-audio (dragonruby-enable 'audio))
-        (when dragonruby-enable-colors (dragonruby-enable 'colors))
-        (when dragonruby-enable-paths (dragonruby-enable 'paths))
-        (when dragonruby-enable-concepts (dragonruby-enable 'concepts))
-        (when dragonruby-enable-completion (dragonruby-enable 'completion))
-        (when dragonruby-enable-docs (dragonruby-enable 'docs))
+        (let (enabled-msgs disabled-msgs)
+          ;; --- Sprites & Tools ---
+          (let ((sprites-active dragonruby-enable-sprites))
+            (if sprites-active 
+                (progn
+                  (dragonruby-enable 'sprites)
+                  (push "🧠 Kernel: Module [sprites] ENABLED" enabled-msgs)
+                  (if dragonruby-enable-sprite-tools
+                      (progn (dragonruby-enable 'sprite-tools)
+                             (push "🧠 Kernel: Module [sprite-tools] ENABLED" enabled-msgs))
+                    (push "🧠 Kernel: Module [sprite-tools] DISABLED" disabled-msgs)))
+              (push "🧠 Kernel: Module [sprites] DISABLED" disabled-msgs)
+              (when dragonruby-enable-sprite-tools
+                (push "🧠 Kernel: Module [sprite-tools] DISABLED (requires [sprites])" disabled-msgs))))
+
+          ;; --- Fonts & Tools ---
+          (let ((fonts-active dragonruby-enable-fonts))
+            (if fonts-active 
+                (progn
+                  (dragonruby-enable 'fonts)
+                  (push "🧠 Kernel: Module [fonts] ENABLED" enabled-msgs)
+                  (if dragonruby-enable-font-tools
+                      (progn (dragonruby-enable 'font-tools)
+                             (push "🧠 Kernel: Module [font-tools] ENABLED" enabled-msgs))
+                    (push "🧠 Kernel: Module [font-tools] DISABLED" disabled-msgs)))
+              (push "🧠 Kernel: Module [fonts] DISABLED" disabled-msgs)
+              (when dragonruby-enable-font-tools
+                (push "🧠 Kernel: Module [font-tools] DISABLED (requires [fonts])" disabled-msgs))))
+          
+          ;; --- Simple Modules ---
+          (if dragonruby-enable-audio
+              (progn (dragonruby-enable 'audio) (push "🧠 Kernel: Module [audio] ENABLED" enabled-msgs))
+            (push "🧠 Kernel: Module [audio] DISABLED" disabled-msgs))
+          
+          (if dragonruby-enable-colors
+              (progn (dragonruby-enable 'colors) (push "🧠 Kernel: Module [colors] ENABLED" enabled-msgs))
+            (push "🧠 Kernel: Module [colors] DISABLED" disabled-msgs))
+          
+          (if dragonruby-enable-paths
+              (progn (dragonruby-enable 'paths) (push "🧠 Kernel: Module [paths] ENABLED" enabled-msgs))
+            (push "🧠 Kernel: Module [paths] DISABLED" disabled-msgs))
+          
+          (if dragonruby-enable-concepts
+              (progn (dragonruby-enable 'concepts) (push "🧠 Kernel: Module [concepts] ENABLED" enabled-msgs))
+            (push "🧠 Kernel: Module [concepts] DISABLED" disabled-msgs))
+          
+          (if dragonruby-enable-completion
+              (progn (dragonruby-enable 'completion) (push "🧠 Kernel: Module [completion] ENABLED" enabled-msgs))
+            (push "🧠 Kernel: Module [completion] DISABLED" disabled-msgs))
+          
+          (if dragonruby-enable-docs
+              (progn (dragonruby-enable 'docs) (push "🧠 Kernel: Module [docs] ENABLED" enabled-msgs))
+            (push "🧠 Kernel: Module [docs] DISABLED" disabled-msgs))
+
+          ;; --- Final Reporting (ENABLED first, then DISABLED) ---
+          (dolist (msg (reverse enabled-msgs)) (message msg))
+          (dolist (msg (reverse disabled-msgs)) (message msg)))
 
         ;; 3. Local Safety
         (setq-local enable-recursive-minibuffers t))

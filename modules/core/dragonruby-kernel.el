@@ -148,7 +148,7 @@ STACK prevents circular dependencies."
 
       ;; 4. Mark Active
       (puthash module-name t dragonruby--active-modules)
-      (message "🧠 Kernel: Module [%s] ONLINE" module-name))))
+      (message "🧠 Kernel: Module [%s] ENABLED" module-name))))
 
 ;; -----------------------------------------------------------------------------
 ;; 🧯 Lifecycle (Deactivation)
@@ -195,7 +195,7 @@ STACK prevents circular dependencies."
 
     ;; 3. Mark Inactive
     (remhash module-name dragonruby--active-modules)
-    (message "🧠 Kernel: Module [%s] OFFLINE" module-name)))
+    (message "🧠 Kernel: Module [%s] DISABLED" module-name)))
 
 (defun dragonruby-module-status (module-name)
   (if (gethash module-name dragonruby--active-modules) :active :inactive))

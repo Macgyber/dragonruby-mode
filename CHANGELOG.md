@@ -8,7 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <details open>
-<summary><h2>[0.7.1] - 2026-01-09 (BUGFIX & DOCUMENTATION)</h2></summary>
+<summary><h2>[0.7.1] - 2026-01-10 (SINCRO TOTAL & SMART DOT)</h2></summary>
+
+### 📜 Contrato de Sincronía Total
+- **Ultra-Minimalist Core**: Nuevo estándar de fábrica donde **todos** los módulos opcionales (`colors`, `sprites`, `fonts`, `audio`, etc.) están desactivados por defecto, **excepto completion**. El plugin ahora arranca como una herramienta puramente de productividad.
+- **Paridad Código-Doc**: Sincronización absoluta entre los `defcustom` del código y las tablas de "Pieza Lego" en el README. Sin letras pequeñas.
+- **Smart Dot (Punto Inteligente)**: El autocompletado se dispara automáticamente al escribir un punto, **solo** si sigue a una cadena válida del contrato (ej. `args.`). Mejora radical del flujo de escritura.
+
+### 🧠 Inteligencia Nativa
+- **Detección Fallback**: El sistema ahora detecta automáticamente el `dragonruby_api.yml` global en la carpeta del plugin si no existe uno local.
+- **Redundancia de Atajos**: Añadido soporte explícito para `C-M-i` junto al atajo amigable `C-.`.
+- **Auto-Inserción de Punto**: Al completar una raíz (como `arg` -> `args`), el sistema inserta el punto automáticamente para continuar la cadena.
 
 ### 🐛 Bugs Corregidos
 - **Modos Obsoletos**: Corregidos checks a modos menores que ya no existen en arquitectura Lego:
@@ -16,22 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `dragonruby-audio-overlay.el`: `dragonruby-audio-mode` → `dragonruby-mode`
   - `dragonruby-sprite-overlay.el`: `dragonruby-sprite-mode` → `dragonruby-mode`
   - `dragonruby-concept-visuals.el`: `dragonruby-concepts-mode` → `dragonruby-mode`
-- **Path Overlay**: Corregido typo `dragonruby-data-extensions` → `dragonruby-data-exts`
-- **dragonruby-utils.el**: Corregida función `dragonruby--get-image-type` con paréntesis faltante
-
-### 🧹 Limpieza de Código Muerto
-- Eliminados timers duplicados (el Scheduler ahora maneja todo)
-- Eliminadas funciones obsoletas: `dragonruby--refresh-font-overlays`, `dragonruby--after-font-overlay-change`
-- Eliminados comentarios `🧱 LEGACY` de todos los módulos
-
-### 📚 Documentación Mejorada
-- **README.md**: Añadidas capturas de pantalla para Colors, Forge Toolbar, y Context Preview
-- **FONTS.md**: Documentada feature "Context Preview" (el plugin lee `text:` cercano para renderizar previews)
-- **Herramientas**: Añadido `M-x dragonruby-diagnose` para diagnóstico completo del sistema
-
-### 🛠️ Nuevas Herramientas
-- `dragonruby-diagnose`: Muestra estado completo del modo, hooks activos, e ImageMagick
-- `dragonruby-diagnose-imagemagick`: Verifica conexión con ImageMagick
+- **Path Overlay**: Corregido typo `dragonruby-data-extensions` → `dragonruby-data-exts`.
+- **dragonruby-utils.el**: Corregida función `dragonruby--get-image-type` con paréntesis faltante.
 
 </details>
 
