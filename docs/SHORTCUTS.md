@@ -138,6 +138,16 @@ Emacs uses its own notation for keys. Here's how to read it:
 
 ---
 
+### 🧠 Autocomplete (Contract)
+| Notation | Keys | Action |
+|----------|------|--------|
+| `C-M-i` | Ctrl+Alt+i | Trigger Completion (Generic) |
+| `C-.` | Ctrl+. | **Windows Trigger** (Special Binding) |
+| **Flow** | | Type `arg` -> Select -> Auto-inserts `.` |
+| | | Type `state` -> Done! |
+
+---
+
 ## 🚀 The workflow: "Double C-M-i" (PUM!)
 
 DragonRuby Mode uses a high-speed completion system called **"The Law"**.
@@ -170,6 +180,7 @@ You can add your own snippets to the system using the `dragonruby-registry`. Add
 | Notation | Keys | Action |
 |----------|------|--------|
 | `M-x dragonruby-mode` | Alt+x, type command | Toggle mode on/off |
+| `M-x dragonruby-inspect-contract` | M-x ... | Visualize active Autocomplete Trees |
 
 ### Development (Local .emacs)
 | Notation | Keys | Action |
@@ -229,4 +240,4 @@ You can add your own snippets to the system using the `dragonruby-registry`. Add
 
 ---
 
-*DragonRuby Emacs Mode — v0.5.0*
+*DragonRuby Emacs Mode — v0.6.1*

@@ -1,7 +1,7 @@
 ;;; .emacs --- DragonRuby Local Dev Configuration (PURE LOGIC)
 
 ;; ============================================================
-;; ⚠️ NO CAMBIOS VISUALES - SOLO LÓGICA DEL PLUGIN
+;; ⚠️ ARCHITECTURE v0.7.0 (Lego System)
 ;; ============================================================
 
 ;; Define la raíz del proyecto dinámicamente
@@ -10,31 +10,30 @@
   "Root of the dragonruby-mode project.")
 
 ;; ============================================================
-;; 1. Rutas de carga para el Plugin
+;; 1. Cargar el Bootloader (Plugin Entry Point)
 ;; ============================================================
-(dolist (path '("" "src" "src/core" "src/sprites" "src/colors" 
-                "src/paths" "src/image-tools" "src/concepts"))
-  (add-to-list 'load-path (expand-file-name path dragonruby-project-root)))
+;; El Bootloader (dragonruby-mode.el) se encarga de:
+;; - Configurar load-path para modules/
+;; - Cargar el Kernel
+;; - Registrar los manifestos
+(add-to-list 'load-path dragonruby-project-root)
 
-;; ============================================================
-;; 2. Cargar el Plugin (con manejo de errores)
-;; ============================================================
 (condition-case err
     (require 'dragonruby-mode)
   (error (message "❌ Error cargando dragonruby-mode: %s" err)))
 
 ;; Activar features opcionales por defecto para testing
 (setq dragonruby-enable-sprites t)
+(setq dragonruby-enable-sprite-tools t)
 (setq dragonruby-enable-colors t)
 (setq dragonruby-enable-paths t)
-(setq dragonruby-enable-image-tools t)
-
-;; Auto-activar en archivos Ruby (futuros)
-(add-hook 'ruby-mode-hook #'dragonruby-maybe-enable)
-(add-hook 'ruby-ts-mode-hook #'dragonruby-maybe-enable)
+(setq dragonruby-enable-concepts t)
+(setq dragonruby-enable-completion t)
+(setq dragonruby-enable-docs t)
+(setq dragonruby-concepts-debug t) ;; Debug Atómico activado
 
 ;; ============================================================
-;; 3. AUTO-ENABLE EN BUFFERS YA ABIERTOS
+;; 2. AUTO-ENABLE EN BUFFERS YA ABIERTOS
 ;; ============================================================
 (defun dragonruby--activate-in-all-ruby-buffers ()
   "Activate dragonruby-mode in all currently open Ruby buffers."
@@ -52,7 +51,7 @@
 (dragonruby--activate-in-all-ruby-buffers)
 
 ;; ============================================================
-;; 4. Teclas de Recarga (Dev Tools) - SIEMPRE DISPONIBLES
+;; 3. Teclas de Recarga (Dev Tools)
 ;; ============================================================
 
 ;; F5 -> Recargar ESTE archivo .emacs
@@ -69,34 +68,42 @@
 (defun reload-dragonruby-mode ()
   "Recargar código fuente del plugin y reiniciar."
   (interactive)
-  ;; Desactivar modo en buffer actual
   (when (bound-and-true-p dragonruby-mode)
     (ignore-errors (dragonruby-mode -1)))
   
-  ;; Recargar todos los archivos .el
-  (let ((src-dir (expand-file-name "src" dragonruby-project-root))
-        (errors nil))
-    (dolist (file (directory-files-recursively src-dir "\\.el$"))
-      (condition-case err
-          (load-file file)
-        (error 
-         (push (format "%s: %s" (file-name-nondirectory file) err) errors))))
-    
-    ;; Recargar el archivo principal
-    (condition-case err
-        (load-file (expand-file-name "dragonruby-mode.el" dragonruby-project-root))
-      (error (push (format "dragonruby-mode.el: %s" err) errors)))
-    
-    ;; Mostrar errores si los hay
-    (if errors
-        (message "⚠️ Recargado con errores:\n%s" (string-join errors "\n"))
-      (progn
-        ;; Activar en todos los buffers Ruby
-        (dragonruby--activate-in-all-ruby-buffers)
-        (message "🔄 DragonRuby Mode: Recargado!")))))
+  ;; Recargar Entry Point (esto dispara la recarga de módulos y Kernel)
+  (load-file (expand-file-name "dragonruby-mode.el" dragonruby-project-root))
+  
+  (dragonruby--activate-in-all-ruby-buffers)
+  (message "🔄 DragonRuby Mode: Recargado (Lego System)!"))
 
-;; SIEMPRE registrar las teclas, incluso si hay errores arriba
 (global-set-key (kbd "<f5>") 'reload-emacs-config)
 (global-set-key (kbd "<f6>") 'reload-dragonruby-mode)
+(global-set-key (kbd "<f12>") 'find-file) ;; Quick open
+
+;; ============================================================
+;; 4. Dependencias del Sistema (ImageMagick)
+;; ============================================================
+;; Requerido para ver "mini-fuentes" y previsualizaciones
+(let ((magick-path "C:/Program Files/ImageMagick-7.1.1-Q16-HDRI/"))
+  (when (file-directory-p magick-path)
+    (add-to-list 'exec-path magick-path)
+    (setenv "PATH" (concat magick-path ";" (getenv "PATH")))
+    (message "🖼️ ImageMagick Configurado: %s" magick-path)))
+
+;; ============================================================
+;; 5. 🧪 LEGO TEST - MODO MINIMALISTA (Solo Autocompletado)
+;; ============================================================
+
+(setq dragonruby-enable-sprites nil)       ; 🔴 OFF
+(setq dragonruby-enable-fonts nil)         ; 🔴 OFF
+(setq dragonruby-enable-audio nil)         ; 🔴 OFF
+(setq dragonruby-enable-colors nil)        ; 🔴 OFF
+(setq dragonruby-enable-paths nil)         ; 🔴 OFF
+(setq dragonruby-enable-concepts nil)      ; 🔴 OFF
+;; (setq dragonruby-enable-completion nil) ; ✅ ON - AUTOCOMPLETADO ACTIVO
+(setq dragonruby-enable-docs nil)          ; 🔴 OFF
+
+;; ⬆️ Comenta las líneas para reconectar módulos y presiona F5.
 
 (message "🚀 DragonRuby Mode Cargado")

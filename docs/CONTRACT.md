@@ -1,117 +1,89 @@
-# DragonRuby Mode Contract
+# The DragonRuby Mode Contract
 
-This document formalizes the responsibilities and interaction patterns for each module in `dragonruby-mode`. It serves as the single source of truth for the architecture, ensuring modularity and stability.
+**Status:** v1.0 — The Invisible Order.
 
-## Core Philosophy
-1.  **Guiding Principle**: A module must fit entirely in your head. If you can't explain it in one sentence, it's too big.
-2.  **Semantic First**: We provide semantic meaning (color, sprites, paths), not just syntax highlighting.
-3.  **Modular Responsibility**: One module, one job. Modules should not leak responsibilities.
-4.  **Keyboard First**: All features must be accessible via keyboard. Mouse is optional (reserved for native OS/Emacs window management or precision tools).
-5.  **LSP-Safe**: Never interfere with LSP, Corfu, Company, or other completion frameworks.
-6.  **Multi-Channel Async Strategy**: Periodic scans (Paths, Colors, Sprites) must use isolated debounce timers (`task-id`) to prevent cross-module collisions. Every asynchronous task must protect Emacs state using `save-match-data` and `save-restriction`.
-7.  **Reactive Invalidation**: Any text modification in the buffer MUST immediately invalidate the visual overlays in the affected range to prevent "visual ghosts" or stale information. Reconstruction happens asynchronously during idle time.
-8.  **Modular Isolation (Strict)**: A feature or module MUST NOT depend on the presence or active state of another sibling module. All shared knowledge (e.g., file extensions, project root detection) must reside in the `src/core/` infrastructure.
-9.  **User Safety & Clarity**: If a feature is experimental or disabled, any user attempt to trigger it MUST produce a standardized "In Development" warning with a clear dismissal (Close) option. Crashing or failing silently is a violation of this contract.
+This document defines the underlying philosophy that governs the entire `dragonruby-mode` project. From the first color highlight to the final autocomplete suggestion, every feature obeys this single Contract.
 
----
+## 🏛️ The Core Philosophy
 
-## Module Contracts
+**"Clarity over Cleverness. Truth over Magic."**
 
-### 0. Core Infrastructure (`src/core/`)
-**Responsibility**: The immutable foundation.
-*   **Projects (`dragonruby-project.el`)**: Reliable root detection (`app/main.rb`).
-*   **Assets (`dragonruby-assets.el`)**: Knowledge of file types and source relations (`.png` → `.kra`, `.psd`, etc.).
-*   **Utils (`dragonruby-utils.el`)**: Debounce function for efficient rescanning.
-*   **Events (`dragonruby-events.el`)**: Lightweight event bus.
+We believe an editor should be a lens, not a filter. It should reveal the reality of your code with absolute precision, without trying to "guess" your intent or obscure the details.
 
-### 1. Sprite System (`src/sprites/`)
-**Responsibility**: Visualize and manage image assets.
-*   **Structure**:
-    *   `dragonruby-sprite-model.el`: Pure domain truth (validation, rules).
-    *   `dragonruby-sprite-fs.el`: Filesystem logic (finding, resolving).
-    *   `dragonruby-sprite-overlay.el`: Visuals + keyboard/mouse interaction.
-    *   `dragonruby-sprite-completion.el`: CAPF logic (depth 100, exclusive no).
-    *   `dragonruby-sprite-actions.el`: Jump to source file.
-*   **Contract**:
-    *   **Detection**: Parse strings starting with `sprites/`.
-    *   **Visualization**: Inline thumbnails, color-coded underlines.
-    *   **Interaction**: `C-c C-o` to open.
-    *   **Preview**: `C-c p` for popup preview (Manual).
-    *   **NON-INTERFERENCE**: `RET` key is never hijacked by overlays. CAPF uses `:exclusive 'no`, depth 100.
-
-### 2. Path & Require System (`src/paths/`)
-**Responsibility**: Navigate code structure and data files.
-*   **Structure**:
-    *   `dragonruby-path-model.el`: Extensions, snippet definitions.
-    *   `dragonruby-path-fs.el`: Resolve paths, collect files.
-    *   `dragonruby-path-snippets.el`: Expand `req` → `require ""`.
-    *   `dragonruby-path-overlay.el`: Clickable underlines.
-    *   `dragonruby-path-actions.el`: Smart complete, open file.
-*   **Contract**:
-    *   **Snippets**: `req`, `reqr`, `load`, `read`, `json` + `C-M-i`.
-    *   **Completion**: Minibuffer-based (NOT CAPF) to avoid LSP conflicts.
-    *   **Navigation**: `C-c C-o` to follow.
-    *   **Open**: `C-c o` to open any project file.
-
-### 3. Color System (`src/colors/`)
-**Responsibility**: Visualize and Edit color usage.
-*   **Structure**: `dragonruby-color-scanner`, `dragonruby-color-visuals`, `dragonruby-color-picker`.
-*   **Contract**:
-    *   **Detection**: RGB arrays, RGBA, hashes, hex.
-    *   **Visualization**: Background overlay + interactive `■` box.
-    *   **Interaction**: `C-c C-o` or Mouse-1 (precision) to edit.
-    *   **Format Preservation**: Edits maintain original code format.
-    *   **Safety**: `RET` is preserved for normal line breaks.
-
-### 4. Image Tools (`src/image-tools/`)
-**Responsibility**: Manipulate specific image assets.
-*   **Structure**: `dragonruby-image-modify`, `dragonruby-image-view`, `dragonruby-image-ui`.
-*   **Contract**:
-    *   **Scope**: Active only when viewing an image file.
-    *   **Tools**: Header-line buttons (Zoom, Rotate, Trim, etc.).
-    *   **Safety**: Automatic backup with `[Undo]` button.
-
-### 5. Concept System (`src/concepts/`) - In Development
-**Responsibility**: Semantic connections.
-*   **Contract**:
-    *   **Detection**: Keywords (`args`, `state`, `tick`).
-    *   **Visualization**: Subtle interactive underline.
-    *   **Interaction**: `C-c C-o` opens documentation.
+### The Pillars
+1.  **Determinism**: If X happens, it is because Y is strictly met. No random behaviors.
+2.  **No Hallucinations**: We never show data that isn't functionally true.
+3.  **Fail-Silent**: If we can't be 100% sure, we do nothing. We never interrupt the flow with guesses.
+4.  **Artisan Control**: The user is the source of truth. The editor is the servant.
 
 ---
 
-## Keyboard Navigation (Contract)
+## 🎨 I. The Visual Contract (Perception)
+*How we handle what you see.*
 
-ALL interactive overlays MUST support:
+### Semantic Colors
+We do not approximate colors. We render the exact truth of the bytecode:
+- **Rule**: If it matches `0xFF...` or `[r,g,b]`, it is a color.
+- **Guarantee**: We never "guess" a variable is a color unless it matches the strict structural contract.
 
-| Key | Action |
-|-----|--------|
-| `C-c C-o` | Activate Overlay (Open, Edit, Navigate) |
-| `mouse-1` | Activate Overlay (Open, Edit, Navigate) |
-| `RET` | Preserved for line breaks / Normal Emacs behavior |
+### Asset Reconnaissance (Sprites, Audio, Fonts)
+We treat assets as binary truths:
+- **Cyan/Green**: The file definitively exists on disk.
+- **Red**: The file definitively does not exist.
+- **Rule**: We never cache "maybe" states. We check the disk logic directly.
 
 ---
 
-## System Architecture
+## ⚡ II. The Navigation Contract (Flow)
+*How we handle where you go.*
 
-```
-src/
-├── core/                <- Facade: dragonruby-core.el
-├── sprites/             <- Facade: dragonruby-sprites.el
-├── paths/               <- Facade: dragonruby-paths.el
-├── image-tools/         <- Facade: dragonruby-image-tools.el
-├── colors/              <- Facade: dragonruby-colors.el
-├── concepts/            <- Facade: dragonruby-concepts.el
-├── dragonruby-mode.el   <- Entry Point
-└── dragonruby-docs.el   <- Knowledge System
+### Contextual Jumps
+We do not scan your entire hard drive.
+- **Rule**: Navigation (`RET`, `C-c C-o`) is context-strict. It only activates inside `require`, `read_file`, or literal asset strings.
+- **Guarantee**: You will never jump to a "fuzzy match" file by accident.
+
+---
+
+## 📜 III. The API Contract (Autocomplete)
+*How we handle what you write.*
+
+**(Formerly "Level 5")**
+
+This is the ultimate expression of our philosophy. It is **NOT** a Language Server (LSP). It does not parse, infer, or guess. It enforces a static agreement between you and your tools.
+
+### Rules
+1.  **Strict Definition**: You define the API structure in `dragonruby_api.yml`.
+2.  **Zero Inference**: `a = args; a.` will never trigger completion. Only explicit roots (`args.`) work.
+3.  **Literal Paths**: Only visible, literal paths are traversed.
+4.  **Fallback Strategy**: The system looks for `dragonruby_api.yml` in the project root. If missing, it uses the global fallback contract (v0.1) bundled with the plugin.
+
+### The Schema
+We strictly respect the 2-space indented YAML contract. If it is not in the YAML, it does not exist for the editor.
+
+### The Schema (v1)
+- **Indentation**: STRICTLY 2 spaces.
+- **Structure**: Maps only.
+- **Roots**: Defined as a list or map keys.
+
+**Example `dragonruby_api.yml`:**
+```yaml
+roots:
+  - args
+
+trees:
+  args:
+    state:
+      tick_count: t
+    outputs:
+      solids: t
+      sprites: t
+      labels: t
 ```
 
-## Compliance
-- [x] **Architecture Verified**: All modules follow Facade/Submodule pattern.
-- [x] **Keyboard Navigation**: All overlays support RET.
-- [x] **LSP-Safe**: Paths uses minibuffer, Sprites CAPF at depth 100.
-- [x] **Contracts Updated**: 2026-01-03 (Added Modular Isolation & User Safety rules).
-
 ---
 
-*DragonRuby Emacs Mode — v0.5.0*
+## Final Statement
+
+This project is not a collection of features. It is a cohesive system designed to preserve a **calm, predictable, and artisan workflow**.
+
+We built this so the tool disappears, and only the creation remains.

@@ -10,5 +10,16 @@
 .DS_Store
 
 
+
 # Build artifacts
 /dist/
+
+# Development Scripts (Private)
+dev/
+
+# Local Config (Private)
+.emacs.d/
+
+# Tests (Private)
+test/
+!test/modules/
