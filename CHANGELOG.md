@@ -8,6 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <details open>
+<summary><h2>[0.7.3] - 2026-01-12 (SOVEREIGN KERNEL & SURGICAL RELOAD)</h2></summary>
+
+### 🧠 Micro-Kernel Soberano (Arquitectura de OS)
+- **Registro Central de Vida**: Implementación de un "Libro de Registro" global para Timers, Hooks y Procesos. Ningún recurso puede nacer sin ser registrado por el Kernel.
+- **Sovereign Shutdown**: El sistema de apagado (`system-shutdown`) ahora es una operación atómica que garantiza la muerte de toda actividad vieja antes de cualquier cambio.
+- **Caza de Zombies**: Red de seguridad que escanea la lista global de timers de Emacs para cancelar funciones huérfanas del namespace `dragonruby-`.
+
+### 🔄 Hot-Reload Quirúrgico (F6)
+- **Ciclo de Vida OS**: Implementación del flujo `Shutdown -> Unload -> Load -> Reboot`.
+- **Integridad de Símbolos**: Se eliminó la purga destructiva de `mapatoms`. Ahora los símbolos permanecen pero el código se refresca quirúrgicamente sin corromper el estado global de Emacs.
+- **Recarga Atómica**: Garantía de recarga desde disco de módulos críticos (Kernel, Scheduler, Audio) para aplicar cambios de lógica al instante.
+
+### 🔊 Audio & Diagnóstico (Visual Upgrade)
+- **Metadatos de Audio**: Extracción de duración real (vía `afinfo/mdls`) con sistema de caché de alta velocidad.
+- **Validación 0-Bytes**: El sistema ahora detecta y marca como inválidos los archivos de audio vacíos o corruptos.
+- **Hover Dinámico**: Rediseño del tooltip de audio con formato clásico optimizado (duración, peso, tipo) y feedback de error mejorado.
+
+### 🖼️ Optimización de Escaneo
+- **Visión Retiniana Visible**: Los módulos de Sprites, Audio, Fuentes y Colores ahora operan exclusivamente en la región visible (con padding de 3000 chars), eliminando el lag en archivos de miles de líneas.
+
+</details>
+
+<details>
 <summary><h2>[0.7.2] - 2026-01-12 (LIBRARY OF ALEXANDRIA & STABILITY)</h2></summary>
 
 ### 📖 Módulo de Guía (BIBLIOTECA DE ALEJANDRÍA)

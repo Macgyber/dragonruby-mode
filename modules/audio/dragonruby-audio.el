@@ -12,7 +12,7 @@
 
 (defun dragonruby-audio-enable ()
   "Enable audio services."
-  (add-hook 'dragonruby-scan-hook #'dragonruby--scan-audio-overlays nil t)
+  (dragonruby-kernel-register-hook 'dragonruby-scan-hook #'dragonruby--scan-audio-overlays t)
   (message "🔊 Audio Module Enabled"))
 
 (defun dragonruby-audio-disable ()

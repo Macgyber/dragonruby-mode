@@ -39,7 +39,7 @@
           (dragonruby-completion-backend-init final-path)
           
           ;; 3. Register CAPF
-          (add-hook 'completion-at-point-functions #'dragonruby-completion-at-point 50 t)
+          (dragonruby-kernel-register-hook 'completion-at-point-functions #'dragonruby-completion-at-point t)
           
           (setq dragonruby-completion--active-mode t)
           (let ((type (if (equal final-path local-path) "Local" "Global")))

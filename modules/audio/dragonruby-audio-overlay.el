@@ -19,11 +19,11 @@
          (duration (if valid (dragonruby--audio-get-duration path) "--:--"))
          (info (cond (valid 
                       (let ((type-str (upcase (or ext "AUDIO"))))
-                        (format "⏱ %s | 📏 %s | 🏷 %s\n\n(RET para abrir)" 
+                        (format "⏱ %s | 📏 %s | 🏷 %s\n(RET to open)" 
                                 duration size type-str)))
                      ((and ext (string-equal (downcase ext) "mp3")) 
-                      "❌ MP3 no soportado (Usa OGG/WAV)")
-                     (t "❌ Archivo no encontrado"))))
+                      "⚠️ Unsupported format: MP3 (Use OGG/WAV)")
+                     (t "❌ File not found"))))
     (overlay-put ov 'dragonruby-audio t)
     (overlay-put ov 'help-echo (propertize info 'face 'bold))
     

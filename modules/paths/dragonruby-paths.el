@@ -32,13 +32,13 @@
 
 (defun dragonruby-paths-enable ()
   "Enable path services."
-  (add-hook 'dragonruby-scan-hook #'dragonruby--scan-paths nil t)
-  ;; Hook keymap activation
-  (add-hook 'ruby-mode-hook #'dragonruby--paths-hook)
+  (dragonruby-kernel-register-hook 'dragonruby-scan-hook #'dragonruby--scan-paths t)
+  ;; Hook keymap activation (Global)
+  (dragonruby-kernel-register-hook 'ruby-mode-hook #'dragonruby--paths-hook)
   (when (eq major-mode 'ruby-mode) (dragonruby-paths-mode 1))
   
   (when dragonruby-enable-path-completion
-    (add-hook 'completion-at-point-functions #'dragonruby-path-completion-at-point 90 t))
+    (dragonruby-kernel-register-hook 'completion-at-point-functions #'dragonruby-path-completion-at-point t))
     
   (message "📂 Paths Module Enabled"))
 

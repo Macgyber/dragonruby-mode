@@ -27,7 +27,7 @@
 
 (defun dragonruby-fonts-enable ()
   "Enable font services."
-  (add-hook 'dragonruby-scan-hook #'dragonruby--scan-font-overlays nil t)
+  (dragonruby-kernel-register-hook 'dragonruby-scan-hook #'dragonruby--scan-font-overlays t)
   (dragonruby--setup-font-capf)
   (message "🅰️ Fonts Module Enabled"))
 

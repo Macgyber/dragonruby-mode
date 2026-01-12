@@ -12,7 +12,7 @@
 
 (defun dragonruby-concepts-enable ()
   "Enable concept highlighting."
-  (add-hook 'dragonruby-scan-hook #'dragonruby--scan-concepts nil t)
+  (dragonruby-kernel-register-hook 'dragonruby-scan-hook #'dragonruby--scan-concepts t)
   (message "🧠 Concepts Module Enabled"))
 
 (defun dragonruby-concepts-disable ()

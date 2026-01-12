@@ -14,8 +14,8 @@
 
 (defun dragonruby-sprites-enable ()
   "Enable sprite services."
-  (add-hook 'dragonruby-scan-hook #'dragonruby--scan-sprites nil t)
-  (add-hook 'dragonruby-monitor-hook #'dragonruby--sprite-popup-monitor-sync nil t)
+  (dragonruby-kernel-register-hook 'dragonruby-scan-hook #'dragonruby--scan-sprites t)
+  (dragonruby-kernel-register-hook 'dragonruby-monitor-hook #'dragonruby--sprite-popup-monitor-sync t)
   (message "🖼️ [Sprites] Module Enabled"))
 
 (defun dragonruby-sprites-disable ()

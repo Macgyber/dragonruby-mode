@@ -79,10 +79,11 @@ Ensures hygiene by removing the timer from registry after execution."
   (let ((old-timer (gethash id dragonruby--debounce-timers)))
     (when old-timer (cancel-timer old-timer))
     (puthash id
-             (run-with-timer delay nil
-                             (lambda ()
-                               (remhash id dragonruby--debounce-timers)
-                               (funcall func)))
+             (dragonruby-kernel-register-timer
+              (run-with-timer delay nil
+                              (lambda ()
+                                (remhash id dragonruby--debounce-timers)
+                                (funcall func))))
              dragonruby--debounce-timers)))
 
 

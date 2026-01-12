@@ -1,7 +1,7 @@
 ;;; dragonruby-mode.el --- Semantic tooling for DragonRuby (Kernel Architecture) -*- lexical-binding: t; -*-
 
 ;; Author: Macgyber <esteban3261g@gmail.com>
-;; Version: 0.7.2
+;; Version: 0.7.3
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: games, dragonruby, tools
 ;; URL: https://github.com/Macgyber/dragonruby-mode

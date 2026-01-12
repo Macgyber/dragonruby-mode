@@ -164,17 +164,22 @@ Only for Cold Boot or Unit Tests. NEVER for Hot Reload."
 ;; -----------------------------------------------------------------------------
 
 (cl-defun dragonruby-register-module (&key name type namespace provides requires entry-point enable-fn disable-fn)
-  "Register a module with the Kernel.
+  "Register a module with the Sovereign Kernel (v0.7.3 Standard).
 
-:NAME        - Symbol. Unique ID.
+The module MUST adhere to the Life-Cycle Contract:
+1. Every Hook, Timer, or Process created in :ENABLE-FN must be registered 
+   using `dragonruby-kernel-register-*` family functions.
+2. :DISABLE-FN should ideally handle local cleanup, but the Kernel reset 
+   is the ultimate authority.
+
+:NAME        - Symbol. Unique ID (e.g. 'sprites).
 :TYPE        - :main or :tool.
-:NAMESPACE   - String. Strict prefix (e.g. \"dragonruby-sprites-\").
-               Modules MUST exclusively own this namespace.
-:PROVIDES    - List of symbols. Capabilities offered.
-:REQUIRES    - List of symbols. Capabilities needed.
-:ENTRY-POINT - Symbol. The Emacs feature to (require ...).
-:ENABLE-FN   - Function. Sets up hooks, timers, state.
-:DISABLE-FN  - Function. Cleans up hooks, timers, state."
+:NAMESPACE   - String. Strict prefix (e.g. \"dragonruby-sprite-\").
+:PROVIDES    - List of symbols. Capabilities (e.g. '(:visuals)).
+:REQUIRES    - List of symbols. Dependencies.
+:ENTRY-POINT - Symbol. The feature to `require`.
+:ENABLE-FN   - Function. Setup logic.
+:DISABLE-FN  - Function. Cleanup logic."
   
   ;; Validation
   (unless (and name entry-point enable-fn disable-fn)

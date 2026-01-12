@@ -14,7 +14,7 @@
 
 (defun dragonruby-colors-enable ()
   "Enable color visualization."
-  (add-hook 'dragonruby-scan-hook #'dragonruby--scan-colors nil t)
+  (dragonruby-kernel-register-hook 'dragonruby-scan-hook #'dragonruby--scan-colors t)
   (message "🎨 Colors Module Enabled"))
 
 (defun dragonruby-colors-disable ()

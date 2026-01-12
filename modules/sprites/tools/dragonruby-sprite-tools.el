@@ -57,7 +57,7 @@
 
 (defun dragonruby-sprite-tools-enable ()
   "Enable Sprite Tools."
-  (add-hook 'image-mode-hook #'dragonruby--image-mode-hook)
+  (dragonruby-kernel-register-hook 'image-mode-hook #'dragonruby--image-mode-hook)
   (message "🛠️ Sprite Tools Enabled"))
 
 (defun dragonruby-sprite-tools-disable ()

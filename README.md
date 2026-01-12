@@ -187,9 +187,11 @@ To customize your experience, add these lines to your `config.el` (Doom) or `ini
 
 If you disable a parent (e.g., `sprites`), the Kernel **automatically** powers down its children (`sprite-tools`) to prevent errors. You don't have to manage dependencies. Just build your perfect editor.
 
-### 🧠 The Unified Knowledge System (Memory & Retina)
-The v0.7.2 update introduces a centralized **Knowledge Kernel**.
- You can audit its current state at any time with `M-x dragonruby-knowledge-inspect`.
+### 🧠 The Sovereign Kernel (v0.7.3 Architect)
+The v0.7.3 update introduces the **Sovereign Kernel**, a central authority inspired by micro-kernel operating systems.
+- **The Ledger of Life**: Every timer, hook, and process must be registered. If the Kernel doesn't know it, it shouldn't exist.
+- **Surgical Hot-Reload (F6)**: Forget the "nuclear options" of the past. Our reload follows a strict `Shutdown -> Unload -> Load -> Reboot` cycle, ensuring a clean state without destroying the Emacs global environment.
+- **Zombie Hunt**: A background safety net that scans the Emacs subsystem for any orphaned processes or timers, neutralizing them instantly.
 
 - **The Memory (Guide)**: Loads definitions from `.org` files into a unified hash-table cache.
 - **The Retina (Concepts)**: Scans your code and queries the Knowledge Kernel for instant context.
@@ -233,6 +235,6 @@ An artisan autocompletion system that respects your definitions. It is **NOT** a
 
 *Forged for creators who refuse to settle. Forged for DragonRuby.*
 
-**DragonRuby Emacs Mode — v0.7.2**
+**DragonRuby Emacs Mode — v0.7.3**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
