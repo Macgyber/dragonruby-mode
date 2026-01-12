@@ -10,6 +10,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defvar dragonruby-knowledge-db
   '(("tick" . "❤️ The Heartbeat.\nRunning 60 times per second, this method drives your game logic.\n[args] contains the world state.")
     
@@ -26,9 +28,32 @@
     ("attr_sprite" . "🖼️ Sprite Primitive.\nA Hash or Array representing an image.\nRequired: x, y, w, h, path."))
   "Alist mapping technical terms to beginner-friendly explanations.")
 
+(defvar dragonruby-concept-aliases
+  '(("outputs" . ("$gtk.outputs" "args.outputs"))
+    ("inputs" . ("$gtk.inputs" "args.inputs"))
+    ("state" . ("$gtk.state" "args.state"))
+    ("sprites" . ("outputs.sprites" "args.outputs.sprites"))
+    ("labels" . ("outputs.labels" "args.outputs.labels"))
+    ("solids" . ("outputs.solids" "args.outputs.solids"))
+    ("borders" . ("outputs.borders" "args.outputs.borders"))
+    ("keyboard" . ("inputs.keyboard" "args.inputs.keyboard"))
+    ("mouse" . ("inputs.mouse" "args.inputs.mouse")))
+  "Alist mapping base concepts to their contextual variants.
+This supports the testeador's challenge: detecting concepts regardless of context.")
+
 (defun dragonruby-knowledge-get (term)
-  "Retrieve the explanation for a given TERM."
-  (cdr (assoc term dragonruby-knowledge-db)))
+  "Retrieve the explanation for a given TERM.
+Automatically normalizes aliases to base concepts."
+  (let ((normalized-term (dragonruby-knowledge--resolve-alias term)))
+    (cdr (assoc normalized-term dragonruby-knowledge-db))))
+
+(defun dragonruby-knowledge--resolve-alias (term)
+  "Resolve TERM to its base concept if it's an alias.
+Returns the original term if no alias found."
+  (or (car (cl-find-if (lambda (entry)
+                         (member term (cdr entry)))
+                       dragonruby-concept-aliases))
+      term))
 
 (provide 'dragonruby-knowledge)
 ;;; dragonruby-knowledge.el ends here

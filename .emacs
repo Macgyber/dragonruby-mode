@@ -38,8 +38,8 @@
 (setq dragonruby-enable-font-tools nil)    ; 🔴 OFF
 (setq dragonruby-enable-audio nil)         ; 🔴 OFF
 (setq dragonruby-enable-paths nil)         ; 🔴 OFF
-(setq dragonruby-enable-concepts nil)      ; 🔴 OFF
-(setq dragonruby-enable-docs nil)          ; 🔴 OFF
+(setq dragonruby-enable-concepts t)        ; ✅ ON (Focused Learning)
+(setq dragonruby-enable-docs t)            ; ✅ ON (Org Documentation)
 
 (setq dragonruby-concepts-debug nil)       ; Debug Atómico DESACTIVADO
 
