@@ -146,13 +146,12 @@ Searches backwards first, then forwards. Matches various Ruby hash/label styles.
               (setq found match)))))
       found)))
 
-(defun dragonruby--scan-font-overlays ()
+(defun dragonruby--scan-font-overlays (&optional beg end)
   "Scan VISIBLE region for font references.
 Adheres to the Constitutional Principle: Only work what is seen."
   (when dragonruby-mode
-    (let* ((region (dragonruby--visible-region))
-           (start-pos (car region))
-           (end-pos (cdr region)))
+    (let* ((start-pos (or beg (point-min)))
+           (end-pos (or end (point-max))))
       ;; 1. Clear overlays ONLY in the region we are about to scan
       (remove-overlays start-pos end-pos 'dragonruby-font t)
       

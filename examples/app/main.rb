@@ -84,14 +84,14 @@ def tick args
   # ✅ Valid Fonts (Hover to see live preview icon)
   args.outputs.labels << {
     x: 640, y: 500,
-    text: "Gae Title",
+    text: "DragonRuby",
     font: "fonts/title_font.otf",
     size_enum: 20
   }
 
   args.outputs.labels << {
     x: 640, y: 400,
-    text: "Pres Start",
+    text: "Press Start",
     font: "fonts/1.ttf"
   }
 
@@ -101,8 +101,8 @@ def tick args
 
   # --- 5. AUDIO (FASE 5) ---------------------------------
   # ✅ Valid Audio (Hover to see info / Look for 🔊 icon)
-  args.outputs.sounds << "sounds/background_music.ogg"
-  args.audio[:sfx] = "sounds/jump.wav"
+  args.outputs.sounds << "sounds/test.ogg"
+  args.audio[:sfx] = "sounds/test.wav"
 
   # ❌ Invalid Audio (Should show RED wave underline)
   args.outputs.sounds << "sounds/missing_track.mp3"

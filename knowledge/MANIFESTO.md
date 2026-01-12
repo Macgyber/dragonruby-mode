@@ -5,30 +5,28 @@
 
 ## I. What is Documented (Explicit)
 
-### 1. The Philosophy
-The project clearly documents what it is **NOT**:
+### 1. The Core Idea
+The project is built on what it is **NOT**:
 - Not an LSP.
-- Not intelligent.
-- Not inferential.
+- Not "intelligent."
+- Not using inference.
 - Not dynamic.
 
-*This creates a strong conceptual boundary that protects the design.*
-
-### 2. The Contract Model
-The role of the YAML file is explicitly defined:
+### 2. The Data Model
+The role of the YAML file is simple:
 - It is the **sole source of truth**.
-- It defines navigable structure, **not behavior**.
+- It defines navigation, **not behavior**.
 - It is **static** by design.
 
-### 3. Autocompletion Rules
-The governance of completion is explicit and non-negotiable:
+### 3. Completion Rules
+Completion is strictly controlled:
 - Roots must be **literal**.
 - Paths must be **visible**.
 - Inference is **forbidden**.
-- Invalid contracts **disable the feature safely**.
+- Invalid data **disables the feature safely**.
 
-### 4. Validation Evidence
-The project includes a real game example (`validation_game.rb`), demonstrating that the system works without cheating or exceptions.
+### 4. Verification
+The project includes `validation_game.rb` to prove the system works reliably in a real scenario.
 
 ---
 
@@ -36,7 +34,7 @@ The project includes a real game example (`validation_game.rb`), demonstrating t
 
 ### 1. Full DragonRuby API Coverage
 The project **does not** document the entire DragonRuby API.
-- **Reason**: The contract is **usage-driven**, not reference-driven.
+- **Reason**: The model is based on **real usage**, not a library reference.
 
 ### 2. Method Semantics
 The YAML **does not** explain what methods do, parameters mean, or internal behavior.
@@ -48,39 +46,39 @@ The project **does not** teach how to structure a game.
 
 ---
 
-## III. What is Implied (But Not Written)
+## III. Design Values
 
-1.  **The Editor as an Amplifier**: The editor should amplify the programmer’s intent, not replace understanding.
-2.  **Stability Over Cleverness**: Long-term stability is more valuable than short-term convenience.
-3.  **Human Memory Is Limited**: Autocomplete exists to reduce **recall burden**, not to eliminate thinking.
-
----
-
-## IV. The Design Resolutions
-
-### What the Project Resolves
-- Resolves **API navigation friction** without introducing magic.
-- Resolves the need for **autocomplete** without lying to the user.
-- Resolves **editor assistance** while preserving learning and mastery.
-- Resolves **extensibility** through data, not code.
-
-### What the Project Refuses to Resolve
-- It does not resolve **"what should I write next?"**
-- It does not resolve **"what does this code mean?"**
-- It does not resolve **incorrect mental models**.
-- It does not resolve **ignorance by automation**.
-
-*These refusals are design decisions, not omissions.*
+1.  **Amplification over Automation**: The editor should help you work faster, not think for you.
+2.  **Stability over Cleverness**: A simple, predictable tool is better than a complex, "smart" one.
+3.  **Human Memory**: Autocomplete is for **recalling names**, not for avoiding learning.
 
 ---
 
-## V. Final Synthesis
+## IV. Boundaries
 
-**The Contract is the line.**
+### What the Project Solves
+- It makes **API navigation** smooth without using "magic."
+- It provides **autocomplete** that is honest and predictable.
+- It helps the programmer while **preserving mastery**.
+- It allows **extensibility** through static data.
 
-Everything on one side is data.  
+### What the Project Ignores
+- It does not tell you **what to write next**.
+- It does not explain **what your code means**.
+- It doesn't fix **wrong mental models**.
+- It won't replace **active learning**.
+
+*These are intentional design choices.*
+
+---
+
+## V. Summary
+
+**The data is the boundary.**
+
+Everything on one side is static data.  
 Everything on the other side is human responsibility.
 
 ---
 
-*Manifesto validated against Contract v0.1 and real gameplay usage.*
+*Manifesto verified against system v0.1 and actual usage.*

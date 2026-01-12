@@ -15,94 +15,82 @@
   (add-to-list 'load-path dragonruby-project-root))
 
 ;; ============================================================
-;; 🧠 FULL PURGE (No ghosts, no bytecode, no stale symbols)
+;; 🧠 SURGICAL RESET (The Sovereign Kernel Way)
 ;; ============================================================
-(defun dragonruby--hard-reset ()
-  "Completely wipe DragonRuby from Emacs memory."
+(defun dragonruby-hard-reset ()
+  "OS-Level system purge. Halts everything and clears features."
   (interactive)
-
-  ;; 1. Turn off mode everywhere
-  (dolist (buf (buffer-list))
-    (with-current-buffer buf
-      (when (bound-and-true-p dragonruby-mode)
-        (ignore-errors (dragonruby-mode -1)))))
-
-  ;; 2. Remove all dragonruby-* features
+  (when (fboundp 'dragonruby-kernel-system-shutdown)
+    (dragonruby-kernel-system-shutdown))
+  
+  ;; Clear Emacs features list to allow fresh 'require'
   (setq features
-        (cl-delete-if
-         (lambda (f)
-           (string-prefix-p "dragonruby-" (symbol-name f)))
-         features))
-
-  ;; 3. Kill all dragonruby-* symbols (except the root path)
-  (mapatoms
-   (lambda (sym)
-     (let ((name (symbol-name sym)))
-       (when (and (string-prefix-p "dragonruby-" name)
-                  (not (string= name "dragonruby-project-root")))
-         (ignore-errors (fmakunbound sym))
-         (ignore-errors (makunbound sym))))))
-
-  ;; 4. Delete all .elc
-  (shell-command
-   (format "find %s -name '*.elc' -delete"
-           (shell-quote-argument dragonruby-project-root)))
-
-  ;; 5. Clean load-history
+        (cl-delete-if (lambda (f) (string-prefix-p "dragonruby-" (symbol-name f))) features))
+  
   (setq load-history
-        (cl-delete-if
-         (lambda (x)
-           (and (consp x)
-                (string-match-p "dragonruby" (format "%s" x))))
-         load-history))
-
+        (cl-delete-if (lambda (x) (and (consp x) (string-match-p "dragonruby" (format "%s" x)))) load-history))
+  
   (garbage-collect)
-  (message "🔥 DragonRuby memory purged"))
+  (message "🐲 DragonRuby: Clean slate. Ready for boot."))
 
 ;; ============================================================
-;; 🔥 TRUE HOT RELOAD
+;; 🔄 TRUE HOT RELOAD (Shutdown -> Unload -> Load -> Reboot)
 ;; ============================================================
+
 (defun dragonruby-hot-reload ()
-  "Refresh the entire dragonruby-mode environment from source."
+  "The Surgical Loop: Shutdown -> Unload -> Load -> Reboot."
   (interactive)
-  (let ((active-buffers (cl-loop for buf in (buffer-list)
-                                 when (with-current-buffer buf (bound-and-true-p dragonruby-mode))
-                                 collect buf)))
-    ;; 0. Rebuild load-path (Emergency recovery)
-    (let ((mod-dir (expand-file-name "modules" dragonruby-project-root)))
-      (dolist (sub '("core" "sprites" "fonts" "audio" "colors" "paths" "concepts" "completion" "guide"))
-        (add-to-list 'load-path (expand-file-name sub mod-dir))))
+  (let ((active-buffers (cl-remove-if-not 
+                         (lambda (b) (buffer-local-value 'dragonruby-mode b)) 
+                         (buffer-list))))
+    
+    (message "🐲 DragonRuby: SURGICAL HOT RELOAD STARTING...")
 
-    ;; 1. Global Reset (Detach all active modules)
-    (when (fboundp 'dragonruby-kernel-reset-live)
-      (dragonruby-kernel-reset-live))
+    ;; 1. SHUTDOWN: Full system halt in ALL buffers
+    (when (fboundp 'dragonruby-kernel-system-shutdown)
+      (dragonruby-kernel-system-shutdown))
 
-    ;; 2. Source Reload
+    ;; 2. CLEAR CACHES & UNLOAD
+    (when (boundp 'dragonruby--audio-duration-cache)
+      (clrhash dragonruby--audio-duration-cache))
+    (setq features (cl-delete-if (lambda (f) (string-prefix-p "dragonruby-" (symbol-name f))) features))
+    
+    ;; 3. LOAD: Fresh code from disk (Cold Load)
     (let ((load-prefer-newer t)
           (byte-compile-warnings nil))
-      (load-file (expand-file-name "dragonruby-mode.el" dragonruby-project-root)))
+      ;; Force reload the main entry point
+      (load (expand-file-name "dragonruby-mode.el" dragonruby-project-root) nil t)
+      
+      ;; Force reload critical modules to ensure logic update
+      (let ((mod-dir (expand-file-name "modules" dragonruby-project-root)))
+        (dolist (mod '("core/dragonruby-kernel.el"
+                       "core/dragonruby-scheduler.el"
+                       "core/dragonruby-utils.el"
+                       "audio/dragonruby-audio-fs.el"
+                       "audio/dragonruby-audio-overlay.el"))
+          (let ((f (expand-file-name mod mod-dir)))
+            (when (file-exists-p f) (load f nil t))))))
 
-    ;; 3. Full Cycle Reboot
+    ;; 4. REBOOT: re-enable in previously active buffers
     (dolist (buf active-buffers)
       (with-current-buffer buf
-        (dragonruby-mode -1)
         (dragonruby-mode 1)))
 
-    (message "🐲 DragonRuby: Hot-Reload Cycle COMPLETE (Paths Restored)")))
+    (message "🐲 DragonRuby: HOT RELOAD COMPLETE (True Surgical Cycle)")))
 
 ;; ============================================================
 ;; 🧩 User Lego Profile
 ;; ============================================================
-(setq dragonruby-enable-completion   t)   ; ✅ ON (Minimalist v0.7.2)
-(setq dragonruby-enable-colors       nil) ; 🔴 OFF
-(setq dragonruby-enable-sprites      nil) ; 🔴 OFF
-(setq dragonruby-enable-sprite-tools nil) ; 🔴 OFF
-(setq dragonruby-enable-fonts        nil) ; 🔴 OFF
-(setq dragonruby-enable-font-tools   nil) ; 🔴 OFF
-(setq dragonruby-enable-audio        nil) ; 🔴 OFF
-(setq dragonruby-enable-paths        nil) ; 🔴 OFF
-(setq dragonruby-enable-concepts     nil) ; 🔴 OFF
-(setq dragonruby-enable-guide        nil) ; 🔴 OFF
+(setq dragonruby-enable-completion   t)   ; ✅ ON
+(setq dragonruby-enable-colors       t)   ; ✅ ON
+(setq dragonruby-enable-sprites      t)   ; ✅ ON
+(setq dragonruby-enable-sprite-tools t)   ; ✅ ON
+(setq dragonruby-enable-fonts        t)   ; ✅ ON
+(setq dragonruby-enable-font-tools   t)   ; ✅ ON
+(setq dragonruby-enable-audio        t)   ; ✅ ON
+(setq dragonruby-enable-paths        t)   ; ✅ ON
+(setq dragonruby-enable-concepts     t)   ; ✅ ON
+(setq dragonruby-enable-guide        t)   ; ✅ ON
 
 ;; ============================================================
 ;; 🧲 Activate on open Ruby buffers

@@ -161,7 +161,7 @@ Includes a small margin (padding) to make scrolling smoother."
   (if (get-buffer-window (current-buffer))
       (let* ((start (window-start))
              (end (window-end nil t))
-             (padding 500))
+             (padding 3000))
         (cons (max (point-min) (- start padding))
               (min (point-max) (+ end padding))))
     (cons (point-min) (point-max))))

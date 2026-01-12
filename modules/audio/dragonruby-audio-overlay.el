@@ -11,14 +11,21 @@
   (setq dragonruby--audio-overlays nil))
 
 (defun dragonruby--make-audio-overlay (start end path valid)
-  "Create an audio overlay for PATH."
+  "Create an audio overlay for PATH with rich metadata metadata."
   (let* ((ov (make-overlay start end))
          (ext (when path (file-name-extension path)))
-         (info (cond (valid (format "Audio: %s\n(RET to open)" (file-name-nondirectory path)))
-                     ((and ext (string-equal (downcase ext) "mp3")) "❌ MP3 not supported by DragonRuby (Use OGG/WAV)")
-                     (t "❌ Audio file not found"))))
+         (attrs (when (and path (file-exists-p path)) (file-attributes path)))
+         (size (if attrs (file-size-human-readable (file-attribute-size attrs)) "?"))
+         (duration (if valid (dragonruby--audio-get-duration path) "--:--"))
+         (info (cond (valid 
+                      (let ((type-str (upcase (or ext "AUDIO"))))
+                        (format "⏱ %s | 📏 %s | 🏷 %s\n\n(RET para abrir)" 
+                                duration size type-str)))
+                     ((and ext (string-equal (downcase ext) "mp3")) 
+                      "❌ MP3 no soportado (Usa OGG/WAV)")
+                     (t "❌ Archivo no encontrado"))))
     (overlay-put ov 'dragonruby-audio t)
-    (overlay-put ov 'help-echo info)
+    (overlay-put ov 'help-echo (propertize info 'face 'bold))
     
     (unless valid
       (overlay-put ov 'face '(:underline (:color "red" :style wave))))
@@ -26,8 +33,8 @@
     (when valid
       ;; Visual Feedback (Strictly OGG vs WAV)
       (let* ((ext-down (downcase (or ext "")))
-             (label (cond ((string= ext-down "ogg") "📢")  ; Trompeta
-                          ((string= ext-down "wav") "🔊"))) ; Altoparlante/Megáfono profesional
+             (label (cond ((string= ext-down "ogg") "📢")
+                          ((string= ext-down "wav") "🔊")))
              (icon (when label (propertize (format " %s" label) 'face '(:height 0.9 :foreground "#2ECC71" :weight bold)))))
         (when icon
           (overlay-put ov 'after-string icon)))
@@ -39,24 +46,25 @@
       (overlay-put ov 'mouse-face '(:background "#2ECC71" :foreground "black")))
     (push ov dragonruby--audio-overlays)))
 
-(defun dragonruby--scan-audio-overlays ()
-  "Scan buffer for audio references."
+(defun dragonruby--scan-audio-overlays (&optional beg end)
+  "Scan VISIBLE region for audio references.
+Passes BEG and END as provided by central scheduler."
   (when dragonruby-mode
-    (dragonruby--clear-audio-overlays)
-    (save-excursion
-      (save-restriction
-        (widen)
-        (goto-char (point-min))
-        (while (re-search-forward "['\"’“”]\\([^'\"\n!’“”]+\\.\\(wav\\|ogg\\|mp3\\)\\)['\"’“”]" nil t)
+    (let ((start-pos (or beg (point-min)))
+          (end-pos (or end (point-max))))
+      (remove-overlays start-pos end-pos 'dragonruby-audio t)
+      (save-excursion
+        (goto-char start-pos)
+        (while (re-search-forward "['\"’“”]\\([^'\"\n!’“”]+\\.\\(wav\\|ogg\\|mp3\\)\\)['\"’“”]" end-pos t)
           (let* ((raw (match-string 1))
-                 (start (match-beginning 0))
-                 (end (match-end 0))
                  (abs (dragonruby--resolve-path raw 'audio))
                  (ext (downcase (or (file-name-extension raw) "")))
                  (supported (member ext '("wav" "ogg")))
-                 (exists (and abs (file-exists-p abs)))
-                 (valid (and supported (not (string-empty-p raw)) exists)))
-            (dragonruby--make-audio-overlay start end abs valid)))))))
+                 (attrs (and abs (file-attributes abs)))
+                 (exists (and attrs (not (file-directory-p abs))))
+                 (size (if attrs (file-attribute-size attrs) 0))
+                 (valid (and supported (not (string-empty-p raw)) exists (> size 0))))
+            (dragonruby--make-audio-overlay (match-beginning 0) (match-end 0) abs valid)))))))
 
 (provide 'dragonruby-audio-overlay)
 ;;; dragonruby-audio-overlay.el ends here

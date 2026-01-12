@@ -72,13 +72,13 @@
 ;; Scanner
 ;; -------------------------
 
-(defun dragonruby--scan-concepts ()
-  "Scan visible region for DragonRuby concepts."
+(defun dragonruby--scan-concepts (&optional beg end)
+  "Scan VISIBLE region for DragonRuby concepts.
+Passes BEG and END as provided by central scheduler."
   (when (and (bound-and-true-p dragonruby-mode)
              (bound-and-true-p dragonruby-enable-concepts))
-    (let* ((region (dragonruby--visible-region))
-           (start-pos (car region))
-           (end-pos (cdr region))
+    (let* ((start-pos (or beg (point-min)))
+           (end-pos (or end (point-max)))
            (pattern (regexp-opt dragonruby-concept-keywords 'symbols)))
 
       (dragonruby--clear-concept-overlays start-pos end-pos)

@@ -41,10 +41,17 @@ Ideal for UI updates, hover checks, and ephemeral popups.")
   :type 'number
   :group 'dragonruby)
 
-(defcustom dragonruby-scan-debounce-delay 0.6
-  "Seconds to wait after typing before rescanning overlays."
-  :type 'number
-  :group 'dragonruby)
+(defun dragonruby-scheduler--calculate-delay ()
+  "Calculate adaptive debounce delay based on buffer size.
+Large buffers (the 'masa') get a longer delay to protect the CPU."
+  (let* ((size (buffer-size))
+         (base 0.4)
+         ;; Scale: +0.2s for every 50kb
+         (extra (* (/ size 50000.0) 0.2)))
+    (min 2.5 (+ base extra))))
+
+(defvar dragonruby-scan-debounce-delay 0.6
+  "OBSOLETE: Use (dragonruby-scheduler--calculate-delay) instead.")
 
 ;; --- DEBUGGING ---
 
@@ -92,14 +99,17 @@ Governs both 'scan' (heavy) and 'monitor' (light) phases."
 
               ;; 2. Scan Phase (Slow/Heavy)
               (when (eq dragonruby--buffer-state 'dirty)
-                (let ((idle-since-change (- now dragonruby--last-interaction-time)))
-                  (when (>= idle-since-change dragonruby-scan-debounce-delay)
-                    (dragonruby--log "PULSE SCAN START | Idle: %.2fs" idle-since-change)
+                (let* ((idle-since-change (- now dragonruby--last-interaction-time))
+                       (adaptive-delay (dragonruby-scheduler--calculate-delay)))
+                  (when (>= idle-since-change adaptive-delay)
+                    (dragonruby--log "PULSE SCAN START | Idle: %.2fs (Adaptive Delay: %.2fs)" 
+                                    idle-since-change adaptive-delay)
                     (setq dragonruby--buffer-state 'processing)
-                    (dolist (fn dragonruby-scan-hook)
-                      (when (functionp fn)
-                        (condition-case err (funcall fn)
-                          (error (message " [DR-SCHED] Scan Error (%s): %s" fn err)))))
+                    (let ((range (dragonruby--visible-region)))
+                      (dolist (fn dragonruby-scan-hook)
+                        (when (functionp fn)
+                          (condition-case err (funcall fn (car range) (cdr range))
+                            (error (message " [DR-SCHED] Scan Error (%s): %s" fn err))))))
                     
                     (setq dragonruby--last-scan-time now)
                     (setq dragonruby--buffer-state 'clean)
@@ -113,22 +123,22 @@ Governs both 'scan' (heavy) and 'monitor' (light) phases."
                        (timerp dragonruby--idle-timer)
                        (memq dragonruby--idle-timer timer-idle-list))))
     (setq dragonruby--idle-timer
-          (run-with-idle-timer 0.5 nil
-                               #'(lambda (buf)
-                                   (when (buffer-live-p buf)
-                                     (with-current-buffer buf
-                                       (dragonruby-pulse buf)
-                                       (setq dragonruby--idle-timer nil)
-                                       (dragonruby--schedule-pulse))))
-                               (current-buffer)))))
+          (dragonruby-kernel-register-timer
+           (run-with-idle-timer 0.5 nil
+                                #'(lambda (buf)
+                                    (when (buffer-live-p buf)
+                                      (with-current-buffer buf
+                                        (dragonruby-pulse buf)
+                                        (setq dragonruby--idle-timer nil)
+                                        (dragonruby--schedule-pulse))))
+                                (current-buffer))))))
 
 ;; --- HOOKS ---
 
 (defun dragonruby--on-change (_beg _end _len)
   "Kernel hearing the buffer scream. Marks it dirty and records time."
   (setq dragonruby--last-interaction-time (float-time))
-  (unless (eq dragonruby--buffer-state 'processing)
-    (setq dragonruby--buffer-state 'dirty)))
+  (setq dragonruby--buffer-state 'dirty))
 
 ;; --- PUBLIC API ---
 
@@ -137,7 +147,7 @@ Governs both 'scan' (heavy) and 'monitor' (light) phases."
   ;; Start as 'dirty' to trigger an initial scan on first pulse
   (setq dragonruby--buffer-state 'dirty)
   (setq dragonruby--last-interaction-time (float-time))
-  (add-hook 'after-change-functions #'dragonruby--on-change nil t)
+  (dragonruby-kernel-register-hook 'after-change-functions #'dragonruby--on-change t)
   ;; Guard against double scheduler/timer creation
   (unless (and dragonruby--idle-timer (timerp dragonruby--idle-timer))
     (dragonruby--schedule-pulse)))

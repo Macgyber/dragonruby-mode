@@ -104,4 +104,4 @@ Example: `[Translation] Español: tick.org`
 
 ---
 
-*DragonRuby Emacs Mode — v0.7.8*
+*DragonRuby Emacs Mode — v0.7.2*

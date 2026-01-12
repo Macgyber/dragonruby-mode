@@ -41,13 +41,12 @@ VALID indicates if file exists."
       (overlay-put ov 'priority -50)
       (push ov dragonruby--path-overlays))))
 
-(defun dragonruby--scan-paths ()
+(defun dragonruby--scan-paths (&optional beg end)
   "Scan VISIBLE region for require/load statements and data file paths.
 Designed for high-frequency execution during the Kernel pulse."
   (when dragonruby-mode
-    (let* ((region (dragonruby--visible-region))
-           (start-pos (car region))
-           (end-pos (cdr region)))
+    (let* ((start-pos (or beg (point-min)))
+           (end-pos (or end (point-max))))
       
       ;; 1. Clear overlays only in the scanned region
       (remove-overlays start-pos end-pos 'dragonruby-path t)

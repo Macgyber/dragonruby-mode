@@ -6,9 +6,9 @@
 (require 'dragonruby-sprite-actions)
 (require 'dragonruby-sprite-popup)
 
-(defcustom dragonruby-sprite-thumbnail-size 36
+(defcustom dragonruby-sprite-thumbnail-size 20
   "Fixed height in pixels for inline sprite thumbnails.
-Default: 36px."
+Default: 20px."
   :type 'integer
   :group 'dragonruby)
 
@@ -94,19 +94,17 @@ Default: 36px."
 
 ;; --- SCANNING ---
 
-(defun dragonruby--scan-sprites ()
+(defun dragonruby--scan-sprites (&optional beg end)
   "Scan buffer for sprite strings and create overlays. 
 Called ONLY by the central scheduler."
-  (let ((search-beg (point-min))
-        (search-end (point-max)))
+  (let ((search-beg (or beg (point-min)))
+        (search-end (or end (point-max))))
     (remove-overlays search-beg search-end 'dragonruby-sprite t)
     (let ((root (dragonruby--find-project-root)))
       (when root
         (save-excursion
-          (save-restriction
-            (widen)
-            (goto-char (point-min))
-            (while (re-search-forward "\"\\([^\"\n]+\\)\"" nil t)
+          (goto-char search-beg)
+          (while (re-search-forward "\"\\([^\"\n]+\\)\"" search-end t)
             (let* ((start (match-beginning 1))
                    (end (match-end 1))
                    (raw-path (match-string 1))
@@ -120,7 +118,7 @@ Called ONLY by the central scheduler."
                         (dragonruby--make-sprite-overlay start end raw-path abs-path 'valid)
                       (dragonruby--make-sprite-overlay start end raw-path abs-path 'missing))))
                  ((member ext dragonruby-unsupported-sprites)
-                  (dragonruby--make-sprite-overlay start end raw-path nil 'unsupported))))))))))))
+                  (dragonruby--make-sprite-overlay start end raw-path nil 'unsupported)))))))))))
 
 (provide 'dragonruby-sprite-overlay)
 ;;; dragonruby-sprite-overlay.el ends here

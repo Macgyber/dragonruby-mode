@@ -4,19 +4,18 @@
 (require 'dragonruby-color-visuals)
 (require 'dragonruby-color-utils)
 
-(defun dragonruby--scan-colors ()
-  "Main entry point for color scanning (Retina Surgical Phase v8.1).
-Cohesive line-based highlighting to eliminate gaps between components."
+(defun dragonruby--scan-colors (&optional beg end)
+  "Scan the buffer for color definitions and apply overlays.
+BEG and END define the range; defaults to whole buffer."
   (when (and (bound-and-true-p dragonruby-mode) 
              (bound-and-true-p dragonruby-enable-colors))
-    (let* ((region (dragonruby--visible-region))
-           (start-pos (car region))
-           (end-pos (cdr region))
+    (let* ((start-pos (or beg (point-min)))
+           (end-pos (or end (point-max)))
            ;; Atomic key-value regex (r: 100, :r => 100, etc)
            (rgba-regex "\\(?:\\b\\|[ \t,]\\)[:\"']?\\([rgba]\\)[:\"']?\\s-*\\(?:=>\\|:\\)\\s-*\\([0-9]+\\)")
            (all-matches '()))
       
-      (dragonruby--clear-color-overlays)
+      (remove-overlays start-pos end-pos 'dragonruby-color t)
       (save-excursion
         ;; 1. Collect all local components
         (goto-char start-pos)

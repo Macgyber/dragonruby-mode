@@ -107,62 +107,41 @@
         
         ;; 2. Kernel Activation (Global Services)
         (let (enabled-msgs disabled-msgs)
-          ;; --- Sprites & Tools ---
-          (let ((sprites-active dragonruby-enable-sprites))
-            (if sprites-active 
-                (progn
-                  (dragonruby-enable 'sprites)
-                  (push "🧠 Kernel: Module [sprites] ENABLED" enabled-msgs)
-                  (if dragonruby-enable-sprite-tools
-                      (progn (dragonruby-enable 'sprite-tools)
-                             (push "🧠 Kernel: Module [sprite-tools] ENABLED" enabled-msgs))
-                    (push "🧠 Kernel: Module [sprite-tools] DISABLED" disabled-msgs)))
-              (push "🧠 Kernel: Module [sprites] DISABLED" disabled-msgs)
-              (when dragonruby-enable-sprite-tools
-                (push "🧠 Kernel: Module [sprite-tools] DISABLED (requires [sprites])" disabled-msgs))))
+          (cl-labels ((activate-mod (mod var &optional req-mod)
+                        (let ((is-enabled (symbol-value var)))
+                          (if is-enabled
+                              (if (or (not req-mod) (dragonruby-module-status req-mod) (eq (dragonruby-module-status req-mod) :active))
+                                  (progn
+                                    (dragonruby-enable mod)
+                                    (push (format "🧠 Kernel: Module [%s] ENABLED" mod) enabled-msgs))
+                                (push (format "🧠 Kernel: Module [%s] DISABLED (requires [%s])" mod req-mod) disabled-msgs))
+                            (push (format "🧠 Kernel: Module [%s] DISABLED" mod) disabled-msgs)))))
 
-          ;; --- Fonts & Tools ---
-          (let ((fonts-active dragonruby-enable-fonts))
-            (if fonts-active 
-                (progn
-                  (dragonruby-enable 'fonts)
-                  (push "🧠 Kernel: Module [fonts] ENABLED" enabled-msgs)
-                  (if dragonruby-enable-font-tools
-                      (progn (dragonruby-enable 'font-tools)
-                             (push "🧠 Kernel: Module [font-tools] ENABLED" enabled-msgs))
-                    (push "🧠 Kernel: Module [font-tools] DISABLED" disabled-msgs)))
-              (push "🧠 Kernel: Module [fonts] DISABLED" disabled-msgs)
-              (when dragonruby-enable-font-tools
-                (push "🧠 Kernel: Module [font-tools] DISABLED (requires [fonts])" disabled-msgs))))
-          
-          ;; --- Simple Modules ---
-          (if dragonruby-enable-audio
-              (progn (dragonruby-enable 'audio) (push "🧠 Kernel: Module [audio] ENABLED" enabled-msgs))
-            (push "🧠 Kernel: Module [audio] DISABLED" disabled-msgs))
-          
-          (if dragonruby-enable-colors
-              (progn (dragonruby-enable 'colors) (push "🧠 Kernel: Module [colors] ENABLED" enabled-msgs))
-            (push "🧠 Kernel: Module [colors] DISABLED" disabled-msgs))
-          
-          (if dragonruby-enable-paths
-              (progn (dragonruby-enable 'paths) (push "🧠 Kernel: Module [paths] ENABLED" enabled-msgs))
-            (push "🧠 Kernel: Module [paths] DISABLED" disabled-msgs))
-          
-          (if dragonruby-enable-concepts
-              (progn (dragonruby-enable 'concepts) (push "🧠 Kernel: Module [concepts] ENABLED" enabled-msgs))
-            (push "🧠 Kernel: Module [concepts] DISABLED" disabled-msgs))
-          
-          (if dragonruby-enable-completion
-              (progn (dragonruby-enable 'completion) (push "🧠 Kernel: Module [completion] ENABLED" enabled-msgs))
-            (push "🧠 Kernel: Module [completion] DISABLED" disabled-msgs))
-          
-          (if dragonruby-enable-guide
-              (progn (dragonruby-enable 'guide) (push "🧠 Kernel: Module [guide] ENABLED" enabled-msgs))
-            (push "🧠 Kernel: Module [guide] DISABLED" disabled-msgs))
+            ;; The User-Defined "Visual to Non-Visual" Order:
+            ;; 1. colors
+            (activate-mod 'colors 'dragonruby-enable-colors)
+            ;; 2. audio
+            (activate-mod 'audio 'dragonruby-enable-audio)
+            ;; 3. sprites
+            (activate-mod 'sprites 'dragonruby-enable-sprites)
+            ;; 4. fonts
+            (activate-mod 'fonts 'dragonruby-enable-fonts)
+            ;; 5. paths
+            (activate-mod 'paths 'dragonruby-enable-paths)
+            ;; 6. completion
+            (activate-mod 'completion 'dragonruby-enable-completion)
+            ;; 7. concepts
+            (activate-mod 'concepts 'dragonruby-enable-concepts)
+            ;; 8. guide
+            (activate-mod 'guide 'dragonruby-enable-guide)
+            ;; 9. tools-font (font-tools)
+            (activate-mod 'font-tools 'dragonruby-enable-font-tools 'fonts)
+            ;; 10. tools-sprites (sprite-tools)
+            (activate-mod 'sprite-tools 'dragonruby-enable-sprite-tools 'sprites)
 
-          ;; --- Final Reporting (ENABLED first, then DISABLED) ---
-          (dolist (msg (reverse enabled-msgs)) (message msg))
-          (dolist (msg (reverse disabled-msgs)) (message msg)))
+            ;; --- Final Reporting (ENABLED first, then DISABLED) ---
+            (dolist (msg (reverse enabled-msgs)) (message msg))
+            (dolist (msg (reverse disabled-msgs)) (message msg))))
         ;; 3. Local Safety
         (setq-local enable-recursive-minibuffers t))
     (error

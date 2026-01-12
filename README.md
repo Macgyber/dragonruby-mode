@@ -188,7 +188,8 @@ To customize your experience, add these lines to your `config.el` (Doom) or `ini
 If you disable a parent (e.g., `sprites`), the Kernel **automatically** powers down its children (`sprite-tools`) to prevent errors. You don't have to manage dependencies. Just build your perfect editor.
 
 ### 🧠 The Unified Knowledge System (Memory & Retina)
-The v0.7.8 update introduces a centralized **Knowledge Kernel**. You can audit its current state at any time with `M-x dragonruby-knowledge-inspect`.
+The v0.7.2 update introduces a centralized **Knowledge Kernel**.
+ You can audit its current state at any time with `M-x dragonruby-knowledge-inspect`.
 
 - **The Memory (Guide)**: Loads definitions from `.org` files into a unified hash-table cache.
 - **The Retina (Concepts)**: Scans your code and queries the Knowledge Kernel for instant context.

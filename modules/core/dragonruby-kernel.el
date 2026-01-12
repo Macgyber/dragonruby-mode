@@ -45,6 +45,55 @@ Ensures we are always working with a valid hash table, avoiding stale references
 (defvar dragonruby--capabilities (make-hash-table :test 'equal)
   "Map of capabilities to providing modules. Key: Capability (symbol). Value: List of Module Names.")
 
+;; --- ⚡ SOVEREIGN KERNEL REGISTRY (The Ledger of Life) ---
+
+(defvar dragonruby--live-timers nil "List of active timers registered with the Kernel.")
+(defvar dragonruby--live-hooks nil "List of (hook . fn) pairs registered with the Kernel.")
+(defvar dragonruby--live-processes nil "List of active processes registered with the Kernel.")
+
+(defvar dragonruby--module-resources (make-hash-table :test 'equal)
+  "Legacy registry for per-module resources. (Deprecated in favor of global ledger)")
+
+(defun dragonruby-kernel-register-timer (timer)
+  "Register a TIMER with the Kernel for lifecycle management."
+  (when (timerp timer)
+    (push timer dragonruby--live-timers))
+  timer)
+
+(defun dragonruby-kernel-register-hook (hook fn &optional local)
+  "Register a global or local HOOK function FN.
+If LOCAL is non-nil, it is treated as a buffer-local hook."
+  (add-hook hook fn nil local)
+  (push (cons hook fn) dragonruby--live-hooks)
+  fn)
+
+(defun dragonruby-kernel-register-process (proc)
+  "Register a PROCESS with the Kernel."
+  (when (processp proc)
+    (push proc dragonruby--live-processes))
+  proc)
+
+(defun dragonruby-register-resource (module type object)
+  "Register a resource for a specific MODULE (Legacy)."
+  (let ((existing (gethash module dragonruby--module-resources)))
+    (puthash module (cons (cons type object) existing) dragonruby--module-resources)))
+
+(defun dragonruby--kill-module-resources (module)
+  "Kill all registered resources for MODULE."
+  (let ((resources (gethash module dragonruby--module-resources)))
+    (dolist (res resources)
+      (let ((type (car res))
+            (obj (cdr res)))
+        (condition-case nil
+            (pcase type
+              ('timer (when (timerp obj) (cancel-timer obj)))
+              ('process (when (processp obj) (delete-process obj)))
+              ('hook (let ((hook-sym (car obj))
+                           (fn (cdr obj)))
+                       (remove-hook hook-sym fn t))))
+          (error nil))))
+    (remhash module dragonruby--module-resources)))
+
 (defun dragonruby--unregister-module (name)
   "Remove all traces of NAME from the global index (Capabilities).
 Prevents zombie providers after a hot-reload or module re-registration."
@@ -63,15 +112,52 @@ Only for Cold Boot or Unit Tests. NEVER for Hot Reload."
   (message "🧠 Kernel: Registry Wiped (Cold Boot)."))
 
 (defun dragonruby-kernel-reset-live ()
-  "Safely detach all active modules without killing the kernel.
-This is the heart of TRUE HOT RELOAD. It calls :disable-fn for 
-every active module, ensuring hooks, timers, and overlays are 
-properly detached while keeping the registry and capabilities alive."
+  "OS-LEVEL EXORCISM: Kill all running DragonRuby activity."
   (interactive)
-  (let ((active (cl-loop for k being the hash-keys in (dragonruby--active-hash) collect k)))
-    (dolist (name active)
-      (dragonruby-disable name)))
-  (message "🧠 Kernel: Live Reset Complete (Environment Cleaned)."))
+  (message "🧹 Kernel: EXORCISM START...")
+
+  ;; 1. Kill Timers
+  (dolist (timer dragonruby--live-timers)
+    (ignore-errors (cancel-timer timer)))
+  (setq dragonruby--live-timers nil)
+
+  ;; 2. Remove Hooks
+  (dolist (pair dragonruby--live-hooks)
+    (ignore-errors (remove-hook (car pair) (cdr pair))))
+  (setq dragonruby--live-hooks nil)
+
+  ;; 3. Kill Processes
+  (dolist (proc dragonruby--live-processes)
+    (ignore-errors (delete-process proc)))
+  (setq dragonruby--live-processes nil)
+
+  ;; 4. Module Cleanup
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (let ((active (cl-loop for k being the hash-keys in (dragonruby--active-hash) collect k)))
+        (dolist (name active)
+          (ignore-errors (dragonruby-disable name))))))
+
+  ;; 5. Safety Net
+  (dolist (timer (append timer-list timer-idle-list))
+    (let* ((fn (timer--function timer))
+           (fn-name (cond ((symbolp fn) (symbol-name fn))
+                          (t ""))))
+      (when (string-prefix-p "dragonruby-" fn-name)
+        (cancel-timer timer))))
+
+  (message "🧹 Kernel: System Halted."))
+
+(defun dragonruby-kernel-system-shutdown ()
+  "Full system shutdown."
+  (interactive)
+  (dragonruby-kernel-reset-live)
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (when (bound-and-true-p dragonruby-mode)
+        (dragonruby-mode -1))))
+  (clrhash dragonruby--module-resources)
+  (message "🐲 Kernel: Shutdown Complete."))
 
 ;; -----------------------------------------------------------------------------
 ;; 📜 Manifest Registration
@@ -226,15 +312,17 @@ STACK prevents circular dependencies."
                    (dragonruby-disable dep-name)))))))
        active-hash))
 
-    ;; 2. Execute Contract
+    ;; 2. Execute Contract & Kill Resources
     (let* ((manifest (gethash module-name dragonruby--modules))
            (disable-fn (and manifest (plist-get manifest :disable-fn))))
       (when (functionp disable-fn)
-        (funcall disable-fn)))
+        (funcall disable-fn))
+      ;; HYGIENE: Kill registered timers/processes
+      (dragonruby--kill-module-resources module-name))
 
     ;; 3. Mark Inactive
     (remhash module-name active-hash)
-    (message "🧠 Kernel: Module [%s] DISABLED" module-name))))
+    (message "🧠 Kernel: Module [%s] DISABLED and PURGED" module-name))))
 
 (defun dragonruby-module-status (module-name)
   (if (gethash module-name (dragonruby--active-hash)) :active :inactive))
