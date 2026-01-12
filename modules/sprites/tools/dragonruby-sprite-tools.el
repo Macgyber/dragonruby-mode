@@ -47,6 +47,8 @@
   (when (and buffer-file-name (dragonruby--find-project-root))
     (dragonruby-image-mode 1)
     (dragonruby-image-init-history)
+    ;; Always active by default
+    (unless dragonruby--show-image-info (dragonruby-image-info))
     (dragonruby--setup-image-header-line)))
 
 ;; -----------------------------------------------------------------------------

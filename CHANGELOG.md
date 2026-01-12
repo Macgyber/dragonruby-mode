@@ -8,6 +8,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <details open>
+<summary><h2>[0.7.2] - 2026-01-12 (LIBRARY OF ALEXANDRIA & STABILITY)</h2></summary>
+
+### 📖 Módulo de Guía (BIBLIOTECA DE ALEJANDRÍA)
+- **Estética de Grimorio**: Transformación visual de Org-mode con títulos jerárquicos (1.4x), márgenes inteligentes y elipsis de libro sagrado (`▾`).
+- **Navegación RET**: Implementado salto directo a la documentación pulsando `RET` sobre conceptos en el código con gestión de memoria optimizada.
+- **Sidebar Derecho**: Panel lateral persistente y anclado (`no-delete-other-windows`) para consulta de conocimiento sin interrupciones.
+- **Tornos de Sabiduría**: Tomos de `args.org`, `state.org` y `sprite.org` estructurados bajo la nueva estética enciclopédica.
+
+### � Módulo de Colores (TESTEADO & ESTABLE)
+- **Estrategia Solid Bar**: Renderizado compacto que fusiona componentes visuales eliminando ruidos en comas y espacios.
+- **Aislamiento de Objetos**: Lógica de proximidad y reinicio por duplicidad para evitar mezcla de colores entre variables cercanas.
+
+### 💓 Estabilidad e Ingeniería (Zero-Blocking)
+- **Exorcismo de Overlays**: Reingeniería total del ciclo de vida de overlays. Eliminación de fugas de memoria y closures dinámicos que causaban bloqueos.
+- **Smart Scheduler**: Latida de un solo disparo a 0.5s garantizando scroll suave incluso en archivos masivos.
+- **Hot-Reload (F6)**: Ciclo purificado de reinicio global, reconstrucción de `load-path` y recarga atómica de búferes.
+
+</details>
+
+<details>
 <summary><h2>[0.7.1] - 2026-01-10 (SINCRO TOTAL & SMART DOT)</h2></summary>
 
 ### 📜 Contrato de Sincronía Total

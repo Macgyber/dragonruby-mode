@@ -10,12 +10,12 @@ We're translating **concept files** (`.org`) that explain DragonRuby concepts li
 
 | Language | Status | Folder |
 |----------|--------|--------|
-| 🇺🇸 English | In progress | `docs/concepts/en/` |
-| 🇪🇸 Español | In progress | `docs/concepts/es/` |
-| 🇨🇳 中文 | Planned | `docs/concepts/zh/` |
-| 🇯🇵 日本語 | Planned | `docs/concepts/ja/` |
-| 🇫🇷 Français | Planned | `docs/concepts/fr/` |
-| 🇩🇪 Deutsch | Planned | `docs/concepts/de/` |
+| 🇺🇸 English | In progress | `knowledge/definitions/` |
+| 🇪🇸 Español | In progress | `knowledge/definitions/` |
+| 🇨🇳 中文 | Planned | `knowledge/definitions/` |
+| 🇯🇵 日本語 | Planned | `knowledge/definitions/` |
+| 🇫🇷 Français | Planned | `knowledge/definitions/` |
+| 🇩🇪 Deutsch | Planned | `knowledge/definitions/` |
 
 ## How to Contribute
 
@@ -32,13 +32,11 @@ If you want to suggest a translation for a specific term or correct an existing 
 
 Check what's available in the English folder:
 ```
-docs/concepts/en/
-├── engine/
-│   ├── tick.org
-│   └── args.org
-├── render/
-│   ├── sprite.org
-│   └── label.org
+knowledge/definitions/
+├── tick.org
+├── args.org
+├── sprite.org
+├── label.org
 ...
 ```
 
@@ -51,10 +49,11 @@ docs/concepts/en/
 Example:
 ```
 # Original
-docs/concepts/en/engine/tick.org
+knowledge/definitions/tick.org
 
 # Your translation
-docs/concepts/es/engine/tick.org
+# (Translations currently use the same folder with separate titles/content 
+# or separate folders as the project scales)
 ```
 
 ### Step 3: Translation rules
@@ -105,4 +104,4 @@ Example: `[Translation] Español: tick.org`
 
 ---
 
-*DragonRuby Emacs Mode — v0.5.0*
+*DragonRuby Emacs Mode — v0.7.8*

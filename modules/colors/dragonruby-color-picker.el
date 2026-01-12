@@ -1,4 +1,8 @@
-;;; dragonruby-color-picker.el --- Functional Color Picker -*- lexical-binding: t; -*-
+;;; dragonruby-color-picker.el --- Functional Color Picker (EXPERIMENTAL) -*- lexical-binding: t; -*-
+;;
+;; ⚠️ STATUS: EXPERIMENTAL
+;; This module is a work-in-progress. It provides interactive color selection
+;; but the API and interaction model are subject to change.
 
 (require 'dragonruby-color-utils)
 

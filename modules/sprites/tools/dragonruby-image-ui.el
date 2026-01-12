@@ -71,7 +71,7 @@ Example:
                  (file :tag "Custom editor path"))
   :group 'dragonruby)
 
-(defvar-local dragonruby--show-image-info nil
+(defvar-local dragonruby--show-image-info t
   "Whether to show image info in header-line.")
 
 (defvar-local dragonruby--info-face-cookie nil
@@ -211,6 +211,11 @@ If no editor is set, prompts the user to select one."
           (let* ((width (window-total-width))
                  (show-meta (> width 100)))
             (list
+             ;; METADATA FIRST (Quick access - always at start if enabled)
+             (if (and dragonruby--show-image-info show-meta)
+                 (concat "  " (or (dragonruby--get-image-info-string) "") "  |  ")
+               "")
+             
              ;; GROUP: VIEW
              " "
              (dragonruby--make-header-button 
@@ -408,12 +413,8 @@ If no editor is set, prompts the user to select one."
                                                          (force-mode-line-update)
                                                          (message "🗑️ Removed: %s" choice)))))))
                                              "Hide/Remove Tool" '(:foreground "#FF5555")))
-               "")
-
-             ;; METADATA (Hidden on small screens)
-             (if (and dragonruby--show-image-info show-meta)
-                 (concat "  " (or (dragonruby--get-image-info-string) ""))
                ""))))))
+
 
 
 ;; Initialize history when image mode starts

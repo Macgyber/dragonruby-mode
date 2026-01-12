@@ -5,6 +5,9 @@
 (defvar-local dragonruby--font-overlays nil
   "List of font overlays in the current buffer.")
 
+(defconst dragonruby--font-regex "['\"’“”]\\([^'\"\n!’“”]+\\.\\(ttf\\|otf\\|woff\\|woff2\\|svg\\|eot\\)\\)['\"’“”]"
+  "Regex to find font references.")
+
 
 (defun dragonruby--clear-font-overlays ()
   "Remove all font overlays from the current buffer."
@@ -144,15 +147,18 @@ Searches backwards first, then forwards. Matches various Ruby hash/label styles.
       found)))
 
 (defun dragonruby--scan-font-overlays ()
-  "Scan buffer for font references (ttf, otf, woff, etc.) inside strings."
+  "Scan VISIBLE region for font references.
+Adheres to the Constitutional Principle: Only work what is seen."
   (when dragonruby-mode
-    (dragonruby--clear-font-overlays)
-    (save-excursion
-      (save-restriction
-        (widen)
-        (goto-char (point-min))
-        ;; Scan for common font extensions (supports "..." and '...' and curly)
-        (while (re-search-forward "['\"’“”]\\([^'\"\n!’“”]+\\.\\(ttf\\|otf\\|woff\\|woff2\\|svg\\|eot\\)\\)['\"’“”]" nil t)
+    (let* ((region (dragonruby--visible-region))
+           (start-pos (car region))
+           (end-pos (cdr region)))
+      ;; 1. Clear overlays ONLY in the region we are about to scan
+      (remove-overlays start-pos end-pos 'dragonruby-font t)
+      
+      (save-excursion
+        (goto-char start-pos)
+        (while (re-search-forward dragonruby--font-regex end-pos t)
           (let* ((raw (match-string 1))
                  (start (match-beginning 1))
                  (end (match-end 1))

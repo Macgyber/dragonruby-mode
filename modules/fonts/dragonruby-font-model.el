@@ -5,8 +5,8 @@
 
 ;; Register Font-specific snippets
 ;; fon -> Universal filter for fonts
-(dragonruby-registry-register 'font
-  '(:snippets (("fon" . "\"fonts/.ttf\""))))
+(defconst dragonruby-font-snippets
+  '(("fon" . "\"fonts/\"")))
 
 (provide 'dragonruby-font-model)
 ;;; dragonruby-font-model.el ends here

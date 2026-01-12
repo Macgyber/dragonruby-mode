@@ -1,0 +1,54 @@
+#+TITLE: 📘 Cuaderno DragonRuby: Sprites
+#+AUTHOR: Sr. Esteban
+#+OPTIONS: toc:2 num:nil
+#+STARTUP: overview indent
+
+* 🧭 Índice
+  - [[*Introducción][Introducción]]
+  - [[*Conceptos Clave][Conceptos Clave]]
+  - [[*Atributos][Atributos]]
+  - [[*Código Base][Código Base]]
+  - [[*Rutas Secretas][Rutas Secretas]]
+  - [[*Bitácora][Bitácora]]
+
+* 🌱 Introducción
+  Este documento guarda los secretos de la luz y la forma: los *Sprites*.
+  Un sprite no es solo una imagen, es una entidad visual con alma lógica dentro del motor.
+
+* 🧠 Conceptos Clave
+** Sprite
+   Una entidad visual que habita sobre el plano 2D. 
+   #+begin_quote
+   “Un sprite es la ventana a la imaginación del jugador.”
+   #+end_quote
+
+* 🏗 Atributos
+** Geometría Base
+   | Clave | Propósito |
+   |-------+-----------|
+   | x, y  | Posición  |
+   | w, h  | Tamaño    |
+   | path  | Imagen    |
+
+** Color y Giro
+   - r, g, b, a :: El tinte del alma del sprite.
+   - angle :: La rotación sobre su eje central.
+
+* 🧪 Código Base
+** Renderizando un héroe
+#+begin_src ruby
+def tick args
+  args.outputs.sprites << {
+    x: 100, y: 100, w: 128, h: 128,
+    path: 'sprites/hero.png'
+  }
+end
+#+end_src
+
+* 🧬 Rutas Secretas
+  - [[file:args.org][📕 Volver a Args]]
+  - [[https://dragonruby.org/docs/sprites.html][Manual Oficial de Sprites]]
+
+* 📅 Bitácora
+** 2026-01-12
+   Hoy los sprites aprendieron a brillar en la oscuridad del código.

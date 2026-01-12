@@ -154,4 +154,4 @@ We want these tools to be lightning-fast and error-free. If something breaks or 
 
 ---
 
-*DragonRuby Emacs Mode — v0.5.0*
+*DragonRuby Emacs Mode — v0.7.8*

@@ -29,8 +29,7 @@ R, G, B, A are color components (0-255). FORMAT is ignored."
              (ov (make-overlay start end)))
         (overlay-put ov 'face
                      `(:background ,hex
-                       :foreground ,contrast
-                       :box (:line-width -1 :color "grey50")))
+                       :foreground ,contrast))
         (overlay-put ov 'priority dragonruby-colors-overlay-priority)
         (overlay-put ov 'dragonruby-color t)
         ;; Only add interactivity if picker is enabled
@@ -39,6 +38,42 @@ R, G, B, A are color components (0-255). FORMAT is ignored."
           (overlay-put ov 'keymap
                        (let ((map (make-sparse-keymap)))
                          ;; Precision tool: mouse only
+                         (define-key map [mouse-1]
+                           (lambda () (interactive)
+                             (dragonruby-color-picker-edit start end nil)))
+                         map))
+          (overlay-put ov 'mouse-face 'highlight))
+        (push ov dragonruby--color-overlays)))))
+
+(defun dragonruby--make-color-overlay-with-hint (start end r g b &optional a standard-order)
+  "Create a color overlay with optional educational hint.
+If STANDARD-ORDER is nil, adds gentle tooltip suggesting canonical r, g, b, a order.
+Respects DragonRuby's tolerance while teaching best practices."
+  (when (dragonruby--valid-rgba-p r g b a)
+    (cl-destructuring-bind (rr gg bb)
+        (dragonruby--apply-alpha r g b a)
+      (let* ((hex (dragonruby--rgb-to-hex rr gg bb))
+             (contrast (dragonruby--get-contrast-color rr gg bb))
+             (ov (make-overlay start end))
+             (base-tooltip (if (bound-and-true-p dragonruby-enable-picker)
+                               "Click to edit color"
+                             ""))
+             (hint (if standard-order
+                       base-tooltip
+                     (concat base-tooltip
+                             (if (string-empty-p base-tooltip) "" "\n\n")
+                             "💡 Tip: Most DR examples use 'r, g, b, a' order"))))
+        (overlay-put ov 'face
+                     `(:background ,hex
+                       :foreground ,contrast
+                       :box (:line-width -1 :color "grey50")))
+        (overlay-put ov 'priority dragonruby-colors-overlay-priority)
+        (overlay-put ov 'dragonruby-color t)
+        (overlay-put ov 'help-echo hint)
+        ;; Only add interactivity if picker is enabled
+        (when (bound-and-true-p dragonruby-enable-picker)
+          (overlay-put ov 'keymap
+                       (let ((map (make-sparse-keymap)))
                          (define-key map [mouse-1]
                            (lambda () (interactive)
                              (dragonruby-color-picker-edit start end nil)))

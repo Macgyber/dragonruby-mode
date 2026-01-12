@@ -8,7 +8,7 @@
 ;; png/jpg/gif... -> Specific extension filters
 ;; Sprite-specific snippets
 (defconst dragonruby-sprite-snippets
-  '(("spr" . "\"\"")))
+  '(("spr" . "\"sprites/\"")))
 
 ;;; Configuration
 (defvar dragonruby-supported-sprites dragonruby-image-exts

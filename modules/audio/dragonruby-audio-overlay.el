@@ -24,11 +24,11 @@
       (overlay-put ov 'face '(:underline (:color "red" :style wave))))
     
     (when valid
-      ;; Visual Feedback (Strictly OGG vs WAV - Using ASCII for Font Compatibility)
+      ;; Visual Feedback (Strictly OGG vs WAV)
       (let* ((ext-down (downcase (or ext "")))
-             (label (cond ((string= ext-down "ogg") "(OGG)")
-                          ((string= ext-down "wav") "(WAV)")))
-             (icon (when label (propertize (format " %s" label) 'face '(:height 0.8 :foreground "#2ECC71" :weight bold)))))
+             (label (cond ((string= ext-down "ogg") "📢")  ; Trompeta
+                          ((string= ext-down "wav") "🔊"))) ; Altoparlante/Megáfono profesional
+             (icon (when label (propertize (format " %s" label) 'face '(:height 0.9 :foreground "#2ECC71" :weight bold)))))
         (when icon
           (overlay-put ov 'after-string icon)))
       
@@ -51,7 +51,7 @@
           (let* ((raw (match-string 1))
                  (start (match-beginning 0))
                  (end (match-end 0))
-                 (abs (dragonruby--resolve-path raw dragonruby-audio-exts))
+                 (abs (dragonruby--resolve-path raw 'audio))
                  (ext (downcase (or (file-name-extension raw) "")))
                  (supported (member ext '("wav" "ogg")))
                  (exists (and abs (file-exists-p abs)))

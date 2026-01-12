@@ -1,7 +1,11 @@
-* Concept Registry
+#+TITLE: 🗺 Catálogo Maestro: Biblioteca DragonRuby
+#+AUTHOR: Sr. Esteban
+#+OPTIONS: toc:2 num:nil
+#+STARTUP: overview indent
 
-This file acts as the central nervous system for DragonRuby concepts.
-The plugin queries this map to connect symbols to living documentation.
+* 🧭 Guía de Navegación
+  Este archivo es el Sistema Nervioso Central del conocimiento. 
+  Aquí se enlazan los símbolos del código con los tomos sagrados de documentación.
 
 * Sprite
 :PROPERTIES:

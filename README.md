@@ -1,7 +1,7 @@
 # DragonRuby Emacs Mode 🐉
 
 <div align="center">
-  <img src="docs/emacs-image.jpg" width="50%" alt="DragonRuby Emacs Mode">
+  <img src="knowledge/emacs-image.jpg" width="50%" alt="DragonRuby Emacs Mode">
   <br><br>
   <b>"It wasn't supposed to be possible."</b><br>
   We built this not just to write code, but to feel it. A love letter to the DragonRuby community and the infinite potential of Emacs.
@@ -29,7 +29,7 @@ Visualize the invisible. Your game's palette, alive in your code.
 - **Contrast Intelligence**: Text automatically adapts (black or white) to ensure readability on any background.
 
 <div align="center">
-  <img src="docs/colors-preview.png" alt="Color Detection Preview" width="60%">
+  <img src="knowledge/colors-preview.png" alt="Color Detection Preview" width="60%">
   <br><em>Arrays, RGBA hashes, and hexadecimal — all detected and visualized.</em>
 </div>
 
@@ -54,7 +54,7 @@ Stop coding blind. See your world as you build it.
 Press `RET` or `C-c C-o` on any sprite in your code and the header-line transforms into a **complete workstation**. You'll have access to a professional arsenal with non-destructive timeline, tool groups (VIEW, TRANSFORM, COLOR, SYSTEM, CREATIVE), and over 15 operations: remove backgrounds, trim margins, pixel-perfect scaling (2x/0.5x), apply effects, rotate, invert, compress, and much more. All without leaving Emacs.
 
 <div align="center">
-  <img src="docs/forge-toolbar.png" alt="The Forge Toolbar" width="80%">
+  <img src="knowledge/forge-toolbar.png" alt="The Forge Toolbar" width="80%">
   <br><em>VIEW, TRANSFORM, COLOR, SYSTEM, CREATIVE — Five tool groups, infinite power.</em>
 </div>
 
@@ -64,7 +64,7 @@ Your bridge to the ecosystem. Located within the Image Editor header-line:
 - **Customizable**: Add your own tools (Web URLs or Local Executables) via the `[+]` button.
 - **Adaptive**: Tools have custom colors and can be hidden/shown to fit your workflow.
 
-**→ [📖 Complete Image Editor Guide](docs/IMAGE_EDITOR.md)** (Timeline, Tool groups, Creative Hub)
+**→ [📖 Complete Image Editor Guide](knowledge/IMAGE_EDITOR.md)** (Timeline, Tool groups, Creative Hub)
 
 
 ### ⚡ Level 3: Curvature Navigation (The Law)
@@ -93,13 +93,13 @@ Did you pick the right font? Why doesn't it look like you expected? Stop guessin
 - **Context Preview**: The plugin reads nearby `text:` values (limited to 11 characters to prevent overflow). Write `text: "Press Start"` near your font, and the thumbnail shows that phrase.
 
 <div align="center">
-  <img src="docs/font-context-preview.png" alt="Font Context Preview" width="60%">
+  <img src="knowledge/font-context-preview.png" alt="Font Context Preview" width="60%">
   <br><em>The plugin reads "Press Start" from nearby text: and renders it in the font.</em>
 </div>
 
 - **Creative Hub**: Explore fonts from within the editor. Available buttons: **Google Fonts**, **DaFont**, **Font Squirrel**. Add `[+]` or remove `[-]` your own links to customize.
 
-**→ [📖 Complete Font System Guide](docs/FONTS.md)** (ABC/Pangram Viewer, Typography resources, Troubleshooting)
+**→ [📖 Complete Font System Guide](knowledge/FONTS.md)** (ABC/Pangram Viewer, Typography resources, Troubleshooting)
 
 ### 🤝 Compatibility with Other Plugins
 
@@ -145,7 +145,7 @@ Choose your preferred method. For a quick setup in **Doom Emacs**, simply copy t
          (ruby-ts-mode . dragonruby-maybe-enable)))
 ```
 
-**→ [📖 Complete Installation Guide](docs/INSTALLATION.md)** (Detailed instructions for Doom Emacs, straight.el, Spacemacs, use-package, manual, and more)
+**→ [📖 Complete Installation Guide](knowledge/INSTALLATION.md)** (Detailed instructions for Doom Emacs, straight.el, Spacemacs, use-package, manual, and more)
 
 ---
 
@@ -183,9 +183,17 @@ To customize your experience, add these lines to your `config.el` (Doom) or `ini
 | `concepts` | Educational concept popups | 🔴 OFF |
 | `paths` | Project navigation, file jumping | 🔴 OFF |
 | `completion` | Strict YAML API Schema | ✅ ON |
-| `docs` | Documentation lookup interface | 🔴 OFF |
+| `guide` | Knowledge guidance system (Sidebar) | 🔴 OFF |
 
 If you disable a parent (e.g., `sprites`), the Kernel **automatically** powers down its children (`sprite-tools`) to prevent errors. You don't have to manage dependencies. Just build your perfect editor.
+
+### 🧠 The Unified Knowledge System (Memory & Retina)
+The v0.7.8 update introduces a centralized **Knowledge Kernel**. You can audit its current state at any time with `M-x dragonruby-knowledge-inspect`.
+
+- **The Memory (Guide)**: Loads definitions from `.org` files into a unified hash-table cache.
+- **The Retina (Concepts)**: Scans your code and queries the Knowledge Kernel for instant context.
+- **Hierarchy of Silence**: Tooltips are suppressed when the Guidance Sidebar is open to keep your workspace clear.
+- **Follow Mode**: The sidebar automatically synchronizes with the concept under your cursor.
 
 ---
 
@@ -213,17 +221,17 @@ An artisan autocompletion system that respects your definitions. It is **NOT** a
 
 ## 📚 Documentation and Resources
 
-- **[📖 IMAGE_EDITOR.md](docs/IMAGE_EDITOR.md)**: Complete image editor guide
-- **[📖 FONTS.md](docs/FONTS.md)**: Font system and typography
-- **[📜 MANIFESTO.md](docs/MANIFESTO.md)**: The Project's Existential Boundaries
-- **[📖 INSTALLATION.md](docs/INSTALLATION.md)**: All installation methods
-- **[🤝 CONTRIBUTING.md](docs/CONTRIBUTING.md)**: Guide for contributors
+- **[📖 IMAGE_EDITOR.md](knowledge/IMAGE_EDITOR.md)**: Complete image editor guide
+- **[📖 FONTS.md](knowledge/FONTS.md)**: Font system and typography
+- **[📜 MANIFESTO.md](knowledge/MANIFESTO.md)**: The Project's Existential Boundaries
+- **[📖 INSTALLATION.md](knowledge/INSTALLATION.md)**: All installation methods
+- **[🤝 CONTRIBUTING.md](knowledge/CONTRIBUTING.md)**: Guide for contributors
 - **[💬 GitHub Issues](https://github.com/Macgyber/dragonruby-mode/issues)**: Report bugs or request features
 
 ---
 
 *Forged for creators who refuse to settle. Forged for DragonRuby.*
 
-**DragonRuby Emacs Mode — v0.7.1**
+**DragonRuby Emacs Mode — v0.7.2**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

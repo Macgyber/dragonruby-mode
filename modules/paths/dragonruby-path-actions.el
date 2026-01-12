@@ -33,19 +33,21 @@ This command strictly follows the requested workflow:
                      (display-candidates
                       (mapcar (lambda (path)
                                 (let* ((ext (or (file-name-extension path) "??"))
-                                       (display (format ".%-4s | %s" (downcase ext) path)))
+                                       (display (format "%-40s (%s)" path (downcase ext))))
                                   (puthash display path display-map)
                                   display))
                               raw-candidates))
-                     ;; ULTRA-MINIMALIST: No labels, no clutter. Just the list.
-                     (prompt " ")
+                     ;; ULTRA-MINIMALIST: Just the list.
+                     (prompt "📁 Path: ")
                      ;; INSTANT LIST
                      (choice (minibuffer-with-setup-hook
                                  (lambda () (minibuffer-completion-help))
                                (completing-read prompt display-candidates nil t initial))))
                 (when (and choice (gethash choice display-map))
                   (delete-region start end)
-                  (insert (gethash choice display-map))))))))))
+                  (insert (gethash choice display-map))))))
+        ;; FALLBACK: If not a snippet and not in a path, use standard CAPF
+        (completion-at-point)))))
 
 (defun dragonruby-open-project-path ()
   "Open any supported project file using the minibuffer."

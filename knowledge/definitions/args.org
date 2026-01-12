@@ -1,0 +1,51 @@
+#+TITLE: 📘 Cuaderno DragonRuby: Args
+#+AUTHOR: Sr. Esteban
+#+OPTIONS: toc:2 num:nil
+#+STARTUP: overview indent
+
+* 🧭 Índice
+  - [[*Introducción][Introducción]]
+  - [[*Conceptos Clave][Conceptos Clave]]
+  - [[*Arquitectura][Arquitectura]]
+  - [[*Código Base][Código Base]]
+  - [[*Experimentos][Experimentos]]
+  - [[*Bitácora][Bitácora]]
+
+* 🌱 Introducción
+  Este documento es un mundo vivo sobre el objeto principal de DragonRuby: *Args*.
+  Aquí no se toman notas: aquí se construye comprensión sobre cómo fluyen los datos en el juego.
+
+* 🧠 Conceptos Clave
+** Args
+   El corazón del loop de juego. Es el contenedor que DragonRuby te pasa en cada `tick`.
+   #+begin_quote
+   “Todo lo que el motor sabe del mundo está dentro de args.”
+   #+end_quote
+
+** Propiedades
+   - state :: Tu base de datos persistente.
+   - inputs :: La voz del jugador.
+   - outputs :: La pantalla y el sonido.
+
+* 🏗 Arquitectura
+** El Ciclo del Tick
+   1. DragonRuby prepara `args`.
+   2. Tu código lee `args.inputs` y `args.state`.
+   3. Tu código escribe en `args.outputs`.
+   4. DragonRuby renderiza el frame.
+
+* 🧪 Código Base
+** Estructura básica
+#+begin_src ruby
+def tick args
+  args.outputs.labels << [640, 360, "Hello World", 5, 1]
+end
+#+end_src
+
+* 🧬 Experimentos
+** Debugging args
+   ¿Qué pasa si imprimimos `args.state` cada segundo?
+
+* 📅 Bitácora
+** 2026-01-12
+   Hoy activamos el motor de conocimiento. La documentación ahora respira.

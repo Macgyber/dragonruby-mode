@@ -72,34 +72,44 @@
     (delete-frame dragonruby--sprite-popup-frame t))
   (setq dragonruby--sprite-popup-frame nil))
 
-;; --- MONITOR --------------------------------------------------------
+;; --- MONITOR (Synchronous) ------------------------------------------
 
-(defun dragonruby--sprite-popup-monitor ()
-  (unless (dragonruby--sprite-popup--graphic-p)
-    (dragonruby--sprite-popup-cleanup))
+(defun dragonruby--sprite-popup-monitor-sync ()
+  "Synchronous monitor called by the Kernel.
+Checks mouse position and manages lifecycle without timers."
+  (when (dragonruby--sprite-popup--graphic-p)
+    (let* ((mpos (mouse-pixel-position))
+           (frame (and (consp mpos) (car mpos)))
+           (x (cadr mpos))
+           (y (let ((r (cddr mpos))) (and (consp r) (car r))))
+           (is-over nil)
+           (hover-path nil))
+      
+      (ignore-errors
+        (when (and (frame-live-p frame) (numberp x) (numberp y))
+          (let* ((posn (posn-at-x-y x y frame))
+                 (window (and posn (posn-window posn)))
+                 (point (and posn (posn-point posn))))
+            (when (and (windowp window) (integerp point))
+              (with-current-buffer (window-buffer window)
+                (dolist (ov (overlays-at point))
+                  (when (overlay-get ov 'dragonruby-sprite)
+                    (setq is-over t)
+                    (setq hover-path (overlay-get ov 'dragonruby-sprite-path)))))))))
+      
+      ;; If mouse is over the popup frame itself, consider it 'over'
+      (when (eq frame dragonruby--sprite-popup-frame)
+        (setq is-over t))
 
-  (let* ((mpos (mouse-pixel-position))
-         (frame (and (consp mpos) (car mpos)))
-         (x (cadr mpos))
-         (y (let ((r (cddr mpos))) (and (consp r) (car r))))
-         (is-over nil))
-    (ignore-errors
-      (when (and (frame-live-p frame) (numberp x) (numberp y))
-        (let* ((posn (posn-at-x-y x y frame))
-               (window (and posn (posn-window posn)))
-               (point (and posn (posn-point posn))))
-          (when (and (windowp window) (integerp point))
-            (with-current-buffer (window-buffer window)
-              (dolist (ov (overlays-at point))
-                (when (overlay-get ov 'dragonruby-sprite)
-                  (setq is-over t))))))))
-    (when (eq frame dragonruby--sprite-popup-frame)
-      (setq is-over t))
-
-    (if is-over
-        (setq dragonruby--sprite-popup-timer
-              (run-with-timer 0.25 nil #'dragonruby--sprite-popup-monitor))
-      (dragonruby--sprite-popup-cleanup))))
+      (cond
+       ;; Scenario A: Hovering a new sprite
+       ((and is-over hover-path 
+             (not (string-equal hover-path dragonruby--sprite-popup-current-path)))
+        (dragonruby--sprite-popup-show hover-path))
+       
+       ;; Scenario B: No longer hovering anything
+       ((not is-over)
+        (dragonruby--sprite-popup-cleanup))))))
 
 ;; --- SHOW -----------------------------------------------------------
 
@@ -200,21 +210,7 @@
            `((buffer . ,buf)
              (left . ,left)
              (top . ,top)
-             (visibility . t)))))
-
-      (dragonruby--sprite-popup--cancel-timer 'dragonruby--sprite-popup-timer)
-      (setq dragonruby--sprite-popup-timer
-            (run-with-timer 0.6 nil #'dragonruby--sprite-popup-monitor)))))
-
-;; --- TRIGGER --------------------------------------------------------
-
-(defun dragonruby--sprite-popup-trigger (path)
-  ;; DEBUG: (message ">>> TRIGGER CALLED for: %s" path)
-  (dragonruby--sprite-popup--cancel-timer 'dragonruby--sprite-popup-trigger-timer)
-  (setq dragonruby--sprite-popup-trigger-timer
-        (run-with-idle-timer 0.2 nil #'dragonruby--sprite-popup-show path))
-  ;; DEBUG: (message ">>> TRIGGER: Timer scheduled (0.2s)")
-  )
+             (visibility . t))))))))
 
 (provide 'dragonruby-sprite-popup)
 ;;; dragonruby-sprite-popup.el ends here

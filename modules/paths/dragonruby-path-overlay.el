@@ -42,59 +42,44 @@ VALID indicates if file exists."
       (push ov dragonruby--path-overlays))))
 
 (defun dragonruby--scan-paths ()
-  "Scan buffer for require/load statements and data file paths.
-Designed for high-frequency execution during typing."
-  (dragonruby--clear-path-overlays)
-  (save-excursion
-    (save-restriction
-      (widen)
-      (goto-char (point-min))
-      ;; Ruby requires (require, require_relative, load)
-      (while (re-search-forward
-              "\\(require\\|require_relative\\|load\\)\\s-*[( ]\\s-*['\"]\\([^'\"]*\\)['\"]"
-              nil t)
-        (let* ((cmd (match-string 1))
-               (raw (match-string 2))
-               (start (match-beginning 0))
-               (end (match-end 0))
-               (type (intern cmd))
-               (abs (dragonruby--resolve-path raw type))
-               ;; Empty paths are never valid
-               (valid (and (not (string-empty-p raw)) abs (file-exists-p abs))))
-          (dragonruby--make-path-overlay start end abs valid)))
+  "Scan VISIBLE region for require/load statements and data file paths.
+Designed for high-frequency execution during the Kernel pulse."
+  (when dragonruby-mode
+    (let* ((region (dragonruby--visible-region))
+           (start-pos (car region))
+           (end-pos (cdr region)))
       
-      ;; DragonRuby Data Reading (read_file, parse_json_file, etc)
-      (goto-char (point-min))
-      (while (re-search-forward
-              "\\(read_file\\|parse_json_file\\|parse_json\\|load_script\\)\\s-*[( ]\\s-*['\"]\\([^'\"]*\\)['\"]"
-              nil t)
-        (let* ((cmd (match-string 1))
-               (raw (match-string 2))
-               (start (match-beginning 0))
-               (end (match-end 0))
-               (type (if (string= cmd "load_script") 'ruby 'data))
-               (abs (dragonruby--resolve-path raw type))
-               (valid (and (not (string-empty-p raw)) abs (file-exists-p abs))))
-          (dragonruby--make-path-overlay start end abs valid)))
-          
-      ;; Generic Data files inside strings (extension-based)
-      (goto-char (point-min))
-      (while (re-search-forward "\"\\([^\"\n!]+\\.[a-z0-9]+\\)\"" nil t)
-        (let* ((raw (match-string 1))
-               (ext (downcase (or (file-name-extension raw) "")))
-               (start (match-beginning 0))
-               (end (match-end 0)))
-          (cond
-           ;; Image Files (The new Sprite Law)
-           ((member ext dragonruby-image-exts)
-            (let* ((abs (dragonruby--resolve-path raw 'sprite))
-                   (exists (and abs (file-exists-p abs))))
-              (dragonruby--make-path-overlay start end abs exists)))
-           ;; Data Files
-           ((member ext dragonruby-data-exts)
-            (let* ((abs (dragonruby--resolve-path raw 'data))
-                   (exists (and abs (file-exists-p abs))))
-              (dragonruby--make-path-overlay start end abs exists)))))))))
+      ;; 1. Clear overlays only in the scanned region
+      (remove-overlays start-pos end-pos 'dragonruby-path t)
+      
+      (save-excursion
+        (goto-char start-pos)
+        ;; Path Regex: require/load/read_file/parse_json
+        (while (re-search-forward
+                "\\(require\\|require_relative\\|load\\|read_file\\|parse_json_file\\|parse_json\\|load_script\\)\\s-*[( ]\\s-*['\"]\\([^'\"]*\\)['\"]"
+                end-pos t)
+          (let* ((cmd (match-string 1))
+                 (raw (match-string 2))
+                 (start (match-beginning 0))
+                 (end (match-end 0))
+                 (type (cond ((string= cmd "require_relative") 'require_relative)
+                             ((member cmd '("require" "load" "load_script")) 'ruby)
+                             (t 'data)))
+                 (abs (dragonruby--resolve-path raw type))
+                 ;; Only work if it's a valid string
+                 (valid (and (not (string-empty-p raw)) abs)))
+            (dragonruby--make-path-overlay start end abs valid)))
+
+        ;; Scan for extension-based data files (txt, json, etc)
+        ;; excluding sprites/fonts to avoid double-overlays
+        (goto-char start-pos)
+        (while (re-search-forward "\"\\([^\"\n!]+\\.\\(txt\\|json\\|csv\\|xml\\|yml\\|yaml\\)\\)\"" end-pos t)
+          (let* ((raw (match-string 1))
+                 (start (match-beginning 1))
+                 (end (match-end 1))
+                 (abs (dragonruby--resolve-path raw 'data)))
+            (when (and abs (not (string-empty-p raw)))
+              (dragonruby--make-path-overlay start end abs t))))))))
 
 (provide 'dragonruby-path-overlay)
 ;;; dragonruby-path-overlay.el ends here

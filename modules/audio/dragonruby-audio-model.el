@@ -4,8 +4,9 @@
 
 
 ;; Register Audio-specific snippets
-(dragonruby-registry-register 'audio
-  '(:snippets (("sou" . "\"sounds/.wav\""))))
+;; sou -> Universal filter for audio
+(defconst dragonruby-audio-snippets
+  '(("sou" . "\"sounds/\"")))
 
 (provide 'dragonruby-audio-model)
 ;;; dragonruby-audio-model.el ends here

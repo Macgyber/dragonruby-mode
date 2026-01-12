@@ -27,7 +27,7 @@ Add these to your `init.el` or `config.el` to unlock early-access tools:
 | Feature Flag | Description | Status |
 |--------------|-------------|--------|
 | `(setq dragonruby-experimental-smart-jump t)` | **Smart Source Jump**: Opens source files (`.psd`, `.kra`) from previews. | 🧪 Experimental |
-| `(setq dragonruby-experimental-concepts-docs t)` | **Living Documentation**: Symlinks code to `.org` docs. | 🧪 Experimental |
+| `(setq dragonruby-experimental-concepts-guide t)` | **Living Documentation**: Symlinks code to `.org` definitions. | 🧪 Experimental |
 
 ### Your Feedback is Gold
 If you enable these and find a bug or have an idea, please use the **Experimental Feedback** template when opening an issue.
@@ -70,4 +70,4 @@ Open an issue with the `question` label.
 
 ---
 
-*DragonRuby Emacs Mode — v0.5.0*
+*DragonRuby Emacs Mode — v0.7.8*

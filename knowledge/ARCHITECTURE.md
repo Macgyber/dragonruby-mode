@@ -2,7 +2,7 @@
 
 ## 🏗️ Core Philosophy: Lego Architecture
 
-The system (v0.7.1+) is built on a **Kernel-Driven Modular Architecture**.
+The system (v0.7.8+) is built on a **Kernel-Driven Modular Architecture**.
 It is not a monolithic plugin; it is a collection of independent modules ("Legos") orchestrated by a central Kernel.
 
 ## 🧠 The Kernel (`modules/core/dragonruby-kernel.el`)
@@ -25,17 +25,21 @@ All logic resides in `modules/`. The `src/` directory is dead.
 dragonruby-mode/
 ├── dragonruby-mode.el       ;; Entry Point (Bootloader)
 ├── modules/
-│   ├── core/                ;; Kernel, Utils, Scheduler
+│   ├── core/                ;; Kernel, Utils, Scheduler, Knowledge
 │   ├── sprites/             ;; Sprite Rendering Engine
 │   │   └── tools/           ;; Image Editor (Sub-module)
 │   ├── fonts/               ;; Font Engine
 │   │   └── tools/           ;; Font Tools (Sub-module)
 │   ├── audio/               ;; Audio detection
 │   ├── colors/              ;; Color palette system
-│   ├── concepts/            ;; Educational overlays
+│   ├── concepts/            ;; Educational overlays (Retina)
 │   ├── paths/               ;; Navigation system
 │   ├── completion/          ;; API Contract (YAML)
-│   └── docs/                ;; Documentation linkage
+│   └── guide/               ;; Knowledge Guidance (Memory)
+│
+├── knowledge/               ;; The Unified Brain (Content)
+│   ├── definitions/         ;; Org files for concepts
+│   └── feedback/            ;; User feedback storage
 └── ...
 ```
 
@@ -59,4 +63,4 @@ DragonRuby Mode follows a strict "Observe and Paint" philosophy.
 
 ---
 
-*DragonRuby Emacs Mode — v0.7.1*
+*DragonRuby Emacs Mode — v0.7.8*

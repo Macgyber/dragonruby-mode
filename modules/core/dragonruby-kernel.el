@@ -32,18 +32,46 @@
 (defvar dragonruby--modules (make-hash-table :test 'equal)
   "Registry of all known modules. Key: Module Name (symbol). Value: Manifest (plist).")
 
-(defvar dragonruby--active-modules (make-hash-table :test 'equal)
-  "Registry of currently ACTIVE modules. Key: Module Name (symbol). Value: t.")
+(defvar-local dragonruby--active-modules nil
+  "Registry of currently ACTIVE modules in this buffer. Key: Module Name (symbol). Value: t.")
+
+(defun dragonruby--active-hash ()
+  "Get the active modules hash for the current buffer safely.
+Ensures we are always working with a valid hash table, avoiding stale references."
+  (or (and (hash-table-p dragonruby--active-modules)
+           dragonruby--active-modules)
+      (setq dragonruby--active-modules (make-hash-table :test 'equal))))
 
 (defvar dragonruby--capabilities (make-hash-table :test 'equal)
   "Map of capabilities to providing modules. Key: Capability (symbol). Value: List of Module Names.")
 
-(defun dragonruby--reset-kernel ()
-  "HARD RESET of the Kernel. Tabula Rasa."
+(defun dragonruby--unregister-module (name)
+  "Remove all traces of NAME from the global index (Capabilities).
+Prevents zombie providers after a hot-reload or module re-registration."
+  (maphash
+   (lambda (cap providers)
+     (when (memq name providers)
+       (puthash cap (delq name providers) dragonruby--capabilities)))
+   dragonruby--capabilities))
+
+(defun dragonruby--kernel-wipe-registry ()
+  "INTERNAL: Wipe the registry and all state.
+Only for Cold Boot or Unit Tests. NEVER for Hot Reload."
   (clrhash dragonruby--modules)
-  (clrhash dragonruby--active-modules)
+  (clrhash (dragonruby--active-hash))
   (clrhash dragonruby--capabilities)
-  (message "🧠 Kernel: System Reset Complete."))
+  (message "🧠 Kernel: Registry Wiped (Cold Boot)."))
+
+(defun dragonruby-kernel-reset-live ()
+  "Safely detach all active modules without killing the kernel.
+This is the heart of TRUE HOT RELOAD. It calls :disable-fn for 
+every active module, ensuring hooks, timers, and overlays are 
+properly detached while keeping the registry and capabilities alive."
+  (interactive)
+  (let ((active (cl-loop for k being the hash-keys in (dragonruby--active-hash) collect k)))
+    (dolist (name active)
+      (dragonruby-disable name)))
+  (message "🧠 Kernel: Live Reset Complete (Environment Cleaned)."))
 
 ;; -----------------------------------------------------------------------------
 ;; 📜 Manifest Registration
@@ -70,8 +98,10 @@
   (when namespace
     (unless (string-prefix-p "dragonruby-" namespace)
       (error "🧠 Kernel: REJECTED Module %s. Namespace '%s' violates Law (MUST start with dragonruby-)." name namespace)))
+  ;; Register (Garbage Collection: unregister old providers first)
+  (when (gethash name dragonruby--modules)
+    (dragonruby--unregister-module name))
 
-  ;; Register
   (puthash name (list :name name
                       :type type
                       :namespace namespace
@@ -85,7 +115,8 @@
   ;; Index Capabilities
   (dolist (cap provides)
     (let ((existing (gethash cap dragonruby--capabilities)))
-      (puthash cap (cons name existing) dragonruby--capabilities)))
+      (unless (memq name existing)
+        (puthash cap (cons name existing) dragonruby--capabilities))))
 
   (message "🧠 Kernel: Registered Module [%s]" name))
 
@@ -99,7 +130,7 @@
     (unless providers
       (error "🧠 Kernel: No module provides capability: %s" capability))
     ;; Prefer active
-    (or (cl-find-if (lambda (m) (gethash m dragonruby--active-modules)) providers)
+    (or (cl-find-if (lambda (m) (gethash m (dragonruby--active-hash))) providers)
         (car providers))))
 
 (defun dragonruby--resolve-dependencies (module-name stack)
@@ -119,45 +150,54 @@ STACK prevents circular dependencies."
 (defun dragonruby-enable-capability (capability &optional stack)
   "Ensure CAPABILITY is available."
   (let ((provider (dragonruby--find-provider capability)))
-    (if (gethash provider dragonruby--active-modules)
+    (if (gethash provider (dragonruby--active-hash))
         provider
       (dragonruby-enable provider stack)
       provider)))
 
 (defun dragonruby-enable (module-name &optional stack)
-  "Activate MODULE-NAME and its dependencies."
-  (unless (gethash module-name dragonruby--active-modules)
-    ;; Cycle Check
-    (when (member module-name stack)
-      (error "🧠 Kernel: Circular dependency detected: %s -> %s" module-name stack))
+  "Activate MODULE-NAME and its dependencies for the current buffer."
+  (let ((active-hash (dragonruby--active-hash))
+        (stack (or stack (list module-name))))
+    (unless (gethash module-name active-hash)
+      ;; Cycle Check
+      (when (member module-name (cdr stack))
+        (error "🧠 Kernel: Circular dependency detected: %s -> %s" module-name stack))
 
-    (let ((manifest (gethash module-name dragonruby--modules)))
-      (unless manifest (error "🧠 Kernel: Unknown module %s" module-name))
+      (let ((manifest (gethash module-name dragonruby--modules)))
+        (unless manifest (error "🧠 Kernel: Unknown module %s" module-name))
 
-      ;; 1. Resolve Dependencies (Pass stack as-is, let resolve add itself for children)
-      (dragonruby--resolve-dependencies module-name stack)
+        ;; CRASH-SAFETY ROLLBACK
+        (condition-case err
+            (progn
+              ;; 1. Resolve Dependencies
+              (dragonruby--resolve-dependencies module-name stack)
 
-      ;; 2. Load Code (Entry Point)
-      (require (plist-get manifest :entry-point))
+              ;; 2. Load Code (Entry Point)
+              (require (plist-get manifest :entry-point))
 
-      ;; 3. Execute Contract
-      (let ((enable-fn (plist-get manifest :enable-fn)))
-        (if (functionp enable-fn)
-            (funcall enable-fn)
-          (error "🧠 Kernel: %s :enable-fn is not callable" module-name)))
+              ;; 3. Execute Contract
+              (let ((enable-fn (plist-get manifest :enable-fn)))
+                (if (functionp enable-fn)
+                    (funcall enable-fn)
+                  (error "🧠 Kernel: %s :enable-fn is not callable" module-name)))
 
-      ;; 4. Mark Active
-      (puthash module-name t dragonruby--active-modules)
-      (message "🧠 Kernel: Module [%s] ENABLED" module-name))))
+              ;; 4. Mark Active
+              (puthash module-name t active-hash)
+              (message "🧠 Kernel: Module [%s] ENABLED" module-name))
+          (error
+           (dragonruby-disable module-name)
+           (signal (car err) (cdr err))))))))
 
 ;; -----------------------------------------------------------------------------
 ;; 🧯 Lifecycle (Deactivation)
 ;; -----------------------------------------------------------------------------
 
 (defun dragonruby-disable (module-name)
-  "Deactivate MODULE-NAME with Smart Cascade."
-  (when (gethash module-name dragonruby--active-modules)
-    (let ((my-caps (plist-get (gethash module-name dragonruby--modules) :provides)))
+  "Deactivate MODULE-NAME for the current buffer."
+  (let ((active-hash (dragonruby--active-hash)))
+    (when (gethash module-name active-hash)
+      (let ((my-caps (plist-get (gethash module-name dragonruby--modules) :provides)))
       
       ;; 1. Cascade Check
       (maphash 
@@ -176,7 +216,7 @@ STACK prevents circular dependencies."
                      (let ((providers (gethash req dragonruby--capabilities)))
                        (unless (cl-some (lambda (p) 
                                           (and (not (eq p module-name))
-                                               (gethash p dragonruby--active-modules)))
+                                               (gethash p active-hash)))
                                         providers)
                          (setq satisfied nil)))))
                  
@@ -184,21 +224,20 @@ STACK prevents circular dependencies."
                    (message "🧠 Kernel: Cascade disabling [%s] (needs %s provided by %s)" 
                             dep-name my-caps module-name)
                    (dragonruby-disable dep-name)))))))
-       dragonruby--active-modules))
+       active-hash))
 
     ;; 2. Execute Contract
     (let* ((manifest (gethash module-name dragonruby--modules))
-           (disable-fn (plist-get manifest :disable-fn)))
-      (if (functionp disable-fn)
-          (funcall disable-fn)
-        (error "🧠 Kernel: %s :disable-fn is not callable" module-name)))
+           (disable-fn (and manifest (plist-get manifest :disable-fn))))
+      (when (functionp disable-fn)
+        (funcall disable-fn)))
 
     ;; 3. Mark Inactive
-    (remhash module-name dragonruby--active-modules)
-    (message "🧠 Kernel: Module [%s] DISABLED" module-name)))
+    (remhash module-name active-hash)
+    (message "🧠 Kernel: Module [%s] DISABLED" module-name))))
 
 (defun dragonruby-module-status (module-name)
-  (if (gethash module-name dragonruby--active-modules) :active :inactive))
+  (if (gethash module-name (dragonruby--active-hash)) :active :inactive))
 
 (provide 'dragonruby-kernel)
 ;;; dragonruby-kernel.el ends here

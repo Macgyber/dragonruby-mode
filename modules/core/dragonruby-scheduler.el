@@ -17,15 +17,33 @@ Possible values:
   "The single authoritative idle timer for this buffer.")
 
 (defvar dragonruby-scan-hook nil
-  "Hook run during the processing phase.
-Modules should register their synchronous scan functions here.
-Functions must be safe and should not perform their own redisplays.")
+  "Heavy tasks: Run during processing after buffer changes.
+Modules register synchronous analysis here.")
 
-;; --- CONFIGURATION ---
+(defvar dragonruby-monitor-hook nil
+  "Light tasks: Run during every idle pulse (even if clean).
+Ideal for UI updates, hover checks, and ephemeral popups.")
+
+;; --- CONFIGURATION (The Nervous System Rhythm) ---
 
 (defcustom dragonruby-idle-delay 0.2
   "Seconds of idle time before triggering a scan pulse."
   :type 'float
+  :group 'dragonruby)
+
+(defcustom dragonruby-popup-trigger-delay 0.2
+  "Seconds to wait before showing sprite popup after hover."
+  :type 'number
+  :group 'dragonruby)
+
+(defcustom dragonruby-popup-monitor-interval 0.25
+  "Seconds between popup monitor checks."
+  :type 'number
+  :group 'dragonruby)
+
+(defcustom dragonruby-scan-debounce-delay 0.6
+  "Seconds to wait after typing before rescanning overlays."
+  :type 'number
   :group 'dragonruby)
 
 ;; --- DEBUGGING ---
@@ -40,91 +58,97 @@ Functions must be safe and should not perform their own redisplays.")
 
 ;; --- PULSE LOGIC ---
 
-(defun dragonruby-pulse ()
-  "The single orchestration event.
-1. Checks if buffer is ready.
-2. Transitions state to 'processing.
-3. Runs all hooks in `dragonruby-scan-hook` safely.
-4. Restores state to 'idle."
-  ;; Only proceed if we are in a valid buffer and state
-  (when (and (buffer-live-p (current-buffer))
-             (eq dragonruby--buffer-state 'scheduled))
-    
-    (dragonruby--log "PULSE START | State: scheduled -> processing")
-    
-    ;; 1. Transition to Processing
-    (setq dragonruby--buffer-state 'processing)
-    (setq dragonruby--idle-timer nil) ;; Timer has fired, clear it
+;; --- STATE ---
 
-    ;; 2. Execution Phase
-    (let ((start-time (float-time)))
-      (condition-case err
-          (run-hooks 'dragonruby-scan-hook)
-        (error
-         (message "DragonRuby Pulse Critical Error: %s" err)))
-      
-      ;; Force visual update immediately
-      (when (get-buffer-window (current-buffer))
-        (redisplay))
-        
-      (dragonruby--log "PULSE END   | State: processing -> idle | Duration: %.4fs" 
-                       (- (float-time) start-time)))
-    
-    ;; 3. Transition back to Idle
-    (setq dragonruby--buffer-state 'idle)))
+(defvar-local dragonruby--last-scan-time 0
+  "Timestamp of the last heavy scan.")
+
+(defvar-local dragonruby--last-interaction-time 0
+  "Timestamp of the last user interaction (change).")
+
+;; --- PULSE LOGIC ---
+
+(defvar-local dragonruby--pulse-in-progress nil
+  "Guard to prevent recursive or overlapping pulses.")
+
+(defun dragonruby-pulse (buf)
+  "The single authoritative heart pulse for BUF.
+Governs both 'scan' (heavy) and 'monitor' (light) phases."
+  (when (and (buffer-live-p buf) (not dragonruby--pulse-in-progress))
+    (setq dragonruby--pulse-in-progress t)
+    (unwind-protect
+        (with-current-buffer buf
+          ;; 1. Visibility & State Check (The Heart only beats if someone is watching)
+          (when (and dragonruby-mode 
+                     (get-buffer-window buf t)
+                     (or dragonruby-scan-hook dragonruby-monitor-hook))
+            
+            (let ((now (float-time)))
+              ;; 1. Monitor Phase (Fast/Light)
+              (dolist (fn dragonruby-monitor-hook)
+                (when (functionp fn)
+                  (condition-case err (funcall fn)
+                    (error (message " [DR-SCHED] Monitor Error (%s): %s" fn err)))))
+
+              ;; 2. Scan Phase (Slow/Heavy)
+              (when (eq dragonruby--buffer-state 'dirty)
+                (let ((idle-since-change (- now dragonruby--last-interaction-time)))
+                  (when (>= idle-since-change dragonruby-scan-debounce-delay)
+                    (dragonruby--log "PULSE SCAN START | Idle: %.2fs" idle-since-change)
+                    (setq dragonruby--buffer-state 'processing)
+                    (dolist (fn dragonruby-scan-hook)
+                      (when (functionp fn)
+                        (condition-case err (funcall fn)
+                          (error (message " [DR-SCHED] Scan Error (%s): %s" fn err)))))
+                    
+                    (setq dragonruby--last-scan-time now)
+                    (setq dragonruby--buffer-state 'clean)
+                    (dragonruby--log "PULSE SCAN END")))))))
+      (setq dragonruby--pulse-in-progress nil))))
 
 (defun dragonruby--schedule-pulse ()
-  "Schedule a pulse if one isn't already pending."
-  (unless (memq dragonruby--buffer-state '(scheduled processing))
-    (dragonruby--log "Schedule Pulse | State: %s -> scheduled" dragonruby--buffer-state)
-    
-    ;; Mark as scheduled
-    (setq dragonruby--buffer-state 'scheduled)
-    
-    ;; Cancel existing timer just in case (defensive)
-    (when dragonruby--idle-timer
-      (cancel-timer dragonruby--idle-timer))
-    
-    ;; Schedule new timer
+  "Ensure the heartbeat is scheduled for the next idle moment."
+  (when (and (bound-and-true-p dragonruby-mode)
+             (not (and dragonruby--idle-timer 
+                       (timerp dragonruby--idle-timer)
+                       (memq dragonruby--idle-timer timer-idle-list))))
     (setq dragonruby--idle-timer
-          (run-with-idle-timer dragonruby-idle-delay nil
-                               (lambda (buf)
-                                 (when (buffer-live-p buf)
-                                   (with-current-buffer buf
-                                     (dragonruby-pulse))))
+          (run-with-idle-timer 0.5 nil
+                               #'(lambda (buf)
+                                   (when (buffer-live-p buf)
+                                     (with-current-buffer buf
+                                       (dragonruby-pulse buf)
+                                       (setq dragonruby--idle-timer nil)
+                                       (dragonruby--schedule-pulse))))
                                (current-buffer)))))
 
 ;; --- HOOKS ---
 
-(defun dragonruby--on-change (beg end len)
-  "Global handler for buffer changes.
-Marks buffer dirty and interacts with scheduler."
-  ;; We don't care about the specific change details, only that it happened.
+(defun dragonruby--on-change (_beg _end _len)
+  "Kernel hearing the buffer scream. Marks it dirty and records time."
+  (setq dragonruby--last-interaction-time (float-time))
   (unless (eq dragonruby--buffer-state 'processing)
-    ;; Only log if not already dirty to avoid spamming logs on every keystroke
-    (unless (eq dragonruby--buffer-state 'dirty)
-      (dragonruby--log "Buffer Change  | State: %s -> dirty" dragonruby--buffer-state))
-      
-    (setq dragonruby--buffer-state 'dirty)
-    (dragonruby--schedule-pulse)))
+    (setq dragonruby--buffer-state 'dirty)))
 
 ;; --- PUBLIC API ---
 
 (defun dragonruby-scheduler-enable ()
-  "Enable the scheduler for the current buffer."
-  (dragonruby--log "ENABLE")
-  (setq dragonruby--buffer-state 'idle)
+  "Enable the kernel heartbeat for the current buffer."
+  ;; Start as 'dirty' to trigger an initial scan on first pulse
+  (setq dragonruby--buffer-state 'dirty)
+  (setq dragonruby--last-interaction-time (float-time))
   (add-hook 'after-change-functions #'dragonruby--on-change nil t)
-  ;; Trigger initial scan
-  (dragonruby--schedule-pulse))
+  ;; Guard against double scheduler/timer creation
+  (unless (and dragonruby--idle-timer (timerp dragonruby--idle-timer))
+    (dragonruby--schedule-pulse)))
 
 (defun dragonruby-scheduler-disable ()
-  "Disable scheduler and cleanup."
-  (dragonruby--log "DISABLE")
-  (setq dragonruby--buffer-state 'clean)
+  "Kill the heartbeat. Silence."
   (remove-hook 'after-change-functions #'dragonruby--on-change t)
   (when dragonruby--idle-timer
     (cancel-timer dragonruby--idle-timer)
-    (setq dragonruby--idle-timer nil)))
+    (setq dragonruby--idle-timer nil))
+  (setq dragonruby--buffer-state 'idle))
 
 (provide 'dragonruby-scheduler)
+;;; dragonruby-scheduler.el ends here

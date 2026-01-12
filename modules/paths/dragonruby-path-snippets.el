@@ -5,6 +5,8 @@
 (require 'cl-lib)
 (require 'dragonruby-path-model)
 (require 'dragonruby-sprite-model)
+(require 'dragonruby-audio-model)
+(require 'dragonruby-font-model)
 
 (defun dragonruby--get-active-snippets ()
   "Collect all registered snippets from active modules."
@@ -18,6 +20,16 @@
     (when (and (boundp 'dragonruby-sprite-snippets)
                (or (not (boundp 'dragonruby-enable-sprites)) dragonruby-enable-sprites))
       (setq all-snippets (append all-snippets dragonruby-sprite-snippets)))
+    
+    ;; 3. Audio
+    (when (and (boundp 'dragonruby-audio-snippets)
+               (or (not (boundp 'dragonruby-enable-audio)) dragonruby-enable-audio))
+      (setq all-snippets (append all-snippets dragonruby-audio-snippets)))
+    
+    ;; 4. Fonts
+    (when (and (boundp 'dragonruby-font-snippets)
+               (or (not (boundp 'dragonruby-enable-fonts)) dragonruby-enable-fonts))
+      (setq all-snippets (append all-snippets dragonruby-font-snippets)))
     
     all-snippets))
 

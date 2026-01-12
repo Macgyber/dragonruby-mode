@@ -28,6 +28,21 @@
       "white"
     "black"))
 
+(defvar dragonruby-color-names-alist
+  '((red     . (255 0 0))
+    (green   . (0 255 0))
+    (blue    . (0 0 255))
+    (white   . (255 255 255))
+    (black   . (0 0 0))
+    (gray    . (128 128 128))
+    (indigo  . (75 0 130))
+    (violet  . (238 130 238))
+    (orange  . (255 165 0))
+    (yellow  . (255 255 0))
+    (cyan    . (0 255 255))
+    (magenta . (255 0 255)))
+  "Alist of standard DragonRuby color symbols and their RGB values.")
+
 (defun dragonruby--in-code-p ()
   "Check if point is in code (not in string or comment)."
   (let ((state (syntax-ppss)))

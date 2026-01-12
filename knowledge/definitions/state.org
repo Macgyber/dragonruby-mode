@@ -1,0 +1,47 @@
+#+TITLE: 📘 Cuaderno DragonRuby: State
+#+AUTHOR: Sr. Esteban
+#+OPTIONS: toc:2 num:nil
+#+STARTUP: overview indent
+
+* 🧭 Índice
+  - [[*Introducción][Introducción]]
+  - [[*Conceptos Clave][Conceptos Clave]]
+  - [[*La Persistencia][La Persistencia]]
+  - [[*Código Base][Código Base]]
+  - [[*Bitácora][Bitácora]]
+
+* 🌱 Introducción
+  Este documento custodia la memoria del universo: el objeto *State*.
+  Sin `state`, el juego no tiene pasado ni futuro, solo un presente eterno.
+
+* 🧠 Conceptos Clave
+** State
+   La base de datos dinámica de tu juego. DragonRuby la guarda automáticamente.
+   #+begin_quote
+   “El estado es la suma de todas las decisiones tomadas.”
+   #+end_quote
+
+* 🏗 La Persistencia
+** Open Entity
+   `args.state` es un objeto "Open Entity". Puedes añadirle cualquier propiedad en cualquier momento sin definir clases.
+
+** Estructura sugerida
+   - state.player :: Datos del protagonista.
+   - state.score :: La gloria acumulada.
+   - state.game_over :: La sombra del fin.
+
+* 🧪 Código Base
+** Inicialización
+#+begin_src ruby
+def tick args
+  args.state.player.x ||= 100
+  args.state.player.y ||= 100
+end
+#+end_src
+
+* 🧬 Pasillos Secretos
+  - [[file:args.org][📕 Volver a Args]]
+
+* 📅 Bitácora
+** 2026-01-12
+   Hoy la memoria del juego se volvió inmortal en este cuaderno.

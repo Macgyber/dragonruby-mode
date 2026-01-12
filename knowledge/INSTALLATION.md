@@ -176,4 +176,4 @@ M-x dragonruby-mode
 
 ---
 
-**DragonRuby Emacs Mode — Universal Installation v0.5.0**
+**DragonRuby Emacs Mode — Universal Installation v0.7.8**

@@ -1,0 +1,43 @@
+#+TITLE: 📘 Cuaderno DragonRuby: [Nombre del Concepto]
+#+AUTHOR: Sr. Esteban
+#+OPTIONS: toc:2 num:nil
+#+STARTUP: overview indent
+
+* 🧭 Índice
+  - [[*Introducción][Introducción]]
+  - [[*Conceptos Clave][Conceptos Clave]]
+  - [[*Arquitectura][Arquitectura]]
+  - [[*Código Base][Código Base]]
+  - [[*Experimentos][Experimentos]]
+  - [[*Bitácora][Bitácora]]
+
+* 🌱 Introducción
+  Este documento es un mundo vivo sobre [Concepto].
+  Aquí no se toman notas: aquí se construye comprensión.
+
+* 🧠 Conceptos Clave
+** [Concepto]
+   Definición humana y concisa.
+   #+begin_quote
+   “Cita o mantra sobre el concepto.”
+   #+end_quote
+
+* 🏗 Arquitectura
+  Explicación de cómo encaja esta pieza en el motor.
+  
+  | Propiedad | Propósito |
+  |-----------+-----------|
+  | p1        | desc      |
+  | p2        | desc      |
+
+* 🧪 Código Base
+** Ejemplo Atómico
+#+begin_src ruby
+# El código más simple que funciona
+#+end_src
+
+* 🧬 Experimentos
+  Ideas para probar los límites de este concepto.
+
+* 📅 Bitácora
+  Registro de descubrimientos realizados sobre esta pieza.

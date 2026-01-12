@@ -2,12 +2,19 @@
 
 ;; --- PROJECT ROOT FINDER ---
 
-(defvar dragonruby--project-root-cache nil
+(defvar-local dragonruby--project-root-cache nil
   "Cache for the project root to avoid constant disk access.")
 
+(defvar-local dragonruby--project-root-last-dir nil
+  "Last directory used to calculate the project root.")
+
 (defun dragonruby--find-project-root ()
-  "Locate the DragonRuby project root directory.
-Criteria: Contains 'dragonruby' executable, 'app/main.rb', or '.git' (Plugin Dev)."
+  "Locate the DragonRuby project root directory safely.
+Invalidates cache if `default-directory` changes to ensure multi-project robustness."
+  (unless (string= default-directory dragonruby--project-root-last-dir)
+    (setq-local dragonruby--project-root-cache nil)
+    (setq-local dragonruby--project-root-last-dir default-directory))
+
   (let ((db-root (or dragonruby--project-root-cache
                      (locate-dominating-file default-directory
                                           (lambda (dir)
@@ -42,9 +49,9 @@ Returns paths relative to DIR."
       (mapcar (lambda (file) (file-relative-name file dir))
               (directory-files-recursively dir pattern)))))
 
-(defun dragonruby--collect-project-files (type)
+(defun dragonruby--collect-project-files (&optional type)
   "Collect all files of TYPE in the project root.
-TYPE can be 'sprite, 'audio, 'font, 'data."
+If TYPE is nil, collect ALL supported files."
   (let* ((root (dragonruby--find-project-root))
          (exts (cond
                 ((eq type 'sprite) dragonruby-image-exts)
@@ -52,6 +59,11 @@ TYPE can be 'sprite, 'audio, 'font, 'data."
                 ((eq type 'font) dragonruby-font-exts)
                 ((eq type 'data) dragonruby-data-exts)
                 ((eq type 'ruby) dragonruby-code-exts)
+                ((null type) (append dragonruby-image-exts 
+                                    dragonruby-audio-exts 
+                                    dragonruby-font-exts 
+                                    dragonruby-data-exts 
+                                    dragonruby-code-exts))
                 (t nil))))
     (when (and root exts)
       (dragonruby--files-in root exts))))
@@ -63,19 +75,22 @@ TYPE can be 'sprite, 'audio, 'font, 'data."
 
 (defun dragonruby--debounce (id func delay)
   "Run FUNC after DELAY seconds, coalescing calls with same ID.
-If previous timer for ID exists, cancel it."
+Ensures hygiene by removing the timer from registry after execution."
   (let ((old-timer (gethash id dragonruby--debounce-timers)))
-    (when old-timer (cancel-timer old-timer)))
+    (when old-timer (cancel-timer old-timer))
     (puthash id
-             (run-with-timer delay nil func)
-             dragonruby--debounce-timers))
+             (run-with-timer delay nil
+                             (lambda ()
+                               (remhash id dragonruby--debounce-timers)
+                               (funcall func)))
+             dragonruby--debounce-timers)))
 
 
 
 
 
-(defvar dragonruby--notified-messages nil
-  "List of messages already shown in this session.")
+(defvar-local dragonruby--notified-messages nil
+  "List of messages already shown in this buffer.")
 
 (defun dragonruby--notify (id msg &optional once)
   "Show MSG in the echo area. If ONCE is t, only show it once per session."
@@ -83,7 +98,7 @@ If previous timer for ID exists, cancel it."
     (message msg)
     (when once (push id dragonruby--notified-messages))))
 
-(defvar dragonruby--warned-features nil
+(defvar-local dragonruby--warned-features nil
   "List of features that have already shown a development warning.")
 
 (defun dragonruby--warn-in-development (feature)
@@ -96,10 +111,11 @@ The warning is only shown once per session to avoid annoyance."
                             '((?c "Close" "Dismiss notice")))
       (push feature dragonruby--warned-features))))
 
-(defun dragonruby--resolve-path (raw-path type-or-extensions)
+(defun dragonruby--resolve-path (raw-path type-or-extensions &optional allow-examples)
   "Resolve RAW-PATH based on TYPE-OR-EXTENSIONS.
 If 2nd arg is a LIST, treat as allowed extensions (legacy behavior).
-If 2nd arg is a SYMBOL, treat as semantic type ('require, 'sprite, etc)."
+If 2nd arg is a SYMBOL, treat as semantic type ('require, 'sprite, etc).
+If ALLOW-EXAMPLES is non-nil, attempt fallback to examples/ folder."
   (let* ((root (dragonruby--find-project-root))
          (current-dir (file-name-directory (or buffer-file-name default-directory))))
     
@@ -131,13 +147,24 @@ If 2nd arg is a SYMBOL, treat as semantic type ('require, 'sprite, etc)."
                (file-exists-p full-path)
                (not (file-directory-p full-path)))
           full-path)
-         ;; DEV/FUZZY FALLBACK: Try examples/ if not found at root
-         ((and root (not (string-prefix-p "examples/" raw-path)))
+         ;; OPT-IN FALLBACK: Try examples/ if explicitly allowed
+         ((and allow-examples root (not (string-prefix-p "examples/" raw-path)))
           (let ((ex-path (expand-file-name (concat "examples/" raw-path) root)))
             (if (and (file-exists-p ex-path) (not (file-directory-p ex-path)))
                 ex-path
               nil)))
          (t nil))))))
+
+(defun dragonruby--visible-region ()
+  "Return (START . END) of the visible portion of the current window.
+Includes a small margin (padding) to make scrolling smoother."
+  (if (get-buffer-window (current-buffer))
+      (let* ((start (window-start))
+             (end (window-end nil t))
+             (padding 500))
+        (cons (max (point-min) (- start padding))
+              (min (point-max) (+ end padding))))
+    (cons (point-min) (point-max))))
 
 (defun dragonruby--get-image-type (path)
   "Guess Emacs image type symbol from PATH extension."

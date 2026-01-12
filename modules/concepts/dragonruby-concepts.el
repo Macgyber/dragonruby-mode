@@ -30,7 +30,7 @@
  :type :main
  :namespace "dragonruby-concept-"
  :provides '(:visuals :code-education)
- :requires nil
+ :requires '(:guidance)
  :entry-point 'dragonruby-concepts
  :enable-fn #'dragonruby-concepts-enable
  :disable-fn #'dragonruby-concepts-disable)
