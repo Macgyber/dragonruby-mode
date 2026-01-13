@@ -35,15 +35,11 @@ end
 # Warning: This is a surgical operation required by Law XVII.
 module Kernel
   def rand(max = 1.0)
-    if defined?(Stargate::Random)
-      Stargate::Random.rand(max)
-    else
-      super(max)
-    end
+    Stargate::Random.rand(max)
   end
 end
 
-if defined?($gtk)
+if $gtk
   # Intercepting DragonRuby's GTK random interface
   class << $gtk
     def rand(max = 1.0)

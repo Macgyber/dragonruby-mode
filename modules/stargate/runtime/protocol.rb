@@ -8,7 +8,7 @@ module Stargate
       # Sovereign entry point for frame metadata emission.
       # Transmits via DragonRuby Console for Emacs interception.
       def emit_moment(address, state_packet, seed)
-        return unless defined?($gtk)
+        return unless $gtk
 
         # Build JSON manually for maximum compatibility and protocol safety.
         # We escape the raw state data string and compact it to a single line.
@@ -21,7 +21,7 @@ module Stargate
       end
 
       def emit_branch(new_id, parent_id, divergence_frame)
-        return unless defined?($gtk)
+        return unless $gtk
 
         json_payload = "{" \
           "\"type\":\"branch\"," \

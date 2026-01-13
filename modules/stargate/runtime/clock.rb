@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'securerandom'
-
 module Stargate
   # The Authority of Time and Branching.
   # This module governs the Laws of Time (II), The Past (III), and Branching (XI).
@@ -17,37 +15,32 @@ module Stargate
       # Enforces the Sacred Order (Seed -> Input -> Inject -> Tick -> Capture).
       def with_frame(seed, inputs)
         # 1. SEED: Sovereignty over RNG (Law XVII).
-        Random.begin_frame(seed) if defined?(Random)
+        Random.begin_frame(seed)
 
         # 2. INPUT: Application of deterministic values.
         # Inputs.apply(inputs) if defined?(Inputs)
 
         # 3. Checkpoint for Dead Hand Rollback (Law IX)
         # We capture state BEFORE any potential mutations (Injection or Tick)
-        Injection.checkpoint if defined?(Injection)
+        Injection.checkpoint
 
         begin
           # 4. INJECT: Trial frames for code hot-reloads (Law VI).
-          Injection.perform_injections if defined?(Injection)
+          Injection.perform_injections
 
           # 5. TICK: The simulation step.
           yield if block_given?
 
           # 6. CAPTURE: Preservation of the Moment (Law V).
-          if defined?(State)
-            state_packet = State.capture
-            if defined?(Protocol)
-              Protocol.emit_moment(current_address, state_packet, seed)
-            end
-          end
+          state_packet = State.capture
+          Protocol.emit_moment(current_address, state_packet, seed)
 
           # 7. INCREMENT: Causal progression (Law II).
           @current_frame += 1
           :ok
         rescue => e
-          $gtk.console.log "🚨 STARGATE CRITICAL: Frame Failed! #{e.message}"
           # DEAD HAND ROLLBACK: Revert to the checkpoint
-          Injection.rollback! if defined?(Injection)
+          Injection.rollback!
           :error
         end
       end
@@ -59,15 +52,14 @@ module Stargate
 
       # Fork the timeline (branching)
       def branch!(divergence_frame, parent_id = @current_branch)
-        new_id = SecureRandom.uuid # UUID Identity (Law XI)
+        # Custom ID Generation (Law XI) - Compatible with DragonRuby
+        new_id = "branch_#{(Time.now.to_f * 1000).to_i}_#{rand(1000)}"
         @branch_forest[new_id] = {
           parent: parent_id,
           divergence: divergence_frame,
           head: divergence_frame
         }
-        if defined?(Protocol)
-          Protocol.emit_branch(new_id, parent_id, divergence_frame)
-        end
+        Protocol.emit_branch(new_id, parent_id, divergence_frame)
         
         @current_branch = new_id
         @current_frame = divergence_frame
@@ -79,10 +71,8 @@ module Stargate
         @current_branch = branch_id
         @current_frame = frame
         
-        if defined?(State)
-          $gtk.console.log "⏪ Stargate: Restoring state for #{branch_id}@#{frame}"
-          State.apply(state_data) 
-        end
+        $gtk.console.log "⏪ Stargate: Restoring state for #{branch_id}@#{frame}"
+        State.apply(state_data) 
         :ok
       end
 

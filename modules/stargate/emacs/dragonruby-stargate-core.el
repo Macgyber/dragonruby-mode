@@ -43,8 +43,13 @@
                 (propertize " 🌌" 'face 'success 'help-echo "Stargate Chronicler Cabled"))
           (add-to-list 'mode-line-process '(:eval dragonruby-stargate--mode-line-indicator))
           
+          (message "🚀 STARGATE: Active in root [%s]" root)
+          (message "🌌 STARGATE: Hint -> Use M-x dragonruby-run to cable the Chronicler.")
           (message "🚀 STARGATE: Organ active and synced with Kernel Pulse."))
-      (error "Not in a DragonRuby project"))))
+      (progn
+        (message "⚠️ STARGATE: Unable to find DragonRuby project root.")
+        (message "💡 Tip: Switch to a game file (main.rb) before enabling.")
+        (error "Not in a DragonRuby project")))))
 
 (defun dragonruby-stargate-disable ()
   "Deactivate and cleanup the Stargate module."

@@ -10,7 +10,7 @@ module Stargate
     class << self
       # Capture a state checkpoint for potential rollback.
       def checkpoint
-        @trial_state = State.capture if defined?(State)
+        @trial_state = State.capture
       end
 
       # Perform the scheduled injections.
@@ -33,7 +33,7 @@ module Stargate
       def rollback!
         if @trial_state
           $gtk.console.log "⏪ Reverting to pre-injection state..."
-          State.apply(@trial_state) if defined?(State)
+          State.apply(@trial_state)
           @trial_state = nil
         end
       end
