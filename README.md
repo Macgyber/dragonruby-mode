@@ -101,6 +101,14 @@ Did you pick the right font? Why doesn't it look like you expected? Stop guessin
 
 **→ [📖 Complete Font System Guide](knowledge/FONTS.md)** (ABC/Pangram Viewer, Typography resources, Troubleshooting)
 
+### 🌌 Level 5: The Time Machine (Stargate) — EXPERIMENTAL
+The ultimate mastery of the simulation. Record, Mutate, and Rewind.
+- **The Chronicler**: Automatic recording of states, seeds, and inputs at every tick. All history is persisted in a JSON-based Forest of Timelines.
+- **The Surgeon (Surgical Injection)**: When you save code, Stargate analyzes the risk (Alpha/Beta/Gamma). If your change crashes the game, the **Dead Hand Rollback** automatically restores the previous valid state.
+- **Timeline Navigation**: Use `M-x dragonruby-stargate-timeline-render` to visualize your history. Scrub through frames and jump between divergent realities.
+- **Organic Pulse**: Synchronized with the Kernel's heart. Stargate searches for your game in silence and attaches its nerves only when the "Dragon" is breathing.
+
+
 ### 🤝 Compatibility with Other Plugins
 
 Designed to **not interfere** with your existing configuration:
@@ -182,6 +190,7 @@ To customize your experience, add these lines to your `config.el` (Doom) or `ini
 | `colors` | Hex/RGB highlighting | 🔴 OFF |
 | `concepts` | Educational concept popups | 🔴 OFF |
 | `paths` | Project navigation, file jumping | 🔴 OFF |
+| `stargate` | Time travel, atomic injections (Experimental) | 🔴 OFF |
 | `completion` | Strict YAML API Schema | ✅ ON |
 | `guide` | Knowledge guidance system (Sidebar) | 🔴 OFF |
 

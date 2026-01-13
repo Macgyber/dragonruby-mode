@@ -19,12 +19,7 @@
 ;; -----------------------------------------------------------------------------
 
 (eval-and-compile
-  (let* ((load-file-path (cond
-                          (load-in-progress load-file-name)
-                          ((and (boundp 'byte-compile-current-file)
-                                byte-compile-current-file)
-                           byte-compile-current-file)
-                          (t (buffer-file-name))))
+  (let* ((load-file-path (or load-file-name (buffer-file-name)))
          (root-dir (file-name-directory load-file-path))
          (mod-dir (expand-file-name "modules" root-dir)))
     
@@ -41,7 +36,15 @@
     (add-to-list 'load-path (expand-file-name "paths" mod-dir))
     (add-to-list 'load-path (expand-file-name "concepts" mod-dir))
     (add-to-list 'load-path (expand-file-name "completion" mod-dir))
-    (add-to-list 'load-path (expand-file-name "guide" mod-dir))))
+    (add-to-list 'load-path (expand-file-name "guide" mod-dir))
+    
+    ;; Stargate (The Time Machine)
+    (let ((stargate-emacs (expand-file-name "stargate/emacs" mod-dir))
+          (stargate-proto (expand-file-name "stargate/protocol" mod-dir))
+          (stargate-sess  (expand-file-name "stargate/sessions" mod-dir)))
+      (add-to-list 'load-path stargate-emacs)
+      (add-to-list 'load-path stargate-proto)
+      (add-to-list 'load-path stargate-sess))))
 
 ;; 1. Initialize Kernel
 (require 'dragonruby-kernel)
@@ -61,6 +64,7 @@
 (require 'dragonruby-paths)
 (require 'dragonruby-concepts)
 (require 'dragonruby-completion)
+(require 'dragonruby-stargate-core)
 (require 'dragonruby-guide)
 
 ;; -----------------------------------------------------------------------------
@@ -79,6 +83,7 @@
 (defcustom dragonruby-enable-paths nil "Enable path system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-concepts nil "Enable concept system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-completion t "Enable completion system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-stargate nil "Enable Stargate time-traveling system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-guide nil "Enable knowledge guidance system." :type 'boolean :group 'dragonruby)
 
 ;; -----------------------------------------------------------------------------
@@ -102,8 +107,9 @@
   "Boot the DragonRuby session for this buffer."
   (condition-case err
       (progn
-        ;; 1. Scheduler (Per Buffer)
-        (dragonruby-scheduler-enable)
+        ;; 1. Core & Scheduler (The Foundation)
+        (dragonruby-enable 'core)
+        (dragonruby-enable 'scheduler)
         
         ;; 2. Kernel Activation (Global Services)
         (let (enabled-msgs disabled-msgs)
@@ -138,6 +144,8 @@
             (activate-mod 'font-tools 'dragonruby-enable-font-tools 'fonts)
             ;; 10. tools-sprites (sprite-tools)
             (activate-mod 'sprite-tools 'dragonruby-enable-sprite-tools 'sprites)
+            ;; 11. stargate (The Mind Layer - Last to Boot)
+            (activate-mod 'stargate 'dragonruby-enable-stargate)
 
             ;; --- Final Reporting (ENABLED first, then DISABLED) ---
             (dolist (msg (reverse enabled-msgs)) (message msg))

@@ -28,6 +28,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🖼️ Optimización de Escaneo
 - **Visión Retiniana Visible**: Los módulos de Sprites, Audio, Fuentes y Colores ahora operan exclusivamente en la región visible (con padding de 3000 chars), eliminando el lag en archivos de miles de líneas.
 
+### 🌌 Módulo Stargate (The Time Machine) — EXPERIMENTAL
+- **Órgano del Kernel**: Primer módulo diseñado como un "órgano vivo" que late sincronizado con el Heartbeat del Kernel (Scheduler).
+- **El Cronista (Bridge)**: Reensamblaje de pulsos JSON vía consola para la captura de momentos de simulación en tiempo real.
+- **El Cirujano (Injector)**: Sistema de inyección atómica con clasificación de riesgo (Alpha/Beta/Gamma) y reversión automática (*Dead Hand Rollback*).
+- **Navegación Temporal**: Visualización visual del "Bosque de Ramas" y capacidad de salto instantáneo entre estados históricos.
+- **Determinismo Forzado**: Herramientas de captura de RNG y estado para garantizar la reproducibilidad total de la simulación.
+
 </details>
 
 <details>

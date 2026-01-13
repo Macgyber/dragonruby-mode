@@ -39,4 +39,17 @@
   ;; have been moved to dragonruby-scheduler.el (the Heart/Nervous System).
   )
 
+(defun dragonruby-core-enable () "Enable core services (NOP)." (message "🧱 [Core] Module Enabled"))
+(defun dragonruby-core-disable () "Disable core services (NOP)." (message "🧱 [Core] Module Disabled"))
+
+(dragonruby-register-module
+ :name 'core
+ :type :main
+ :namespace "dragonruby-"
+ :provides '(:core)
+ :requires nil
+ :entry-point 'dragonruby-core
+ :enable-fn #'dragonruby-core-enable
+ :disable-fn #'dragonruby-core-disable)
+
 (provide 'dragonruby-core)

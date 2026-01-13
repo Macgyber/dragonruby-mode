@@ -16,19 +16,27 @@ Invalidates cache if `default-directory` changes to ensure multi-project robustn
     (setq-local dragonruby--project-root-last-dir default-directory))
 
   (let ((db-root (or dragonruby--project-root-cache
-                     (locate-dominating-file default-directory
-                                          (lambda (dir)
-                                            (let ((p1 (expand-file-name "dragonruby" dir))
-                                                  (p2 (expand-file-name "dragonruby.exe" dir))
-                                                  (p3 (expand-file-name "app/main.rb" dir))
-                                                  ;; Fallback for Plugin Development
-                                                  (p4 (expand-file-name ".git" dir))
-                                                  (p5 (expand-file-name "dragonruby-mode.el" dir)))
-                                              (or (file-exists-p p1)
-                                                  (file-exists-p p2)
-                                                  (file-exists-p p3)
-                                                  (file-exists-p p4)
-                                                  (file-exists-p p5))))))))
+                     (let ((found (locate-dominating-file default-directory
+                                           (lambda (dir)
+                                             (let ((p1 (expand-file-name "dragonruby" dir))
+                                                   (p2 (expand-file-name "dragonruby.exe" dir))
+                                                   (p3 (expand-file-name "app/main.rb" dir))
+                                                   ;; Fallback for Plugin Development
+                                                   (p4 (expand-file-name ".git" dir))
+                                                   (p5 (expand-file-name "dragonruby-mode.el" dir)))
+                                               (or (file-exists-p p1)
+                                                   (file-exists-p p2)
+                                                   (file-exists-p p3)
+                                                   (file-exists-p p4)
+                                                   (file-exists-p p5)))))))
+                       (when found
+                         ;; If we found a sub-root (like mygame/), check if the parent is the Master Root (binary)
+                         (let ((parent (file-name-directory (directory-file-name found))))
+                           (if (and parent 
+                                    (or (file-exists-p (expand-file-name "dragonruby" parent))
+                                        (file-exists-p (expand-file-name "dragonruby.exe" parent))))
+                               parent
+                             found)))))))
     (when db-root
       (setq-local dragonruby--project-root-cache (expand-file-name db-root)))
     dragonruby--project-root-cache))
@@ -60,10 +68,10 @@ If TYPE is nil, collect ALL supported files."
                 ((eq type 'data) dragonruby-data-exts)
                 ((eq type 'ruby) dragonruby-code-exts)
                 ((null type) (append dragonruby-image-exts 
-                                    dragonruby-audio-exts 
-                                    dragonruby-font-exts 
-                                    dragonruby-data-exts 
-                                    dragonruby-code-exts))
+                                     dragonruby-audio-exts 
+                                     dragonruby-font-exts 
+                                     dragonruby-data-exts 
+                                     dragonruby-code-exts))
                 (t nil))))
     (when (and root exts)
       (dragonruby--files-in root exts))))
@@ -81,14 +89,10 @@ Ensures hygiene by removing the timer from registry after execution."
     (puthash id
              (dragonruby-kernel-register-timer
               (run-with-timer delay nil
-                              (lambda ()
-                                (remhash id dragonruby--debounce-timers)
-                                (funcall func))))
+                               (lambda ()
+                                 (remhash id dragonruby--debounce-timers)
+                                 (funcall func))))
              dragonruby--debounce-timers)))
-
-
-
-
 
 (defvar-local dragonruby--notified-messages nil
   "List of messages already shown in this buffer.")
@@ -130,7 +134,7 @@ If ALLOW-EXAMPLES is non-nil, attempt fallback to examples/ folder."
                          (or (null type-or-extensions)
                              (and ext (member (downcase ext) type-or-extensions))))
                 abs-path))))
-
+      
       ;; SMART MODE: (path type-symbol)
       (let* ((type type-or-extensions)
              (base-dir (cond

@@ -1,4 +1,7 @@
+require_relative "../../modules/stargate/runtime/stargate_init"
+
 def tick args
+  Stargate::Bootstrap.tick(args) do
   # ========================================================
   # 🧪 DRAGONRUBY EMACS PLUGIN - VALIDATION SUITE
   # ========================================================
@@ -111,4 +114,5 @@ def tick args
   # Render Text
   args.outputs.labels << [640, 360, "DragonRuby Emacs Mode Test", 1, 1]
   args.inputs.controller
+  end
 end

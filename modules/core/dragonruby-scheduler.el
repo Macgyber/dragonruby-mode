@@ -160,5 +160,15 @@ Governs both 'scan' (heavy) and 'monitor' (light) phases."
     (setq dragonruby--idle-timer nil))
   (setq dragonruby--buffer-state 'idle))
 
+(dragonruby-register-module
+ :name 'scheduler
+ :type :main
+ :namespace "dragonruby-scheduler-"
+ :provides '(:scheduler)
+ :requires '(:core)
+ :entry-point 'dragonruby-scheduler
+ :enable-fn #'dragonruby-scheduler-enable
+ :disable-fn #'dragonruby-scheduler-disable)
+
 (provide 'dragonruby-scheduler)
 ;;; dragonruby-scheduler.el ends here

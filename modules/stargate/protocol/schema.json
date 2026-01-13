@@ -1,0 +1,85 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Stargate Session",
+    "description": "Serialization format for a Stargate live simulation history.",
+    "type": "object",
+    "required": [
+        "version",
+        "branches",
+        "moments"
+    ],
+    "properties": {
+        "version": {
+            "type": "string",
+            "description": "Stargate Protocol Version (e.g., 1.0.0)"
+        },
+        "metadata": {
+            "type": "object",
+            "properties": {
+                "project_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "integer"
+                },
+                "last_frame": {
+                    "type": "integer"
+                }
+            }
+        },
+        "branches": {
+            "type": "object",
+            "description": "The Forest of Branches indexing UUIDs to parentage.",
+            "additionalProperties": {
+                "type": "object",
+                "required": [
+                    "parent",
+                    "divergence"
+                ],
+                "properties": {
+                    "parent": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "divergence": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "moments": {
+            "type": "object",
+            "description": "The Index of recorded moments: branch_id@frame -> metadata.",
+            "additionalProperties": {
+                "type": "object",
+                "required": [
+                    "hash",
+                    "seed",
+                    "code_hash"
+                ],
+                "properties": {
+                    "hash": {
+                        "type": "string",
+                        "description": "SHA-256 of the args.state data"
+                    },
+                    "seed": {
+                        "type": "integer"
+                    },
+                    "code_hash": {
+                        "type": "string",
+                        "description": "SHA-256 of the active code vault"
+                    },
+                    "observed_at": {
+                        "type": "integer",
+                        "description": "Non-canonical UI metadata, generated outside the runtime tick for timeline UX."
+                    }
+                }
+            }
+        }
+    }
+}
