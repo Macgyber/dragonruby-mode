@@ -59,6 +59,7 @@
           (if (file-exists-p full-path)
               (progn
                 (find-file-other-window full-path)
+                (dragonruby-guide--apply-hi-fi-styling)
                 (widen)
                 (goto-char (point-min))
                 (when (re-search-forward (format "^\\*+ %s" (regexp-quote concept-name)) nil t)
@@ -86,6 +87,20 @@
       (dragonruby-guide-open-concept-sidebar "args"))))
 
 ;;;###autoload
+(defun dragonruby-guide-open-glossary ()
+  "Open the high-fidelity comprehensive glossary."
+  (interactive)
+  (let ((full-path (expand-file-name "glossary.org" dragonruby-guide-directory)))
+    (if (file-exists-p full-path)
+        (progn
+          (find-file full-path)
+          (dragonruby-guide--apply-hi-fi-styling))
+      (message "⚠️ Glossary file not found: %s" full-path))))
+
+;;;###autoload
+(defalias 'dragonruby-glosario #'dragonruby-guide-open-glossary)
+
+;;;###autoload
 (defun dragonruby-guide-open-concept-sidebar (concept-name)
   "Open CONCEPT-NAME in a persistent side window."
   (interactive "sConcept: ")
@@ -107,6 +122,7 @@
                 (with-current-buffer buf
                   (widen)
                   (goto-char (point-min))
+                  (dragonruby-guide--apply-hi-fi-styling)
                   (when (re-search-forward (format "^\\*+ %s" (regexp-quote concept-name)) nil t)
                     (if (fboundp 'org-fold-show-subtree)
                         (org-fold-show-subtree)
@@ -133,14 +149,29 @@
   (when (bound-and-true-p dragonruby-mode-map)
     (define-key dragonruby-mode-map (kbd "C-c C-d") nil))
   (let ((buf dragonruby-guide--sidebar-buffer))
-    (when (and buf (buffer-live-p buf))
-      (let ((win (get-buffer-window buf t)))
-        (when win (delete-window win)))
-      (kill-buffer buf)))
+    (with-current-buffer (get-buffer-create " *temp*") ;; Safety check for buffer-live-p
+      (when (and buf (buffer-live-p buf))
+        (let ((win (get-buffer-window buf t)))
+          (when win (delete-window win)))
+        (kill-buffer buf))))
   (dragonruby-knowledge-clear)
   (setq dragonruby-guide--concept-map nil)
   (setq dragonruby-guide--sidebar-buffer nil)
   (message "📖 Guide Module Disabled"))
+
+(defun dragonruby-guide--apply-hi-fi-styling ()
+  "Apply Godot-docs inspired styling to the current buffer."
+  (when (derived-mode-p 'org-mode)
+    (setq-local line-spacing 0.2)
+    (setq-local left-margin-width 2)
+    (setq-local right-margin-width 2)
+    (set-window-margins nil left-margin-width right-margin-width)
+    (visual-line-mode 1)
+    (when (bound-and-true-p display-line-numbers-mode)
+      (display-line-numbers-mode -1))
+    ;; If org-modern is available, use it
+    (when (fboundp 'org-modern-mode)
+      (org-modern-mode 1))))
 
 (provide 'dragonruby-guide--impl)
 ;;; dragonruby-guide--impl.el ends here

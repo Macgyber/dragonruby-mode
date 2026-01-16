@@ -1,0 +1,79 @@
+#+TITLE: 📖 DragonRuby Glossarial: Master Reference
+#+AUTHOR: Anonymous
+#+OPTIONS: toc:nil num:nil
+#+STARTUP: overview indent
+
+# Design Notes: To achieve the Godot finish, use a sidebar emulation and custom callouts.
+
+[[file:index.org][🏠 Back to Index]] | [[*About][About]] | [[*Manual][Manual]] | [[*Class Reference][Class Reference]] | [[*Community][Community]]
+
+* 📚 ABOUT
+- [[*Introduction][Introduction]]
+- [[*List of features][List of features]]
+- [[*Frequently asked questions][Frequently asked questions]]
+
+* 🚀 GETTING STARTED
+- [[*Installation][Installation]]
+- [[*Your first game][Your first game]]
+
+* 🛠 MANUAL
+- [[*The Game Loop][The Game Loop]]
+- [[*Input System][Input System]]
+- [[*Rendering Engine][Rendering Engine]]
+
+* 🧠 ENGINE DETAILS
+- [[*Memory Management][Memory Management]]
+- [[*Physics & Collision][Physics & Collision]]
+
+* 💬 COMMUNITY
+- [[*Contributing][Contributing]]
+- [[*DragonRuby Discord][DragonRuby Discord]]
+
+* 📚 CLASS REFERENCE
+- [[file:args.org][Args]]
+- [[file:state.org][State]]
+- [[file:sprite.org][Sprite]]
+
+---
+
+* Introduction
+:PROPERTIES:
+:ID: introduction
+:END:
+
+Welcome to the official **DragonRuby Mode** documentation! This guide is designed to provide a high-fidelity, interactive experience right inside Emacs.
+
+#+begin_note
+**Note**: This documentation is live. If you update your code or the engine, these definitions might evolve.
+#+end_note
+
+* Frequently asked questions
+:PROPERTIES:
+:ID: faq
+:END:
+
+**Q: Is DragonRuby a real engine?**
+A: Yes, it is a highly optimized 2D engine built on top of Ruby and SDL2.
+
+#+begin_important
+**Important**: DragonRuby Mode is NOT an LSP. It is a deterministic guidance system.
+#+end_important
+
+* Class Reference
+:PROPERTIES:
+:ID: class_ref
+:END:
+
+Detailed analysis of the engine's core objects.
+
+- **[[file:args.org][Args]]**: The heart of the tick.
+- **[[file:state.org][State]]**: The memory of the world.
+- **[[file:sprite.org][Sprite]]**: The visual manifestation.
+
+---
+
+#+begin_quote
+“The simulation is only as strong as its definition.”
+#+end_quote
+
+*DragonRuby Emacs Mode — Legacy v0.7.4*

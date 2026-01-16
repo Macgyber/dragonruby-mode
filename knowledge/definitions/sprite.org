@@ -1,5 +1,5 @@
 #+TITLE: 📘 DragonRuby Workbook: Sprites
-#+AUTHOR: Mr. Esteban
+#+AUTHOR: Anonymous
 #+OPTIONS: toc:2 num:nil
 #+STARTUP: overview indent
 
@@ -18,9 +18,14 @@
 * 🧠 Key Concepts
 ** Sprite
    A visual entity that inhabits the 2D plane. 
-   #+begin_quote
-   “A sprite is the window to the player's imagination.”
-   #+end_quote
+
+#+begin_note
+**Rendering**: DragonRuby's renderer is optimized for massive amounts of sprites. Use hashes or classes to define them.
+#+end_note
+
+#+begin_quote
+“A sprite is the window to the player's imagination.”
+#+end_quote
 
 * 🏗 Attributes
 ** Base Geometry

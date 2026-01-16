@@ -1,5 +1,5 @@
 #+TITLE: 📘 DragonRuby Workbook: [Concept Name]
-#+AUTHOR: Mr. Esteban
+#+AUTHOR: Anonymous
 #+OPTIONS: toc:2 num:nil
 #+STARTUP: overview indent
 

@@ -1,5 +1,5 @@
 #+TITLE: 📘 DragonRuby Workbook: Args
-#+AUTHOR: Sr. Esteban
+#+AUTHOR: Anonymous
 #+OPTIONS: toc:2 num:nil
 #+STARTUP: overview indent
 
@@ -18,9 +18,14 @@
 * 🧠 Key Concepts
 ** Args
    The heart of the game loop. It is the container that DragonRuby passes to you in every `tick`.
-   #+begin_quote
-   “Everything the engine knows about the world is inside args.”
-   #+end_quote
+
+#+begin_note
+**Engine Detail**: Everything the engine knows about the world is inside args. If it's not in args, it doesn't exist for the current tick.
+#+end_note
+
+#+begin_quote
+“Everything the engine knows about the world is inside args.”
+#+end_quote
 
 ** Properties
    - state :: Your persistent database.

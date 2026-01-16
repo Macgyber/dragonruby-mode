@@ -99,56 +99,62 @@
 
 (defun dragonruby--boot-session ()
   "Boot the DragonRuby session for this buffer."
-  (condition-case err
-      (progn
-        ;; 1. Core & Scheduler (The Foundation)
-        (dragonruby-enable 'core)
-        (dragonruby-enable 'scheduler)
-        
-        ;; 2. Kernel Activation (Global Services)
-        (let (enabled-msgs disabled-msgs)
-          (cl-labels ((activate-mod (mod var &optional req-mod)
-                        (let ((is-enabled (symbol-value var)))
-                          (if is-enabled
-                              (if (or (not req-mod) (eq (dragonruby-module-status req-mod) :active))
+  (let ((reporter (make-progress-reporter "🐉 DragonRuby: Booting..." 0 13))
+        (step 0))
+    (condition-case err
+        (progn
+          ;; 1. Core (Step 1)
+          (dragonruby-enable 'core)
+          (setq step (1+ step))
+          (progress-reporter-update reporter step "Core Foundation")
+
+          ;; 2. Scheduler (Step 2)
+          (dragonruby-enable 'scheduler)
+          (setq step (1+ step))
+          (progress-reporter-update reporter step "Scheduler Heartbeat")
+          
+          ;; 3. Kernel Activation (Global Services)
+          (let (enabled-msgs disabled-msgs)
+            (cl-labels ((activate-mod (mod var &optional req-mod label)
+                          (let ((is-enabled (symbol-value var)))
+                            (setq step (1+ step))
+                            (if is-enabled
+                                (if (or (not req-mod) (eq (dragonruby-module-status req-mod) :active))
+                                    (progn
+                                      (dragonruby-enable mod)
+                                      (progress-reporter-update reporter step (or label (symbol-name mod)))
+                                      (push (format "🧠 Kernel: Module [%s] ENABLED" mod) enabled-msgs))
                                   (progn
-                                    (dragonruby-enable mod)
-                                    (push (format "🧠 Kernel: Module [%s] ENABLED" mod) enabled-msgs))
-                                (push (format "🧠 Kernel: Module [%s] DISABLED (requires [%s])" mod req-mod) disabled-msgs))
-                            (push (format "🧠 Kernel: Module [%s] DISABLED" mod) disabled-msgs)))))
+                                    (progress-reporter-update reporter step (format "Skipped [%s] (Missing Dep)" mod))
+                                    (push (format "🧠 Kernel: Module [%s] DISABLED (requires [%s])" mod req-mod) disabled-msgs)))
+                              (progn
+                                (progress-reporter-update reporter step (format "Off [%s]" mod))
+                                (push (format "🧠 Kernel: Module [%s] DISABLED" mod) disabled-msgs))))))
 
-            ;; The User-Defined "Visual to Non-Visual" Order:
-            ;; 1. colors
-            (activate-mod 'colors 'dragonruby-enable-colors)
-            ;; 2. audio
-            (activate-mod 'audio 'dragonruby-enable-audio)
-            ;; 3. sprites
-            (activate-mod 'sprites 'dragonruby-enable-sprites)
-            ;; 4. fonts
-            (activate-mod 'fonts 'dragonruby-enable-fonts)
-            ;; 5. paths
-            (activate-mod 'paths 'dragonruby-enable-paths)
-            ;; 6. completion
-            (activate-mod 'completion 'dragonruby-enable-completion)
-            ;; 7. concepts
-            (activate-mod 'concepts 'dragonruby-enable-concepts)
-            ;; 8. guide
-            (activate-mod 'guide 'dragonruby-enable-guide)
-            ;; 9. tools-font (font-tools)
-            (activate-mod 'font-tools 'dragonruby-enable-font-tools 'fonts)
-            ;; 10. tools-sprites (sprite-tools)
-            (activate-mod 'sprite-tools 'dragonruby-enable-sprite-tools 'sprites)
-            ;; 11. stargate (The Mind Layer - Last to Boot)
-            (activate-mod 'stargate 'dragonruby-enable-stargate)
+              ;; Order (Steps 3-13)
+              (activate-mod 'colors 'dragonruby-enable-colors nil "Optics")
+              (activate-mod 'audio 'dragonruby-enable-audio nil "Sonics")
+              (activate-mod 'sprites 'dragonruby-enable-sprites nil "Visuals")
+              (activate-mod 'fonts 'dragonruby-enable-fonts nil "Glyphs")
+              (activate-mod 'paths 'dragonruby-enable-paths nil "Navigation")
+              (activate-mod 'completion 'dragonruby-enable-completion nil "Prediction")
+              (activate-mod 'concepts 'dragonruby-enable-concepts nil "Knowledge")
+              (activate-mod 'guide 'dragonruby-enable-guide nil "Guidance")
+              (activate-mod 'font-tools 'dragonruby-enable-font-tools 'fonts "Typography")
+              (activate-mod 'sprite-tools 'dragonruby-enable-sprite-tools 'sprites "Artisan")
+              (activate-mod 'stargate 'dragonruby-enable-stargate nil "Timeline")
 
-            ;; --- Final Reporting (ENABLED first, then DISABLED) ---
-            (dolist (msg (reverse enabled-msgs)) (message msg))
-            (dolist (msg (reverse disabled-msgs)) (message msg))))
-        ;; 3. Local Safety
-        (setq-local enable-recursive-minibuffers t))
-    (error
-     (message "❌ BOOT FAILED: %s" err)
-     (dragonruby-mode -1))))
+              ;; --- Final Reporting ---
+              (progress-reporter-done reporter)
+              (dolist (msg (reverse enabled-msgs)) (message msg))
+              (dolist (msg (reverse disabled-msgs)) (message msg))))
+
+          ;; 4. Local Safety
+          (setq-local enable-recursive-minibuffers t))
+      (error
+       (when reporter (progress-reporter-done reporter))
+       (message "❌ BOOT FAILED at %d%%: %s" (floor (* (/ (float step) 13.0) 100)) err)
+       (dragonruby-mode -1)))))
 
 (defun dragonruby--shutdown-session ()
   "Shutdown the local session."

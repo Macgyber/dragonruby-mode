@@ -1,5 +1,5 @@
 #+TITLE: 📘 DragonRuby Workbook: State
-#+AUTHOR: Mr. Esteban
+#+AUTHOR: Anonymous
 #+OPTIONS: toc:2 num:nil
 #+STARTUP: overview indent
 
@@ -17,9 +17,14 @@
 * 🧠 Key Concepts
 ** State
    The dynamic database of your game. DragonRuby saves it automatically.
-   #+begin_quote
-   “State is the sum of all decisions made.”
-   #+end_quote
+
+#+begin_note
+**Persistence**: State is saved and loaded automatically by the engine. It is the primary way to maintain continuity between ticks and sessions.
+#+end_note
+
+#+begin_quote
+“State is the sum of all decisions made.”
+#+end_quote
 
 * 🏗 Persistence
 ** Open Entity

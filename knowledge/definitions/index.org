@@ -1,11 +1,13 @@
 #+TITLE: 🗺 Master Catalog: DragonRuby Library
-#+AUTHOR: Mr. Esteban
+#+AUTHOR: Anonymous
 #+OPTIONS: toc:2 num:nil
 #+STARTUP: overview indent
 
 * 🧭 Navigation Guide
   This file is the Central Nervous System of knowledge. 
   Here code symbols are linked with the sacred volumes of documentation.
+
+  - **[[file:glossary.org][📘 OPEN COMPREHENSIVE GLOSSARY]]**
 
 * Sprite
 :PROPERTIES:
