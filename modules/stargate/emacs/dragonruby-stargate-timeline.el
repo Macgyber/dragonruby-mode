@@ -40,10 +40,9 @@
 (defun dragonruby-stargate-timeline ()
   "Render the Branch Forest visualization for the current session."
   (interactive)
-  (unless dragonruby-stargate--active-session
-    (unless (called-interactively-p 'interactive)
-      (return nil))
-    (error "No active Stargate session"))
+  (if (not dragonruby-stargate--active-session)
+    (when (called-interactively-p 'interactive)
+      (error "No active Stargate session"))
   
   (let* ((index-file (expand-file-name "session.json" dragonruby-stargate--active-session))
          (json-object-type 'alist)
@@ -70,17 +69,22 @@
           (dragonruby-stargate-timeline--render-branch "prime" 0 branches moments)
           
           ;; Navigation logic: auto-scroll if we were at the end, else preserve position
-          (if was-at-end
-              (goto-char (point-max))
-            (goto-char (if (= pos 1) (point-min) pos)))
-          (stargate-timeline-mode)))
+          (let ((win (get-buffer-window buffer)))
+            (if was-at-end
+                (progn
+                  (goto-char (point-max))
+                  (when win (set-window-point win (point-max))))
+              (goto-char (if (= pos 1) (point-min) pos))
+              (when win (set-window-point win (point)))))
+          
+          (stargate-timeline-mode)
+          (message "🌌 Stargate: Timeline rendered (%d moments)" (length moments))))
       (unless (get-buffer-window buffer)
-        (display-buffer buffer)))))
+        (display-buffer buffer))))))
 
 (defun dragonruby-stargate-timeline--render-branch (branch-id indent branches moments)
   "Recursively render BRANCH-ID with INDENT."
-  (let ((prefix (make-string (* indent 2) ?\s))
-        (is-prime (string= branch-id "prime")))
+  (let ((prefix (make-string (* indent 2) ?\s)))
     
     ;; Render Branch Header
     (insert prefix (propertize (format " 🌿 Branch: %s" branch-id) 

@@ -16,7 +16,7 @@
 
 (defcustom dragonruby-guide-sidebar-position 'right
   "Position of the guidance sidebar.
-Can be 'left, 'right, 'top, or 'bottom."
+Can be `left', `right', `top', or `bottom'."
   :type '(choice (const left) (const right) (const top) (const bottom))
   :group 'dragonruby)
 

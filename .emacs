@@ -81,17 +81,17 @@
 ;; ============================================================
 ;; 🧩 User Lego Profile
 ;; ============================================================
-(setq dragonruby-enable-completion   t) ;❌OFF
-(setq dragonruby-enable-colors       t) ;❌OFF
-(setq dragonruby-enable-sprites      t) ;❌OFF
-(setq dragonruby-enable-sprite-tools t) ;❌OFF
-(setq dragonruby-enable-fonts        t) ;❌OFF
-(setq dragonruby-enable-font-tools   t) ;❌OFF
-(setq dragonruby-enable-audio        t) ;❌OFF
-(setq dragonruby-enable-paths        t) ;❌OFF
-(setq dragonruby-enable-concepts     t) ;❌OFF
+(setq dragonruby-enable-completion   nil) ;❌OFF
+(setq dragonruby-enable-colors       nil) ;❌OFF
+(setq dragonruby-enable-sprites      nil) ;❌OFF
+(setq dragonruby-enable-sprite-tools nil) ;❌OFF
+(setq dragonruby-enable-fonts        nil) ;❌OFF
+(setq dragonruby-enable-font-tools   nil) ;❌OFF
+(setq dragonruby-enable-audio        nil) ;❌OFF
+(setq dragonruby-enable-paths        nil) ;❌OFF
+(setq dragonruby-enable-concepts     nil) ;❌OFF
 (setq dragonruby-enable-stargate     t)   ;✅ON
-(setq dragonruby-enable-guide        t) ;❌OFF
+(setq dragonruby-enable-guide        nil) ;❌OFF
 
 ;; ============================================================
 ;; 🧲 Activate on open Ruby buffers

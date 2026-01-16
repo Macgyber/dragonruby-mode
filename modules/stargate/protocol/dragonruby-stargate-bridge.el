@@ -13,7 +13,7 @@
   "Remove ANSI escape codes from STRING."
   (replace-regexp-in-string "\e\\[[0-9;]*[a-zA-Z]" "" string))
 
-(defun dragonruby-stargate-bridge--filter (process output)
+(defun dragonruby-stargate-bridge--filter (_process output)
   "Filter and capture [STARGATE_MOMENT] events from PROCESS OUTPUT."
   ;; 1. Accumulate raw output (Fragmentation handling)
   (setq dragonruby-stargate-bridge--partial-buffer 
@@ -49,21 +49,26 @@
              (event (json-read-from-string json-string)))
         
         ;; Protocol Contract Validation (The Book of Laws)
-        (let ((type (cdr (assoc "type" event)))
-              (obs (cdr (assoc "observed_at" event))))
+        ;; We use a more robust extraction that handles both string and symbol keys
+        (let* ((get-val (lambda (key) 
+                          (cdr (or (assoc (if (symbolp key) (symbol-name key) key) event)
+                                   (assoc (if (stringp key) (intern key) key) event)))))
+               (type (funcall get-val "type"))
+               (obs  (funcall get-val "observed_at"))
+               (mtype (funcall get-val "moment_type")))
           (cond
            ((not type) 
-            (message "🛑 Stargate Bridge: Malformed packet ignored (Missing 'type')."))
-           ((and (string= type "moment") (not (assoc "moment_type" event)))
+            (message "🛑 Stargate Bridge: Malformed packet ignored (Missing 'type'). JSON: %s" json-string))
+           ((and (string= type "moment") (not mtype))
             (message "⚠️ Stargate Bridge: DEPRECATED PACKET - Missing 'moment_type'."))
-           ((and (string= type "moment") (not (listp obs)))
-            (message "🛑 Stargate Bridge: CONTRACT VIOLATION - 'observed_at' must be a struct."))
+           ((and (string= type "moment") (not (numberp obs)))
+            (message "🛑 Stargate Bridge: CONTRACT VIOLATION - 'observed_at' must be an integer (is %S). JSON: %s" 
+                     obs json-string))
            (t
             (run-hook-with-args 'dragonruby-stargate-bridge-event-hook event)))))
     (error
      (message "❌ Stargate Bridge: JSON Parse Error: %s" err)
-     ;; Log a snippet of the failed string for debugging
-     (message "🔗 Segment: %s..." (substring json-string 0 (min (length json-string) 100))))))
+     (message "🔗 Raw Packet: %s" json-string))))
 
 (defun dragonruby-stargate-bridge-send-code (code)
   "Send CODE to the DragonRuby runtime via the bridge."
@@ -75,15 +80,18 @@
   "Find the DragonRuby simulation process and install the filter.
 If SILENT is non-nil, don't message when the process is not found."
   (interactive)
-  ;; DragonRuby Toolkit uses "dragonruby" as the process name.
+  ;; DragonRuby Toolkit uses "dragonruby" as the process name via (dragonruby-run).
   (let ((proc (get-process "dragonruby")))
-    (if proc
+    (if (and proc (process-live-p proc))
         (progn
           (setq dragonruby-stargate-bridge--process proc)
-          (set-process-filter proc #'dragonruby-stargate-bridge--filter)
-          (message "📡 Stargate Bridge: Cabled to DragonRuby Simulation."))
+          ;; Only set filter if not already set to our filter
+          (unless (eq (process-filter proc) #'dragonruby-stargate-bridge--filter)
+            (set-process-filter proc #'dragonruby-stargate-bridge--filter))
+          (unless silent
+            (message "📡 Stargate Bridge: Cabled to DragonRuby Simulation.")))
       (unless silent
-        (message "❌ Stargate Bridge: Could not find 'dragonruby' process.")))))
+        (message "❌ Stargate Bridge: No active 'dragonruby' process found. Launch the game with M-x dragonruby-run first.")))))
 
 (defalias 'dragonruby-stargate-bridge-install #'dragonruby-stargate-bridge-find-and-install)
 (defalias 'stargate-bridge-cable #'dragonruby-stargate-bridge-find-and-install)

@@ -65,20 +65,20 @@
 ;; ⚙️ Configuration (Feature Flags)
 ;; -----------------------------------------------------------------------------
 
-(defcustom dragonruby-enable-sprites t "Enable sprite system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-sprite-tools t "Enable sprite tools." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-fonts t "Enable font system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-font-tools t "Enable font tools." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-audio t "Enable audio system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-colors t "Enable color system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-sprites nil "Enable sprite system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-sprite-tools nil "Enable sprite tools." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-fonts nil "Enable font system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-font-tools nil "Enable font tools." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-audio nil "Enable audio system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-colors nil "Enable color system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-picker t 
   "Enable color picker. ⚠️ EXPERIMENTAL: Interaction model may change." 
   :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-paths t "Enable path system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-concepts t "Enable concept system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-completion t "Enable completion system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-paths nil "Enable path system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-concepts nil "Enable concept system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-completion nil "Enable completion system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-stargate t "Enable Stargate time-traveling system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-guide t "Enable knowledge guidance system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-guide nil "Enable knowledge guidance system." :type 'boolean :group 'dragonruby)
 
 ;; -----------------------------------------------------------------------------
 ;; 🎮 Session Manager (The Mode)

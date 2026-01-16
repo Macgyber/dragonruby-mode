@@ -18,6 +18,23 @@ For years, we accepted that "powerful" meant "complicated" and "fast" meant "ugl
 We haven't just added features; we have established an **Invisible Order**. From the zero-latency sprite rendering to the industrial-grade memory management, every line of code here exists to protect your flow. We don't want to receive the credit; we want you to create the impossible, and forget we are even here.
 
 This is our contribution to the craft. This is the new baseline.
+## 📑 Tabla de Contenidos
+
+- [🏛️ El Nuevo Estándar](#-the-new-standard-a-quiet-revolution)
+- [⚔️ El Arsenal Estable (Base Fundamental)](#-the-stable-arsenal-the-foundational-base)
+  - [🎨 Nivel 1: Espectro Semántico (Colores)](#-level-1-semantic-spectrum-colors)
+  - [🖼️ Nivel 2: Reconocimiento (Sprites)](#-level-2-reconnaissance-operations-sprites)
+  - [🎨 La Forja: Editor de Imágenes Integrado](#-the-forge-integrated-image-editor)
+  - [🌐 Nivel 4: El Hub Creativo (Beta)](#-level-4-the-creative-hub-beta)
+  - [⚡ Nivel 3: Navegación de Curvatura](#-level-3-curvature-navigation-the-law)
+- [💎 Arsenal Táctico (Beta)](#-tactical-arsenal-beta)
+  - [🔊 Motor de Resonancia (Audio)](#-the-resonance-engine-audio--beta)
+  - [🅰️ Motor de Glifos (Fuentes)](#-the-glyph-engine-fonts)
+  - [🌌 Nivel 5: Stargate (Máquina del Tiempo)](#-level-5-the-time-machine-stargate--experimental)
+- [📦 Instalación](#-installation)
+- [🏗️ Arquitectura: El Sistema Lego](#-architecture-the-lego-system-beta)
+  - [🧠 El Kernel Soberano](#-the-sovereign-kernel-v073-architect)
+- [📚 Documentación y Recursos](#-documentation-and-resources)
 
 ---
 
@@ -171,9 +188,10 @@ The Kernel is the central nervous system. It strictly enforces the **Three Laws*
 3.  **Cold Boot Law**: Nothing runs until you ask for it. Zero zombie processes.
 
 ### 🧱 Assembling Your Legos
-You have total control. Enable or disable individual pieces in your config. The Kernel handles the wiring automatically.
+You have total control. You can enable or disable individual pieces in your configuration, or handle it visually:
 
-To customize your experience, add these lines to your `config.el` (Doom) or `init.el` (Vanilla) **before** loading the mode:
+- **Visual Method**: Run `M-x customize-group RET dragonruby` to see all available modules and toggle them with a single click.
+- **Config Method**: Add these lines to your `config.el` (Doom) or `init.el` (Vanilla) **before** loading the mode:
 
 ```elisp
 ;; Example: Minimalist Setup (Code Only)
@@ -192,8 +210,8 @@ To customize your experience, add these lines to your `config.el` (Doom) or `ini
 | `colors` | Hex/RGB highlighting | 🔴 OFF |
 | `concepts` | Educational concept popups | 🔴 OFF |
 | `paths` | Project navigation, file jumping | 🔴 OFF |
-| `stargate` | Time travel, atomic injections (Experimental) | 🔴 OFF |
-| `completion` | Strict YAML API Schema | ✅ ON |
+| `stargate` | Time travel, atomic injections (Experimental) | ✅ ON |
+| `completion` | Strict YAML API Schema | 🔴 OFF |
 | `guide` | Knowledge guidance system (Sidebar) | 🔴 OFF |
 
 If you disable a parent (e.g., `sprites`), the Kernel **automatically** powers down its children (`sprite-tools`) to prevent errors. You don't have to manage dependencies. Just build your perfect editor.

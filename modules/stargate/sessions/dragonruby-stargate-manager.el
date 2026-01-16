@@ -1,8 +1,9 @@
 ;;; manager.el --- Stargate Session Management and Asset Vault -*- lexical-binding: t -*-
 
-(require 'json)
-(require 'dragonruby-utils)
 (require 'cl-lib)
+(require 'json)
+
+(defvar json-encoding-object-type)
 
 (defvar dragonruby-stargate--active-session nil
   "Path to the currently active .dr-stargate session directory.")

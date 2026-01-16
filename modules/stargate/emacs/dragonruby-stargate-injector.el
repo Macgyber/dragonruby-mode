@@ -8,7 +8,7 @@
 
 (defun dragonruby-stargate-injector-classify (snippet)
   "Classify the risk level of SNIPPET.
-Returns a symbol: 'alpha, 'beta, or 'gamma."
+Returns a symbol: `alpha', `beta', or `gamma'."
   (cond
    ;; GAMMA: Structural changes (Class definitions, state key mutations)
    ((string-match-p (concat "\\<" (regexp-opt '("class" "module" "attr_accessor" "attr_reader" "attr_writer") t) "\\>") snippet)
