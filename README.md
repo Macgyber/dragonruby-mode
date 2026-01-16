@@ -18,23 +18,23 @@ For years, we accepted that "powerful" meant "complicated" and "fast" meant "ugl
 We haven't just added features; we have established an **Invisible Order**. From the zero-latency sprite rendering to the industrial-grade memory management, every line of code here exists to protect your flow. We don't want to receive the credit; we want you to create the impossible, and forget we are even here.
 
 This is our contribution to the craft. This is the new baseline.
-## 📑 Tabla de Contenidos
+## 📑 Table of Contents
 
-- [🏛️ El Nuevo Estándar](#-the-new-standard-a-quiet-revolution)
-- [⚔️ El Arsenal Estable (Base Fundamental)](#-the-stable-arsenal-the-foundational-base)
-  - [🎨 Nivel 1: Espectro Semántico (Colores)](#-level-1-semantic-spectrum-colors)
-  - [🖼️ Nivel 2: Reconocimiento (Sprites)](#-level-2-reconnaissance-operations-sprites)
-  - [🎨 La Forja: Editor de Imágenes Integrado](#-the-forge-integrated-image-editor)
-  - [🌐 Nivel 4: El Hub Creativo (Beta)](#-level-4-the-creative-hub-beta)
-  - [⚡ Nivel 3: Navegación de Curvatura](#-level-3-curvature-navigation-the-law)
-- [💎 Arsenal Táctico (Beta)](#-tactical-arsenal-beta)
-  - [🔊 Motor de Resonancia (Audio)](#-the-resonance-engine-audio--beta)
-  - [🅰️ Motor de Glifos (Fuentes)](#-the-glyph-engine-fonts)
-  - [🌌 Nivel 5: Stargate (Máquina del Tiempo)](#-level-5-the-time-machine-stargate--experimental)
-- [📦 Instalación](#-installation)
-- [🏗️ Arquitectura: El Sistema Lego](#-architecture-the-lego-system-beta)
-  - [🧠 El Kernel Soberano](#-the-sovereign-kernel-v073-architect)
-- [📚 Documentación y Recursos](#-documentation-and-resources)
+- [🏛️ The New Standard](#-the-new-standard-a-quiet-revolution)
+- [⚔️ The Stable Arsenal (Foundational Base)](#-the-stable-arsenal-the-foundational-base)
+  - [🎨 Level 1: Semantic Spectrum (Colors)](#-level-1-semantic-spectrum-colors)
+  - [🖼️ Level 2: Reconnaissance Operations (Sprites)](#-level-2-reconnaissance-operations-sprites)
+  - [🎨 The Forge: Integrated Image Editor](#-the-forge-integrated-image-editor)
+  - [🌐 Level 4: The Creative Hub (Beta)](#-level-4-the-creative-hub-beta)
+  - [⚡ Level 3: Curvature Navigation (The Law)](#-level-3-curvature-navigation-the-law)
+- [💎 Tactical Arsenal (Beta)](#-tactical-arsenal-beta)
+  - [🔊 The Resonance Engine (Audio)](#-the-resonance-engine-audio--beta)
+  - [🅰️ The Glyph Engine (Fonts)](#-the-glyph-engine-fonts)
+  - [🌌 Level 5: The Time Machine (Stargate)](#-level-5-the-time-machine-stargate--experimental)
+- [📦 Installation](#-installation)
+- [🏗️ Architecture: The Lego System (Beta)](#-architecture-the-lego-system-beta)
+  - [🧠 The Sovereign Kernel](#-the-sovereign-kernel-v073-architect)
+- [📚 Documentation and Resources](#-documentation-and-resources)
 
 ---
 
