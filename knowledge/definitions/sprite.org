@@ -1,41 +1,41 @@
-#+TITLE: 📘 Cuaderno DragonRuby: Sprites
-#+AUTHOR: Sr. Esteban
+#+TITLE: 📘 DragonRuby Workbook: Sprites
+#+AUTHOR: Mr. Esteban
 #+OPTIONS: toc:2 num:nil
 #+STARTUP: overview indent
 
-* 🧭 Índice
-  - [[*Introducción][Introducción]]
-  - [[*Conceptos Clave][Conceptos Clave]]
-  - [[*Atributos][Atributos]]
-  - [[*Código Base][Código Base]]
-  - [[*Rutas Secretas][Rutas Secretas]]
-  - [[*Bitácora][Bitácora]]
+* 🧭 Index
+  - [[*Introduction][Introduction]]
+  - [[*Key Concepts][Key Concepts]]
+  - [[*Attributes][Attributes]]
+  - [[*Base Code][Base Code]]
+  - [[*Secret Routes][Secret Routes]]
+  - [[*Logbook][Logbook]]
 
-* 🌱 Introducción
-  Este documento guarda los secretos de la luz y la forma: los *Sprites*.
-  Un sprite no es solo una imagen, es una entidad visual con alma lógica dentro del motor.
+* 🌱 Introduction
+  This document guards the secrets of light and form: the *Sprites*.
+  A sprite is not just an image, it is a visual entity with a logical soul within the engine.
 
-* 🧠 Conceptos Clave
+* 🧠 Key Concepts
 ** Sprite
-   Una entidad visual que habita sobre el plano 2D. 
+   A visual entity that inhabits the 2D plane. 
    #+begin_quote
-   “Un sprite es la ventana a la imaginación del jugador.”
+   “A sprite is the window to the player's imagination.”
    #+end_quote
 
-* 🏗 Atributos
-** Geometría Base
-   | Clave | Propósito |
-   |-------+-----------|
-   | x, y  | Posición  |
-   | w, h  | Tamaño    |
-   | path  | Imagen    |
+* 🏗 Attributes
+** Base Geometry
+   | Key   | Purpose |
+   |-------+---------|
+   | x, y  | Position|
+   | w, h  | Size    |
+   | path  | Image   |
 
-** Color y Giro
-   - r, g, b, a :: El tinte del alma del sprite.
-   - angle :: La rotación sobre su eje central.
+** Color and Turn
+   - r, g, b, a :: The tint of the sprite's soul.
+   - angle      :: Rotation about its central axis.
 
-* 🧪 Código Base
-** Renderizando un héroe
+* 🧪 Base Code
+** Rendering a hero
 #+begin_src ruby
 def tick args
   args.outputs.sprites << {
@@ -45,10 +45,10 @@ def tick args
 end
 #+end_src
 
-* 🧬 Rutas Secretas
-  - [[file:args.org][📕 Volver a Args]]
-  - [[https://dragonruby.org/docs/sprites.html][Manual Oficial de Sprites]]
+* 🧬 Secret Routes
+  - [[file:args.org][📕 Back to Args]]
+  - [[https://dragonruby.org/docs/sprites.html][Official Sprites Manual]]
 
-* 📅 Bitácora
+* 📅 Logbook
 ** 2026-01-12
-   Hoy los sprites aprendieron a brillar en la oscuridad del código.
+   Today the sprites learned to shine in the darkness of the code.

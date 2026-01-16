@@ -1,51 +1,51 @@
-#+TITLE: 📘 Cuaderno DragonRuby: Args
+#+TITLE: 📘 DragonRuby Workbook: Args
 #+AUTHOR: Sr. Esteban
 #+OPTIONS: toc:2 num:nil
 #+STARTUP: overview indent
 
-* 🧭 Índice
-  - [[*Introducción][Introducción]]
-  - [[*Conceptos Clave][Conceptos Clave]]
-  - [[*Arquitectura][Arquitectura]]
-  - [[*Código Base][Código Base]]
-  - [[*Experimentos][Experimentos]]
-  - [[*Bitácora][Bitácora]]
+* 🧭 Index
+  - [[*Introduction][Introduction]]
+  - [[*Key Concepts][Key Concepts]]
+  - [[*Architecture][Architecture]]
+  - [[*Base Code][Base Code]]
+  - [[*Experiments][Experiments]]
+  - [[*Logbook][Logbook]]
 
-* 🌱 Introducción
-  Este documento es un mundo vivo sobre el objeto principal de DragonRuby: *Args*.
-  Aquí no se toman notas: aquí se construye comprensión sobre cómo fluyen los datos en el juego.
+* 🌱 Introduction
+  This document is a living world about DragonRuby's main object: *Args*.
+  Notes are not just taken here: understanding is built on how data flows in the game.
 
-* 🧠 Conceptos Clave
+* 🧠 Key Concepts
 ** Args
-   El corazón del loop de juego. Es el contenedor que DragonRuby te pasa en cada `tick`.
+   The heart of the game loop. It is the container that DragonRuby passes to you in every `tick`.
    #+begin_quote
-   “Todo lo que el motor sabe del mundo está dentro de args.”
+   “Everything the engine knows about the world is inside args.”
    #+end_quote
 
-** Propiedades
-   - state :: Tu base de datos persistente.
-   - inputs :: La voz del jugador.
-   - outputs :: La pantalla y el sonido.
+** Properties
+   - state :: Your persistent database.
+   - inputs :: The player's voice.
+   - outputs :: The screen and the sound.
 
-* 🏗 Arquitectura
-** El Ciclo del Tick
-   1. DragonRuby prepara `args`.
-   2. Tu código lee `args.inputs` y `args.state`.
-   3. Tu código escribe en `args.outputs`.
-   4. DragonRuby renderiza el frame.
+* 🏗 Architecture
+** The Tick Cycle
+   1. DragonRuby prepares `args`.
+   2. Your code reads `args.inputs` and `args.state`.
+   3. Your code writes to `args.outputs`.
+   4. DragonRuby renders the frame.
 
-* 🧪 Código Base
-** Estructura básica
+* 🧪 Base Code
+** Basic structure
 #+begin_src ruby
 def tick args
   args.outputs.labels << [640, 360, "Hello World", 5, 1]
 end
 #+end_src
 
-* 🧬 Experimentos
+* 🧬 Experiments
 ** Debugging args
-   ¿Qué pasa si imprimimos `args.state` cada segundo?
+   What happens if we print `args.state` every second?
 
-* 📅 Bitácora
+* 📅 Logbook
 ** 2026-01-12
-   Hoy activamos el motor de conocimiento. La documentación ahora respira.
+   Today we activated the knowledge engine. The documentation now breathes.

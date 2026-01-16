@@ -102,11 +102,13 @@ Did you pick the right font? Why doesn't it look like you expected? Stop guessin
 **→ [📖 Complete Font System Guide](knowledge/FONTS.md)** (ABC/Pangram Viewer, Typography resources, Troubleshooting)
 
 ### 🌌 Level 5: The Time Machine (Stargate) — EXPERIMENTAL
-The ultimate mastery of the simulation. Record, Mutate, and Rewind.
-- **The Chronicler**: Automatic recording of states, seeds, and inputs at every tick. All history is persisted in a JSON-based Forest of Timelines.
-- **The Surgeon (Surgical Injection)**: When you save code, Stargate analyzes the risk (Alpha/Beta/Gamma). If your change crashes the game, the **Dead Hand Rollback** automatically restores the previous valid state.
-- **Timeline Navigation**: Use `M-x dragonruby-stargate-timeline-render` to visualize your history. Scrub through frames and jump between divergent realities.
-- **Organic Pulse**: Synchronized with the Kernel's heart. Stargate searches for your game in silence and attaches its nerves only when the "Dragon" is breathing.
+Master the simulation. Record, Mutate, and Rewind with atomic precision.
+
+- **The Chronicler**: Continuous recording of states and seeds into a JSON-backed history.
+- **The Surgeon**: Real-time code injection with **Dead Hand Rollback** safety.
+- **Timeline Navigation**: Visual scrubber to jump between divergent realities.
+
+**→ [📖 Complete Stargate Guide](knowledge/STARGATE.md)** (State tracking, Atomic Injections, Timeline Navigation)
 
 
 ### 🤝 Compatibility with Other Plugins
@@ -200,6 +202,7 @@ If you disable a parent (e.g., `sprites`), the Kernel **automatically** powers d
 The v0.7.3 update introduces the **Sovereign Kernel**, a central authority inspired by micro-kernel operating systems.
 - **The Ledger of Life**: Every timer, hook, and process must be registered. If the Kernel doesn't know it, it shouldn't exist.
 - **Surgical Hot-Reload (F6)**: Forget the "nuclear options" of the past. Our reload follows a strict `Shutdown -> Unload -> Load -> Reboot` cycle, ensuring a clean state without destroying the Emacs global environment.
+- **Lazy Implementation**: Heavy logic is split from manifests. Functions and modes are only loaded from disk when a module is actually used, keeping your initial setup light and deterministic.
 - **Zombie Hunt**: A background safety net that scans the Emacs subsystem for any orphaned processes or timers, neutralizing them instantly.
 
 - **The Memory (Guide)**: Loads definitions from `.org` files into a unified hash-table cache.
@@ -235,7 +238,6 @@ An artisan autocompletion system that respects your definitions. It is **NOT** a
 
 - **[📖 IMAGE_EDITOR.md](knowledge/IMAGE_EDITOR.md)**: Complete image editor guide
 - **[📖 FONTS.md](knowledge/FONTS.md)**: Font system and typography
-- **[📜 MANIFESTO.md](knowledge/MANIFESTO.md)**: The Project's Existential Boundaries
 - **[📖 INSTALLATION.md](knowledge/INSTALLATION.md)**: All installation methods
 - **[🤝 CONTRIBUTING.md](knowledge/CONTRIBUTING.md)**: Guide for contributors
 - **[💬 GitHub Issues](https://github.com/Macgyber/dragonruby-mode/issues)**: Report bugs or request features
@@ -244,6 +246,6 @@ An artisan autocompletion system that respects your definitions. It is **NOT** a
 
 *Forged for creators who refuse to settle. Forged for DragonRuby.*
 
-**DragonRuby Emacs Mode — v0.7.3**
+**DragonRuby Emacs Mode — v0.7.4**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)

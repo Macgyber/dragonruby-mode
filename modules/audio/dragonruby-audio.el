@@ -1,25 +1,10 @@
-;;; dragonruby-audio.el --- Audio services for DragonRuby -*- lexical-binding: t; -*-
+;;; dragonruby-audio.el --- Audio services manifest for DragonRuby -*- lexical-binding: t; -*-
 
 (require 'dragonruby-kernel)
-(require 'dragonruby-core)
-(require 'dragonruby-audio-model)
-(require 'dragonruby-audio-fs)
-(require 'dragonruby-audio-overlay)
 
-;; -----------------------------------------------------------------------------
-;; 🧬 Lifecycle
-;; -----------------------------------------------------------------------------
-
-(defun dragonruby-audio-enable ()
-  "Enable audio services."
-  (dragonruby-kernel-register-hook 'dragonruby-scan-hook #'dragonruby--scan-audio-overlays t)
-  (message "🔊 Audio Module Enabled"))
-
-(defun dragonruby-audio-disable ()
-  "Disable audio services."
-  (remove-hook 'dragonruby-scan-hook #'dragonruby--scan-audio-overlays t)
-  (dragonruby--clear-audio-overlays)
-  (message "🔊 Audio Module Disabled"))
+;; Autoload implementation functions
+(autoload 'dragonruby-audio-enable "dragonruby-audio--impl")
+(autoload 'dragonruby-audio-disable "dragonruby-audio--impl")
 
 ;; -----------------------------------------------------------------------------
 ;; 📜 Manifest
@@ -31,7 +16,7 @@
  :namespace "dragonruby-audio-"
  :provides '(:visuals :audio-detection)
  :requires nil
- :entry-point 'dragonruby-audio
+ :entry-point 'dragonruby-audio--impl
  :enable-fn #'dragonruby-audio-enable
  :disable-fn #'dragonruby-audio-disable)
 

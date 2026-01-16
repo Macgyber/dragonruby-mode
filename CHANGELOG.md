@@ -8,213 +8,232 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <details open>
+<summary><h2>[0.7.4] - 2026-01-16 (DETERMINISTIC LOAD & LAZY IMPLEMENTATION)</h2></summary>
+
+### 🏗️ Deterministic Load Model (MELPA Compliance)
+- **Manifest/Implementation Split**: Separated all 11 feature modules into lightweight manifests (`.el`) and heavy implementations (`--impl.el`).
+- **Lazy Loading**: Logic is now only loaded from disk when a module is explicitly enabled or an interactive command is triggered.
+- **Side-Effect Free**: `(require 'dragonruby-mode)` no longer modifies the global `load-path` or triggers project detection until explicitly initialized.
+
+### 🎯 Surgical Activation Policy
+- **Surgical Hooks**: `dragonruby-maybe-enable` is now restricted to a whitelist of major modes (`ruby-mode`, `image-mode`, `conf-mode`) and specific file extensions.
+- **Quiet Detection**: Optimized `dragonruby--find-project-root` to suppress diagnostic noise and only message the user once per buffer.
+- **Project Sovereignty**: Priority swap in root discovery to prefer the **Content Root** (game code) over the **Toolkit Root** (binary location).
+
+### 📂 Universal Code Navigation
+- **Fixed Paths Navigability**: Resolved a type mismatch that prevented `require` statements from being navigable.
+- **Instant Scan**: Forced an immediate scan pulse upon module activation for instant visual feedback.
+
+</details>
+
+<details>
 <summary><h2>[0.7.3] - 2026-01-12 (SOVEREIGN KERNEL & SURGICAL RELOAD)</h2></summary>
 
-### 🧠 Micro-Kernel Soberano (Arquitectura de OS)
-- **Registro Central de Vida**: Implementación de un "Libro de Registro" global para Timers, Hooks y Procesos. Ningún recurso puede nacer sin ser registrado por el Kernel.
-- **Sovereign Shutdown**: El sistema de apagado (`system-shutdown`) ahora es una operación atómica que garantiza la muerte de toda actividad vieja antes de cualquier cambio.
-- **Caza de Zombies**: Red de seguridad que escanea la lista global de timers de Emacs para cancelar funciones huérfanas del namespace `dragonruby-`.
+### 🧠 Sovereign Micro-Kernel (OS Architecture)
+- **Central Life Registry**: Implementation of a global "Registry Book" for Timers, Hooks, and Processes. No resource can be born without being registered by the Kernel.
+- **Sovereign Shutdown**: The shutdown system (`system-shutdown`) is now an atomic operation that guarantees the death of all old activity before any change.
+- **Zombie Hunt**: Safety net that scans the global Emacs timer list to cancel orphan functions from the `dragonruby-` namespace.
 
-### 🔄 Hot-Reload Quirúrgico (F6)
-- **Ciclo de Vida OS**: Implementación del flujo `Shutdown -> Unload -> Load -> Reboot`.
-- **Integridad de Símbolos**: Se eliminó la purga destructiva de `mapatoms`. Ahora los símbolos permanecen pero el código se refresca quirúrgicamente sin corromper el estado global de Emacs.
-- **Recarga Atómica**: Garantía de recarga desde disco de módulos críticos (Kernel, Scheduler, Audio) para aplicar cambios de lógica al instante.
+### 🔄 Surgical Hot-Reload (F6)
+- **OS Life Cycle**: Implementation of the `Shutdown -> Unload -> Load -> Reboot` flow.
+- **Symbol Integrity**: Destructive `mapatoms` purging was removed. Now symbols remain but code is surgically refreshed without corrupting the global Emacs state.
+- **Atomic Reload**: Guaranteed background reload of critical modules (Kernel, Scheduler, Audio) to apply logic changes instantly.
 
-### 🔊 Audio & Diagnóstico (Visual Upgrade)
-- **Metadatos de Audio**: Extracción de duración real (vía `afinfo/mdls`) con sistema de caché de alta velocidad.
-- **Validación 0-Bytes**: El sistema ahora detecta y marca como inválidos los archivos de audio vacíos o corruptos.
-- **Hover Dinámico**: Rediseño del tooltip de audio con formato clásico optimizado (duración, peso, tipo) y feedback de error mejorado.
+### 🔊 Audio & Diagnostics (Visual Upgrade)
+- **Audio Metadata**: Real duration extraction (via `afinfo/mdls`) with high-speed caching system.
+- **0-Byte Validation**: The system now detects and marks empty or corrupt audio files as invalid.
+- **Dynamic Hover**: Redesigned audio tooltip with optimized classic format (duration, weight, type) and improved error feedback.
 
-### 🖼️ Optimización de Escaneo
-- **Visión Retiniana Visible**: Los módulos de Sprites, Audio, Fuentes y Colores ahora operan exclusivamente en la región visible (con padding de 3000 chars), eliminando el lag en archivos de miles de líneas.
+### 🖼️ Scan Optimization
+- **Visible Retinal Vision**: Sprites, Audio, Fonts, and Colors modules now operate exclusively in the visible region (with 3000 chars padding), eliminating lag in files with thousands of lines.
 
-### 🌌 Módulo Stargate (The Time Machine) — EXPERIMENTAL
-- **Órgano del Kernel**: Primer módulo diseñado como un "órgano vivo" que late sincronizado con el Heartbeat del Kernel (Scheduler).
-- **El Cronista (Bridge)**: Reensamblaje de pulsos JSON vía consola para la captura de momentos de simulación en tiempo real.
-- **El Cirujano (Injector)**: Sistema de inyección atómica con clasificación de riesgo (Alpha/Beta/Gamma) y reversión automática (*Dead Hand Rollback*).
-- **Navegación Temporal**: Visualización visual del "Bosque de Ramas" y capacidad de salto instantáneo entre estados históricos.
-- **Determinismo Forzado**: Herramientas de captura de RNG y estado para garantizar la reproducibilidad total de la simulación.
+### 🌌 Stargate Module (The Time Machine) — EXPERIMENTAL
+- **Kernel Organ**: First module designed as a "living organ" that beats synchronized with the Kernel Heartbeat (Scheduler).
+- **The Chronicler (Bridge)**: JSON pulse reassembly via console for real-time simulation moment capture.
+- **The Surgeon (Injector)**: Atomic injection system with risk classification (Alpha/Beta/Gamma) and automatic reversion (*Dead Hand Rollback*).
+- **Temporal Navigation**: Visual visualization of the "Forest of Branches" and capability of instant jump between historical states.
+- **Forced Determinism**: RNG and state capture tools to guarantee total reproducibility of the simulation.
 
 </details>
 
 <details>
 <summary><h2>[0.7.2] - 2026-01-12 (LIBRARY OF ALEXANDRIA & STABILITY)</h2></summary>
 
-### 📖 Módulo de Guía (BIBLIOTECA DE ALEJANDRÍA)
-- **Estética de Grimorio**: Transformación visual de Org-mode con títulos jerárquicos (1.4x), márgenes inteligentes y elipsis de libro sagrado (`▾`).
-- **Navegación RET**: Implementado salto directo a la documentación pulsando `RET` sobre conceptos en el código con gestión de memoria optimizada.
-- **Sidebar Derecho**: Panel lateral persistente y anclado (`no-delete-other-windows`) para consulta de conocimiento sin interrupciones.
-- **Tornos de Sabiduría**: Tomos de `args.org`, `state.org` y `sprite.org` estructurados bajo la nueva estética enciclopédica.
+### 📖 Guide Module (LIBRARY OF ALEXANDRIA)
+- **Grimoire Aesthetics**: Org-mode visual transformation with hierarchical titles (1.4x), intelligent margins, and sacred book ellipsis (`▾`).
+- **RET Navigation**: Implemented direct jump to documentation by pressing `RET` over concepts in the code with optimized memory management.
+- **Right Sidebar**: Persistent and anchored lateral panel (`no-delete-other-windows`) for knowledge consultation without interruptions.
+- **Wisdom Lathes**: `args.org`, `state.org`, and `sprite.org` volumes structured under the new encyclopedic aesthetic.
 
-### � Módulo de Colores (TESTEADO & ESTABLE)
-- **Estrategia Solid Bar**: Renderizado compacto que fusiona componentes visuales eliminando ruidos en comas y espacios.
-- **Aislamiento de Objetos**: Lógica de proximidad y reinicio por duplicidad para evitar mezcla de colores entre variables cercanas.
+### 🎨 Colors Module (TESTED & STABLE)
+- **Solid Bar Strategy**: Compact rendering that merges visual components, eliminating noise in commas and spaces.
+- **Object Isolation**: Proximity logic and restart by duplicity to avoid mixing colors between nearby variables.
 
-### 💓 Estabilidad e Ingeniería (Zero-Blocking)
-- **Exorcismo de Overlays**: Reingeniería total del ciclo de vida de overlays. Eliminación de fugas de memoria y closures dinámicos que causaban bloqueos.
-- **Smart Scheduler**: Latida de un solo disparo a 0.5s garantizando scroll suave incluso en archivos masivos.
-- **Hot-Reload (F6)**: Ciclo purificado de reinicio global, reconstrucción de `load-path` y recarga atómica de búferes.
+### 💓 Stability and Engineering (Zero-Blocking)
+- **Overlay Exorcism**: Total reengineering of the overlay life cycle. Elimination of memory leaks and dynamic closures that caused blockages.
+- **Smart Scheduler**: Single-shot beat at 0.5s guaranteeing smooth scroll even in massive files.
+- **Hot-Reload (F6)**: Purified global restart cycle, `load-path` reconstruction, and atomic buffer reload.
 
 </details>
 
 <details>
-<summary><h2>[0.7.1] - 2026-01-10 (SINCRO TOTAL & SMART DOT)</h2></summary>
+<summary><h2>[0.7.1] - 2026-01-10 (TOTAL SYNC & SMART DOT)</h2></summary>
 
-### 📜 Contrato de Sincronía Total
-- **Ultra-Minimalist Core**: Nuevo estándar de fábrica donde **todos** los módulos opcionales (`colors`, `sprites`, `fonts`, `audio`, etc.) están desactivados por defecto, **excepto completion**. El plugin ahora arranca como una herramienta puramente de productividad.
-- **Paridad Código-Doc**: Sincronización absoluta entre los `defcustom` del código y las tablas de "Pieza Lego" en el README. Sin letras pequeñas.
-- **Smart Dot (Punto Inteligente)**: El autocompletado se dispara automáticamente al escribir un punto, **solo** si sigue a una cadena válida del contrato (ej. `args.`). Mejora radical del flujo de escritura.
+### 📜 Total Synchrony Contract
+- **Ultra-Minimalist Core**: New factory standard where **all** optional modules (`colors`, `sprites`, `fonts`, `audio`, etc.) are disabled by default, **except completion**. The plugin now starts as a purely productivity tool.
+- **Code-Doc Parity**: Absolute synchronization between the code's `defcustom` and the "Lego Piece" tables in the README. No fine print.
+- **Smart Dot**: Autocompletion triggers automatically when typing a dot, **only** if it follows a valid contract string (e.g., `args.`). Radical improvement of writing flow.
 
-### 🧠 Inteligencia Nativa
-- **Detección Fallback**: El sistema ahora detecta automáticamente el `dragonruby_api.yml` global en la carpeta del plugin si no existe uno local.
-- **Redundancia de Atajos**: Añadido soporte explícito para `C-M-i` junto al atajo amigable `C-.`.
-- **Auto-Inserción de Punto**: Al completar una raíz (como `arg` -> `args`), el sistema inserta el punto automáticamente para continuar la cadena.
+### 🧠 Native Intelligence
+- **Fallback Detection**: The system now automatically detects the global `dragonruby_api.yml` in the plugin folder if no local one exists.
+- **Shortcut Redundancy**: Explicit support added for `C-M-i` alongside the move friendly `C-.`.
+- **Auto-Dot Insertion**: When completing a root (like `arg` -> `args`), the system automatically inserts the dot to continue the chain.
 
-### 🐛 Bugs Corregidos
-- **Modos Obsoletos**: Corregidos checks a modos menores que ya no existen en arquitectura Lego:
+### 🐛 Bug Fixes
+- **Obsolete Modes**: Fixed checks to minor modes that no longer exist in Lego architecture:
   - `dragonruby-font-overlay.el`: `dragonruby-font-mode` → `dragonruby-mode`
   - `dragonruby-audio-overlay.el`: `dragonruby-audio-mode` → `dragonruby-mode`
   - `dragonruby-sprite-overlay.el`: `dragonruby-sprite-mode` → `dragonruby-mode`
   - `dragonruby-concept-visuals.el`: `dragonruby-concepts-mode` → `dragonruby-mode`
-- **Path Overlay**: Corregido typo `dragonruby-data-extensions` → `dragonruby-data-exts`.
-- **dragonruby-utils.el**: Corregida función `dragonruby--get-image-type` con paréntesis faltante.
+- **Path Overlay**: Fixed typo `dragonruby-data-extensions` → `dragonruby-data-exts`.
+- **dragonruby-utils.el**: Corrected `dragonruby--get-image-type` function with missing parenthesis.
 
 </details>
 
 <details>
-<summary><h2>[0.7.0] - 2026-01-09 (FASE 5: LEGO ARCHITECTURE & KERNEL)</h2></summary>
+<summary><h2>[0.7.0] - 2026-01-09 (PHASE 5: LEGO ARCHITECTURE & KERNEL)</h2></summary>
 
-### 🏗️ Arquitectura Lego (The Kernel)
-El sistema ha sido reestructurado desde cero. Ya no es una colección de scripts, es un **Sistema Operativo** modular.
-- **The Kernel**: Un orquestador central que gestiona la vida y muerte de cada funcionalidad.
+### 🏗️ Lego Architecture (The Kernel)
+The system has been restructured from scratch. It is no longer a collection of scripts; it is a modular **Operating System**.
+- **The Kernel**: A central orchestrator that manages the life and death of each functionality.
 - **The Three Laws**:
-  1. **Namespace Law**: Cada módulo posee su espacio exclusivo.
-  2. **Capability Law**: Los módulos declaran qué *necesitan* (`:rendering`) y qué *proveen*, no a quién conocen.
-  3. **Cold Boot Law**: Nada corre por defecto. Cero zombies.
+  1. **Namespace Law**: Each module owns its exclusive space.
+  2. **Capability Law**: Modules declare what they *need* (e.g., `:rendering`) and what they *provide*, not who they know.
+  3. **Cold Boot Law**: Nothing runs by default. Zero zombies.
 
-### 🛡️ Modularidad Total
-Todos los sistemas han sido encapsulados en `modules/` con contratos estrictos (`manifest`):
-- `modules/core`: Kernel y librerías base.
-- `modules/sprites`: Motor de renderizado.
-- `modules/sprites/tools`: Editor de imágenes (depende de sprites).
-- `modules/fonts`: Visor de tipografías.
+### 🛡️ Total Modularity
+All systems have been encapsulated in `modules/` with strict contracts (`manifest`):
+- `modules/core`: Kernel and base libraries.
+- `modules/sprites`: Rendering engine.
+- `modules/sprites/tools`: Image editor (depends on sprites).
+- `modules/fonts`: Typography viewer.
 - `modules/audio`, `modules/colors`, `modules/paths`, `modules/concepts`.
 
-### 📦 Preparación MELPA
-- Estructura compatible con empaquetado estándar.
-- `dragonruby-pkg.el` añadido.
-- Configuración flexible: El usuario puede desactivar piezas (`legos`) individuales en su `init.el`.
+### 📦 MELPA Preparation
+- Compatible structure with standard packaging.
+- `dragonruby-pkg.el` added.
+- Flexible configuration: The user can deactivate individual pieces (`legos`) in their `init.el`.
 
 </details>
 
 <details>
-<summary><h2>[0.6.1] - 2026-01-08 (FASE 4: CONTRACT COMPLETION & FLUIDITY)</h2></summary>
+<summary><h2>[0.6.1] - 2026-01-08 (PHASE 4: CONTRACT COMPLETION & FLUIDITY)</h2></summary>
 
-### 🧠 Inteligencia Nativa (Autocomplete Engine)
-El sistema de autocompletado ha sido estabilizado y verificado.
-- **Auto-Dot Flow**: Al seleccionar una raíz como `args`, el sistema inserta automáticamente el punto (`args.`), permitiendo una escritura fluida (`args.` -> `state`).
-- **Native Data**: Implementado como backend CAPF estándar. Compatible 100% con `Minibuffer`, `Company-Mode` y `Corfu`.
-- **Zero-Ghost Policy**: Código auditado y purgado de referencias a módulos obsoletos. Logs de depuración eliminados para rendimiento máximo.
-- **Namespace Safety**: backend renombrado para garantizar cero colisiones con otras utilidades.
-- **Contract Fallback**: Busca `dragonruby_api.yml` en la raíz del proyecto; si no existe, usa un contrato global de respaldo.
+### 🧠 Native Intelligence (Autocomplete Engine)
+The autocompletion system has been stabilized and verified.
+- **Auto-Dot Flow**: When selecting a root like `args`, the system automatically inserts the dot (`args.`), allowing fluid writing (`args.` -> `state`).
+- **Native Data**: Implemented as a standard CAPF backend. 100% compatible with `Minibuffer`, `Company-Mode`, and `Corfu`.
+- **Zero-Ghost Policy**: Code audited and purged of references to obsolete modules. Debugging logs removed for maximum performance.
+- **Namespace Safety**: Backend renamed to guarantee zero collisions with other utilities.
+- **Contract Fallback**: Searches for `dragonruby_api.yml` in the project root; if it doesn't exist, it uses a global backup contract.
 
-### 🏭 Mejoras Técnicas
-- **Windows Shortcut**: Implementado `C-.` como atajo nativo para disparar autocompletado en DragonRuby Mode.
-- **Silent Core**: Eliminada etiqueta visual `[Contract]` para una integración UI más limpia y nativa.
+### 🏭 Technical Improvements
+- **Windows Shortcut**: Implemented `C-.` as a native shortcut to trigger autocompletion in DragonRuby Mode.
+- **Silent Core**: Visual label `[Contract]` removed for a cleaner and more native UI integration.
 
 </details>
 
 <details>
-<summary><h2>[0.6.0] - 2026-01-06 (FASE INDUSTRIAL: ZERO BLOCKING & RELIABILITY)</h2></summary>
+<summary><h2>[0.6.0] - 2026-01-06 (INDUSTRIAL PHASE: ZERO BLOCKING & RELIABILITY)</h2></summary>
 
-### 🏭 Blindaje Industrial ("Por Fuera vs Por Dentro")
-Esta versión representa una reingeniería completa bajo la filosofía de **"Orden Invisible"**.
+### 🏭 Industrial Shielding ("Outside vs Inside")
+This version represents a complete reengineering under the philosophy of **"Invisible Order"**.
 
-### Añadido
-- **Métricas Activas en Carga**:
-  - El sistema de activación (`dragonruby-mode.el`) ahora reporta errores críticos con precisión quirúrgica (`CRITICAL FALLBACK`), permitiendo diagnósticos inmediatos.
-  - Eliminación de fallos silenciosos en la carga de módulos.
+### Added
+- **Active metrics on load**:
+  - The activation system (`dragonruby-mode.el`) now reports critical errors with surgical precision (`CRITICAL FALLBACK`), allowing immediate diagnostics.
+  - Elimination of silent failures in module loading.
 
-### Mejorado
-- **Zero Blocking (Rendimiento Extremo)**:
-  - **Refactor de Sprites**: Eliminada *toda* generación de imágenes del hilo principal de escaneo.
-  - **Resultado**: El escaneo de archivos grandes es ahora instantáneo (~0ms bloqueo). Las previsualizaciones ricas (imágenes completas) se cargan *lazy* solo al hacer hover (200ms), manteniendo el editor "liviano como la seda".
-- **Memoria Controlada (SRE)**:
-  - **Singleton Timer Pattern**: Implementado control estricto de timers en los popups de sprites.
-  - **Prevención de Fugas**: Se garantiza que solo exista un timer activo a la vez, eliminando el riesgo de "Timer Storms" al mover el mouse rápidamente.
-  - **Ciclos Claros**: Desactivar el modo ahora limpia agresivamente todos los recursos visuales y procesos pendientes.
-- **Núcleo Silencioso (Silent Core)**:
-  - **Defensa en Profundidad**: `dragonruby-project.el` ahora maneja contextos nulos (buffers sin archivo) sin lanzar excepciones, garantizando estabilidad total en scratchpads y terminales.
+### Improved
+- **Zero Blocking (Extreme Performance)**:
+  - **Sprites Refactor**: Removed *all* image generation from the main scan thread.
+  - **Result**: Scanning large files is now instant (~0ms blocking). Rich previews (full images) are loaded *lazy* only on hover (200ms), keeping the editor "light as silk."
+- **Controlled Memory (SRE)**:
+  - **Singleton Timer Pattern**: Implemented strict timer control in sprite popups.
+  - **Leak Prevention**: It is guaranteed that only one timer exists at a time, eliminating the risk of "Timer Storms" when moving the mouse quickly.
+  - **Clear Cycles**: Deactivating the mode now aggressively cleans up all visual resources and pending processes.
+- **Silent Core**:
+  - **Defense in Depth**: `dragonruby-project.el` now handles null contexts (buffers without a file) without throwing exceptions, guaranteeing total stability in scratchpads and terminals.
 
-### Cambiado
-- **Separación de Responsabilidades Visuales**:
-  - **Inline**: Solo muestra mini-thumbnails cacheados (Validación instantánea).
-  - **Popup**: Maneja exclusivamente la carga de medios ricos (Detalle bajo demanda).
-  - Esta separación es la clave de la nueva arquitectura "Zero Blocking".
+### Changed
+- **Separation of Visual Responsibilities**:
+- **Inline**: Only shows cached mini-thumbnails (Instant validation).
+- **Popup**: Exclusively handles the loading of rich media (Detail on demand).
+- This separation is the key to the new "Zero Blocking" architecture.
 
 </details>
 
 ---
 
 <details>
-<summary><h2>[0.5.0] - 2026-01-05 (FASE 3: AUDIO, FONTS & POLISH)</h2></summary>
+<summary><h2>[0.5.0] - 2026-01-05 (PHASE 3: AUDIO, FONTS & POLISH)</h2></summary>
 
-### Añadido
+### Added
 - **DragonRuby Creative Hub (v1)**:
-  - Integración completa con editores externos.
-  - Botones web para Graphite, Piskel, Lospec, Itch.io.
-  - Sistema "Adaptive UI" que cambia según el ancho de ventana.
-  - Usuarios pueden añadir sus propias "Creative Tools" (URLs o Exes).
-- **Sistema de Audio (Experimental)**:
-  - Detección de `args.audio`.
-  - Reproducción `.wav`/`.ogg` básica desde Emacs (depende de backend).
-- **Fuentes (Fonts)**:
-  - Previsualización de `.ttf` al hacer hover sobre cadenas.
-  - Instalación de fuentes (placeholder).
+  - Full integration with external editors.
+  - Web buttons for Graphite, Piskel, Lospec, Itch.io.
+  - "Adaptive UI" system that changes based on window width.
+  - Users can add their own "Creative Tools" (URLs or Exes).
+- **Audio System (Experimental)**:
+  - `args.audio` detection.
+  - Basic `.wav`/`.ogg` playback from Emacs (depends on backend).
+- **Fonts**:
+  - `.ttf` preview on hover.
+  - Font installation (placeholder).
 
-### Mejorado
+### Improved
 - **Image Editor**:
-  - Añadido botón "Rotate 90°".
-  - Añadido botón "Flip H/V".
-  - Mejorado el layout responsivo (VIEW, TRANSFORM, COLOR, SYSTEM, CREATIVE).
+  - Added "Rotate 90°" button.
+  - Added "Flip H/V" button.
+  - Improved responsive layout (VIEW, TRANSFORM, COLOR, SYSTEM, CREATIVE).
 
 </details>
 
 <details>
-<summary><h2>[0.4.0] - 2026-01-04 (FASE 2: PATHS & REFACTOR)</h2></summary>
+<summary><h2>[0.4.0] - 2026-01-04 (PHASE 2: PATHS & REFACTOR)</h2></summary>
 
-### Añadido
-- **Sistema de Paths (Navegación)**:
-  - Detección inteligente de `require`, `read_file`, `write_file`.
-  - Detección de cadenas JSON y CSV.
-  - Enlaces clickeables (Open file).
-- **Refactorización Modular**:
-  - Separación estricta: `core`, `sprites`, `paths`, `colors`.
-  - Eliminación de dependencias circulares.
-  - Carga diferida (autoloads).
-
-</details>
-
-<details>
-<summary><h2>[0.3.0] - 2026-01-03 (FASE 1: SPRITES & COLORS)</h2></summary>
-
-### Añadido
-- **Sistema de Sprites**:
-  - Miniaturas inline (tamaño fuente).
-  - Tooltip básico.
-- **Sistema de Colores**:
-  - Detección de Arrays RGB `[255, 0, 0]`.
-  - Detección de Hashes `{r: 255, ...}`.
-  - Overlay de color real.
+### Added
+- **Path System (Navigation)**:
+  - Intelligent detection of `require`, `read_file`, `write_file`.
+  - JSON and CSV string detection.
+  - Clickable links (Open file).
+- **Modular Refactor**:
+  - Strict separation: `core`, `sprites`, `paths`, `colors`.
+  - Elimination of circular dependencies.
+  - Deferred loading (autoloads).
 
 </details>
 
 <details>
-<summary><h2>[0.1.0] - 2026-01-01 (INICIO)</h2></summary>
+<summary><h2>[0.3.0] - 2026-01-03 (PHASE 1: SPRITES & COLORS)</h2></summary>
 
-### Añadido
-- Estructura base del proyecto.
-- `dragonruby-mode.el` (esqueleto).
-- Detección básica de archivos `.rb`.
+### Added
+- **Sprite System**:
+  - Inline thumbnails (font size).
+  - Basic tooltip.
+- **Color System**:
+  - RGB Array detection `[255, 0, 0]`.
+  - Hash detection `{r: 255, ...}`.
+  - Real color overlay.
+
+</details>
+
+<details>
+<summary><h2>[0.1.0] - 2026-01-01 (START)</h2></summary>
+
+### Added
+- Project base structure.
+- `dragonruby-mode.el` (skeleton).
+- Basic detection of `.rb` files.
 
 </details>

@@ -1,25 +1,10 @@
-;;; dragonruby-concepts.el --- Concept Recognition Facade -*- lexical-binding: t; -*-
+;;; dragonruby-concepts.el --- Concept recognition manifest for DragonRuby -*- lexical-binding: t; -*-
 
 (require 'dragonruby-kernel)
-(require 'dragonruby-core)
-(require 'dragonruby-concept-visuals)
 
-;; 🧱 LEGACY MINOR MODES REMOVED
-
-;; -----------------------------------------------------------------------------
-;; 🧬 Lifecycle
-;; -----------------------------------------------------------------------------
-
-(defun dragonruby-concepts-enable ()
-  "Enable concept highlighting."
-  (dragonruby-kernel-register-hook 'dragonruby-scan-hook #'dragonruby--scan-concepts t)
-  (message "🧠 Concepts Module Enabled"))
-
-(defun dragonruby-concepts-disable ()
-  "Disable concept highlighting."
-  (remove-hook 'dragonruby-scan-hook #'dragonruby--scan-concepts t)
-  (dragonruby--clear-concept-overlays)
-  (message "🧠 Concepts Module Disabled"))
+;; Autoload implementation functions
+(autoload 'dragonruby-concepts-enable "dragonruby-concepts--impl")
+(autoload 'dragonruby-concepts-disable "dragonruby-concepts--impl")
 
 ;; -----------------------------------------------------------------------------
 ;; 📜 Manifest
@@ -31,7 +16,7 @@
  :namespace "dragonruby-concept-"
  :provides '(:visuals :code-education)
  :requires '(:guidance)
- :entry-point 'dragonruby-concepts
+ :entry-point 'dragonruby-concepts--impl
  :enable-fn #'dragonruby-concepts-enable
  :disable-fn #'dragonruby-concepts-disable)
 

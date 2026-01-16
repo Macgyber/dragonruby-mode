@@ -1,43 +1,43 @@
-#+TITLE: 📘 Cuaderno DragonRuby: [Nombre del Concepto]
-#+AUTHOR: Sr. Esteban
+#+TITLE: 📘 DragonRuby Workbook: [Concept Name]
+#+AUTHOR: Mr. Esteban
 #+OPTIONS: toc:2 num:nil
 #+STARTUP: overview indent
 
-* 🧭 Índice
-  - [[*Introducción][Introducción]]
-  - [[*Conceptos Clave][Conceptos Clave]]
-  - [[*Arquitectura][Arquitectura]]
-  - [[*Código Base][Código Base]]
-  - [[*Experimentos][Experimentos]]
-  - [[*Bitácora][Bitácora]]
+* 🧭 Index
+  - [[*Introduction][Introduction]]
+  - [[*Key Concepts][Key Concepts]]
+  - [[*Architecture][Architecture]]
+  - [[*Base Code][Base Code]]
+  - [[*Experiments][Experiments]]
+  - [[*Logbook][Logbook]]
 
-* 🌱 Introducción
-  Este documento es un mundo vivo sobre [Concepto].
-  Aquí no se toman notas: aquí se construye comprensión.
+* 🌱 Introduction
+  This document is a living world about [Concept].
+  Notes are not taken here: understanding is built.
 
-* 🧠 Conceptos Clave
-** [Concepto]
-   Definición humana y concisa.
+* 🧠 Key Concepts
+** [Concept]
+   Human and concise definition.
    #+begin_quote
-   “Cita o mantra sobre el concepto.”
+   “Quote or mantra about the concept.”
    #+end_quote
 
-* 🏗 Arquitectura
-  Explicación de cómo encaja esta pieza en el motor.
+* 🏗 Architecture
+  Explanation of how this piece fits into the engine.
   
-  | Propiedad | Propósito |
+  | Property  | Purpose   |
   |-----------+-----------|
   | p1        | desc      |
   | p2        | desc      |
 
-* 🧪 Código Base
-** Ejemplo Atómico
+* 🧪 Base Code
+** Atomic Example
 #+begin_src ruby
-# El código más simple que funciona
+# The simplest code that works
 #+end_src
 
-* 🧬 Experimentos
-  Ideas para probar los límites de este concepto.
+* 🧬 Experiments
+  Ideas to test the limits of this concept.
 
-* 📅 Bitácora
-  Registro de descubrimientos realizados sobre esta pieza.
+* 📅 Logbook
+  Record of discoveries made about this piece.

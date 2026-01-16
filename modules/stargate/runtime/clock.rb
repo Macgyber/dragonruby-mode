@@ -40,6 +40,8 @@ module Stargate
           :ok
         rescue => e
           # DEAD HAND ROLLBACK: Revert to the checkpoint
+          puts "[STARGATE_ERROR] CLOCK ERROR: #{e.message}"
+          puts e.backtrace.join("\n") if $gtk
           Injection.rollback!
           :error
         end

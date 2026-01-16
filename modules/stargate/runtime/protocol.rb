@@ -9,6 +9,7 @@ module Stargate
       # Transmits via DragonRuby Console for Emacs interception.
       def emit_moment(address, state_packet, seed)
         return unless $gtk
+        return unless state_packet # Law V: Cannot emit what we didn't capture.
 
         # Build JSON manually for maximum compatibility and protocol safety.
         # We escape the raw state data string and compact it to a single line.
@@ -17,7 +18,7 @@ module Stargate
         json_payload = "{\"type\":\"moment\",\"address\":\"#{address}\",\"hash\":\"#{state_packet[:hash]}\",\"seed\":#{seed},\"data\":\"#{data_json}\",\"observed_at\":#{Time.now.to_i}}"
 
         # [STARGATE_MOMENT] is for the Emacs Chronicler.
-        $gtk.console.log "[STARGATE_MOMENT] #{json_payload}"
+        puts "[STARGATE_MOMENT] #{json_payload}"
       end
 
       def emit_branch(new_id, parent_id, divergence_frame)
@@ -29,7 +30,7 @@ module Stargate
           "\"parent\":\"#{parent_id}\"," \
           "\"divergence\":#{divergence_frame}" \
           "}"
-        $gtk.console.log "[STARGATE_MOMENT] #{json_payload}"
+        puts "[STARGATE_MOMENT] #{json_payload}"
       end
     end
   end

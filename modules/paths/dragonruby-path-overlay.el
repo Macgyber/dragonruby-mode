@@ -62,7 +62,7 @@ Designed for high-frequency execution during the Kernel pulse."
                  (start (match-beginning 0))
                  (end (match-end 0))
                  (type (cond ((string= cmd "require_relative") 'require_relative)
-                             ((member cmd '("require" "load" "load_script")) 'ruby)
+                             ((member cmd '("require" "load" "load_script")) 'require)
                              (t 'data)))
                  (abs (dragonruby--resolve-path raw type))
                  ;; Only work if it's a valid string

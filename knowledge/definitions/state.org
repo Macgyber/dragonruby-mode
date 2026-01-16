@@ -1,37 +1,37 @@
-#+TITLE: 📘 Cuaderno DragonRuby: State
-#+AUTHOR: Sr. Esteban
+#+TITLE: 📘 DragonRuby Workbook: State
+#+AUTHOR: Mr. Esteban
 #+OPTIONS: toc:2 num:nil
 #+STARTUP: overview indent
 
-* 🧭 Índice
-  - [[*Introducción][Introducción]]
-  - [[*Conceptos Clave][Conceptos Clave]]
-  - [[*La Persistencia][La Persistencia]]
-  - [[*Código Base][Código Base]]
-  - [[*Bitácora][Bitácora]]
+* 🧭 Index
+  - [[*Introduction][Introduction]]
+  - [[*Key Concepts][Key Concepts]]
+  - [[*Persistence][Persistence]]
+  - [[*Base Code][Base Code]]
+  - [[*Logbook][Logbook]]
 
-* 🌱 Introducción
-  Este documento custodia la memoria del universo: el objeto *State*.
-  Sin `state`, el juego no tiene pasado ni futuro, solo un presente eterno.
+* 🌱 Introduction
+  This document guards the memory of the universe: the *State* object.
+  Without `state`, the game has no past or future, only an eternal present.
 
-* 🧠 Conceptos Clave
+* 🧠 Key Concepts
 ** State
-   La base de datos dinámica de tu juego. DragonRuby la guarda automáticamente.
+   The dynamic database of your game. DragonRuby saves it automatically.
    #+begin_quote
-   “El estado es la suma de todas las decisiones tomadas.”
+   “State is the sum of all decisions made.”
    #+end_quote
 
-* 🏗 La Persistencia
+* 🏗 Persistence
 ** Open Entity
-   `args.state` es un objeto "Open Entity". Puedes añadirle cualquier propiedad en cualquier momento sin definir clases.
+   `args.state` is an "Open Entity" object. You can add any property to it at any time without defining classes.
 
-** Estructura sugerida
-   - state.player :: Datos del protagonista.
-   - state.score :: La gloria acumulada.
-   - state.game_over :: La sombra del fin.
+** Suggested Structure
+   - state.player :: Protagonist data.
+   - state.score :: Accumulated glory.
+   - state.game_over :: The shadow of the end.
 
-* 🧪 Código Base
-** Inicialización
+* 🧪 Base Code
+** Initialization
 #+begin_src ruby
 def tick args
   args.state.player.x ||= 100
@@ -39,9 +39,9 @@ def tick args
 end
 #+end_src
 
-* 🧬 Pasillos Secretos
-  - [[file:args.org][📕 Volver a Args]]
+* 🧬 Secret Passageways
+  - [[file:args.org][📕 Back to Args]]
 
-* 📅 Bitácora
+* 📅 Logbook
 ** 2026-01-12
-   Hoy la memoria del juego se volvió inmortal en este cuaderno.
+   Today the memory of the game became immortal in this workbook.

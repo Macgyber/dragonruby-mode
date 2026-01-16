@@ -58,7 +58,7 @@
 ```elisp
 (package-vc-install "https://github.com/Macgyber/dragonruby-mode")
 
-;; Luego añade a tu init.el:
+;; Then add to your init.el:
 (add-hook 'ruby-mode-hook #'dragonruby-maybe-enable)
 (add-hook 'ruby-ts-mode-hook #'dragonruby-maybe-enable)
 ```
@@ -100,7 +100,7 @@ git submodule init
 
 ### MELPA
 ```elisp
-;; Cuando esté disponible en MELPA:
+;; When available on MELPA:
 (use-package dragonruby-mode
   :ensure t
   :hook ((ruby-mode . dragonruby-maybe-enable)
@@ -176,4 +176,4 @@ M-x dragonruby-mode
 
 ---
 
-**DragonRuby Emacs Mode — Universal Installation v0.7.3**
+**DragonRuby Emacs Mode — Universal Installation v0.7.4**

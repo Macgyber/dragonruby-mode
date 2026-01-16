@@ -11,11 +11,16 @@ module Stargate
         begin
           # Law V: SHA-256 state tracking
           raw_data = $gtk.serialize_state
+          unless raw_data
+            puts "[STARGATE_WARNING] Serialization returned EMPTY data."
+            return nil
+          end
+          
           hash = $gtk.sha256(raw_data)
           
           { data: raw_data, hash: hash }
         rescue => e
-          $gtk.console.log "ERROR: Stargate State Capture Failed: #{e.message}"
+          puts "[STARGATE_ERROR] State Capture Failed: #{e.message}"
           nil
         end
       end

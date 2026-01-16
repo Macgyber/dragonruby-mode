@@ -1,11 +1,11 @@
-#+TITLE: 🗺 Catálogo Maestro: Biblioteca DragonRuby
-#+AUTHOR: Sr. Esteban
+#+TITLE: 🗺 Master Catalog: DragonRuby Library
+#+AUTHOR: Mr. Esteban
 #+OPTIONS: toc:2 num:nil
 #+STARTUP: overview indent
 
-* 🧭 Guía de Navegación
-  Este archivo es el Sistema Nervioso Central del conocimiento. 
-  Aquí se enlazan los símbolos del código con los tomos sagrados de documentación.
+* 🧭 Navigation Guide
+  This file is the Central Nervous System of knowledge. 
+  Here code symbols are linked with the sacred volumes of documentation.
 
 * Sprite
 :PROPERTIES:

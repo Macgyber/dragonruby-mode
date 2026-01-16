@@ -11,11 +11,18 @@ The Kernel is the absolute authority. It manages:
 1.  **Registry**: Which modules exist (`dragonruby-register-module`).
 2.  **Lifecycle**: Enabling/Disabling modules (`dragonruby-enable`).
 3.  **Dependency Resolution**: Ensuring `sprite-tools` logic waits for `sprites` logic.
+4.  **Lazy Loading**: The Kernel manages the loading of implementation files (`--impl.el`) only when needed.
 
 ### The Three Laws
 1.  **Namespace Law**: Every module MUST own its namespace (e.g., `dragonruby-sprite-`).
 2.  **Capability Law**: Modules provide/require capabilities (e.g., `:rendering`, `:audio`).
 3.  **Cold Boot Law**: The system starts with ZERO active modules.
+
+## 📄 Manifest vs. Implementation Split
+
+To ensure MELPA compliance and deterministic loading:
+- **Manifests** (`dragonruby-<feature>.el`): Contain only registration and `autoloads`. They are always loaded at startup to register capabilities.
+- **Implementations** (`dragonruby-<feature>--impl.el`): Contain all functions, variables, and modes. They are only loaded from disk when the module is activated.
 
 ## 🧱 Module Structure
 
@@ -48,11 +55,11 @@ dragonruby-mode/
 1.  **Load**: Emacs loads `dragonruby-mode.el`.
     *   It adds `modules/*` to `load-path`.
     *   It requires the **Kernel**.
-    *   It requires all module entry points (Manifest Registration).
-2.  **Activation**: User runs `M-x dragonruby-mode`.
+    *   It requires all module **Manifests** (Lightweight registration).
+2.  **Activation**: User runs `M-x dragonruby-mode` or auto-activation triggers.
     *   `dragonruby-mode` calls `(dragonruby-scheduler-enable)`.
     *   `dragonruby-mode` checks `defcustom` flags (e.g. `dragonruby-enable-sprites`).
-    *   It calls `(dragonruby-enable 'sprites)` -> Kernel resolves dependencies -> Module goes ONLINE.
+    *   It calls `(dragonruby-enable 'sprites)` -> Kernel requires the **Implementation** (`--impl.el`) -> Module goes ONLINE.
 
 ## 🧘 Visual Policy (The "Good Citizen" Protocol)
 
@@ -63,4 +70,4 @@ DragonRuby Mode follows a strict "Observe and Paint" philosophy.
 
 ---
 
-*DragonRuby Emacs Mode — v0.7.2*
+*DragonRuby Emacs Mode — v0.7.4*

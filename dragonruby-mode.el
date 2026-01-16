@@ -1,7 +1,7 @@
 ;;; dragonruby-mode.el --- Semantic tooling for DragonRuby (Kernel Architecture) -*- lexical-binding: t; -*-
 
 ;; Author: Macgyber <esteban3261g@gmail.com>
-;; Version: 0.7.3
+;; Version: 0.7.4
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: games, dragonruby, tools
 ;; URL: https://github.com/Macgyber/dragonruby-mode
@@ -18,33 +18,27 @@
 ;; 🧱 Bootloader (Load Path & Registry)
 ;; -----------------------------------------------------------------------------
 
+(defun dragonruby--setup-load-path ()
+  "Setup the load path for DragonRuby mode modules."
+  (let* ((load-path-source (or load-file-name (buffer-file-name)))
+         (plugin-root (and load-path-source (file-name-directory load-path-source))))
+    (when plugin-root
+      (let ((mod-dir (expand-file-name "modules" plugin-root)))
+        ;; Core
+        (add-to-list 'load-path (expand-file-name "core" mod-dir))
+        
+        ;; Features
+        (dolist (dir '("sprites" "sprites/tools" "fonts" "fonts/tools" 
+                       "audio" "colors" "paths" "concepts" "completion" "guide"))
+          (add-to-list 'load-path (expand-file-name dir mod-dir)))
+        
+        ;; Stargate
+        (dolist (dir '("stargate/emacs" "stargate/protocol" "stargate/sessions"))
+          (add-to-list 'load-path (expand-file-name dir mod-dir)))))))
+
+;; Initialize Load Path
 (eval-and-compile
-  (let* ((load-file-path (or load-file-name (buffer-file-name)))
-         (root-dir (file-name-directory load-file-path))
-         (mod-dir (expand-file-name "modules" root-dir)))
-    
-    ;; Core
-    (add-to-list 'load-path (expand-file-name "core" mod-dir))
-    
-    ;; Features
-    (add-to-list 'load-path (expand-file-name "sprites" mod-dir))
-    (add-to-list 'load-path (expand-file-name "sprites/tools" mod-dir))
-    (add-to-list 'load-path (expand-file-name "fonts" mod-dir))
-    (add-to-list 'load-path (expand-file-name "fonts/tools" mod-dir))
-    (add-to-list 'load-path (expand-file-name "audio" mod-dir))
-    (add-to-list 'load-path (expand-file-name "colors" mod-dir))
-    (add-to-list 'load-path (expand-file-name "paths" mod-dir))
-    (add-to-list 'load-path (expand-file-name "concepts" mod-dir))
-    (add-to-list 'load-path (expand-file-name "completion" mod-dir))
-    (add-to-list 'load-path (expand-file-name "guide" mod-dir))
-    
-    ;; Stargate (The Time Machine)
-    (let ((stargate-emacs (expand-file-name "stargate/emacs" mod-dir))
-          (stargate-proto (expand-file-name "stargate/protocol" mod-dir))
-          (stargate-sess  (expand-file-name "stargate/sessions" mod-dir)))
-      (add-to-list 'load-path stargate-emacs)
-      (add-to-list 'load-path stargate-proto)
-      (add-to-list 'load-path stargate-sess))))
+  (dragonruby--setup-load-path))
 
 ;; 1. Initialize Kernel
 (require 'dragonruby-kernel)
@@ -71,20 +65,20 @@
 ;; ⚙️ Configuration (Feature Flags)
 ;; -----------------------------------------------------------------------------
 
-(defcustom dragonruby-enable-sprites nil "Enable sprite system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-sprite-tools nil "Enable sprite tools." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-fonts nil "Enable font system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-font-tools nil "Enable font tools." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-audio nil "Enable audio system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-colors nil "Enable color system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-picker nil 
+(defcustom dragonruby-enable-sprites t "Enable sprite system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-sprite-tools t "Enable sprite tools." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-fonts t "Enable font system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-font-tools t "Enable font tools." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-audio t "Enable audio system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-colors t "Enable color system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-picker t 
   "Enable color picker. ⚠️ EXPERIMENTAL: Interaction model may change." 
   :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-paths nil "Enable path system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-concepts nil "Enable concept system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-paths t "Enable path system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-concepts t "Enable concept system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-completion t "Enable completion system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-stargate nil "Enable Stargate time-traveling system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-guide nil "Enable knowledge guidance system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-stargate t "Enable Stargate time-traveling system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-guide t "Enable knowledge guidance system." :type 'boolean :group 'dragonruby)
 
 ;; -----------------------------------------------------------------------------
 ;; 🎮 Session Manager (The Mode)
@@ -116,7 +110,7 @@
           (cl-labels ((activate-mod (mod var &optional req-mod)
                         (let ((is-enabled (symbol-value var)))
                           (if is-enabled
-                              (if (or (not req-mod) (dragonruby-module-status req-mod) (eq (dragonruby-module-status req-mod) :active))
+                              (if (or (not req-mod) (eq (dragonruby-module-status req-mod) :active))
                                   (progn
                                     (dragonruby-enable mod)
                                     (push (format "🧠 Kernel: Module [%s] ENABLED" mod) enabled-msgs))
@@ -159,19 +153,55 @@
 (defun dragonruby--shutdown-session ()
   "Shutdown the local session."
   (dragonruby-scheduler-disable)
-  (dragonruby-kernel-reset-live)
+  (dragonruby-kernel-buffer-cleanup)
   (message "【 🐉 】 DragonRuby Mode Shutdown Complete."))
+
+(defcustom dragonruby-auto-activation-modes '(ruby-mode image-mode conf-mode)
+  "List of major modes that trigger auto-detection of DragonRuby project."
+  :type '(repeat symbol)
+  :group 'dragonruby)
 
 ;;;###autoload
 (defun dragonruby-maybe-enable ()
   "Enable `dragonruby-mode' only if in a DragonRuby project."
-  (let ((root (dragonruby--find-project-root)))
-    (if (and (not dragonruby-mode) root)
-        (dragonruby-mode 1))))
+  (when (and (not dragonruby-mode)
+             (or (member major-mode dragonruby-auto-activation-modes)
+                 (let ((ext (file-name-extension (or (buffer-file-name) ""))))
+                   (member ext '("rb" "png" "jpg" "jpeg" "gif" "bmp" "webp" "ttf" "otf" "wav" "ogg")))))
+    (let ((root (dragonruby--find-project-root t))) ;; Always quiet in hooks
+      (when root
+        (dragonruby-mode 1)))))
 
 ;; Register hooks
 (add-hook 'find-file-hook #'dragonruby-maybe-enable)
 (add-hook 'ruby-mode-hook #'dragonruby-maybe-enable)
+(add-hook 'image-mode-hook #'dragonruby-maybe-enable)
+
+(defun dragonruby-reset-and-reload ()
+  "Force a full system reset and reload from current configuration.
+Use this to apply changes made to `.emacs` without restarting Emacs."
+  (interactive)
+  (message "🌀 DragonRuby: Syncing Reality...")
+  ;; 0. Evaluation of user config (Look for .emacs in plugin root or use current buffer)
+  (let* ((load-path-source (or load-file-name (buffer-file-name)))
+         (plugin-root (and load-path-source (file-name-directory load-path-source)))
+         (config-file (and plugin-root (expand-file-name ".emacs" plugin-root))))
+    (if (and config-file (file-exists-p config-file))
+        (load config-file)
+      (when (string-match-p "\\.emacs$" (or (buffer-file-name) ""))
+        (eval-buffer))))
+  
+  ;; 1. Global Reset (Kills all active activity)
+  (dragonruby-kernel-system-shutdown)
+  ;; 2. Re-evaluate the local mode file and core libs (to refresh registry)
+  (load "dragonruby-mode")
+  (load "dragonruby-utils")
+  ;; 3. Scan all buffers and re-enable if applicable
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (when (dragonruby--find-project-root)
+        (dragonruby-mode 1))))
+  (message "✨ DragonRuby: Reality Synced. Configuration Applied."))
 
 (message "【 🐉 】 DragonRuby Mode (Lego) LOADED.")
 

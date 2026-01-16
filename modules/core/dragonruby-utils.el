@@ -8,46 +8,57 @@
 (defvar-local dragonruby--project-root-last-dir nil
   "Last directory used to calculate the project root.")
 
-(defvar dragonruby--global-project-root nil
-  "Last confirmed valid project root (Global fallback).")
+(defvar dragonruby--last-detected-project-root nil
+  "Last confirmed valid project root (For reference only).")
 
-(defun dragonruby--find-project-root ()
+(defun dragonruby--find-project-root (&optional quiet)
   "Locate the DragonRuby project root directory safely.
+If QUIET is non-nil, suppress diagnostic messages.
 Prioritizes the folder containing the 'dragonruby' binary (The Master Root)."
-  (unless (string= default-directory dragonruby--project-root-last-dir)
+  (unless (equal default-directory dragonruby--project-root-last-dir)
     (setq-local dragonruby--project-root-cache nil)
     (setq-local dragonruby--project-root-last-dir default-directory))
 
   (let ((db-root (or dragonruby--project-root-cache
                      (let* ((search-dir default-directory)
-                            ;; 1. Absolute Priority: The folder with the Binary
+                            ;; 1. Absolute Priority: The folder with the actual Binary (The Toolkit Root)
                             (binary-root (locate-dominating-file search-dir
                                            (lambda (dir)
                                              (or (file-exists-p (expand-file-name "dragonruby" dir))
                                                  (file-exists-p (expand-file-name "dragonruby-macos" dir))
                                                  (file-exists-p (expand-file-name "dragonruby.exe" dir))))))
-                            ;; 2. Sub-Root Fallback: The folder with the app code
+                            ;; 2. Sub-Root Fallback: The folder with code or markers (The Sovereign Root)
                             (content-root (locate-dominating-file search-dir
                                             (lambda (dir)
-                                              (or (file-exists-p (expand-file-name "app/main.rb" dir))
-                                                  (file-exists-p (expand-file-name "mygame" dir))))))
-                            ;; 3. Development Fallback: Plugin folders
-                            (dev-root (locate-dominating-file search-dir
-                                        (lambda (dir)
-                                          (or (file-exists-p (expand-file-name ".git" dir))
-                                              (file-exists-p (expand-file-name "dragonruby-mode.el" dir)))))))
+                                              (let ((has-main (file-exists-p (expand-file-name "main.rb" dir)))
+                                                    (is-app-dir (string-suffix-p "app/" (file-name-as-directory dir))))
+                                                (or (file-exists-p (expand-file-name "app/main.rb" dir))
+                                                    (and has-main (not is-app-dir)) ;; Only count main.rb if NOT in /app/
+                                                    (file-exists-p (expand-file-name "mygame" dir))
+                                                    (file-exists-p (expand-file-name "metadata" dir))
+                                                    (file-exists-p (expand-file-name "metadata.xml" dir))
+                                                    (file-exists-p (expand-file-name ".dragonruby" dir))))))))
                        
-                       (or binary-root content-root dev-root)))))
-    (when db-root
-      (let ((abs-root (expand-file-name db-root)))
-        (setq-local dragonruby--project-root-cache abs-root)
-        ;; If it's a real project root (contains binary or app), update global fallback
-        (when (or (file-exists-p (expand-file-name "dragonruby" abs-root))
-                  (file-exists-p (expand-file-name "app/main.rb" abs-root)))
-          (setq dragonruby--global-project-root abs-root))))
-    
-    ;; Use local cache followed by global fallback
-    (or db-root dragonruby--global-project-root)))
+                        ;; Prefer content-root (Sovereign) over binary-root (Master)
+                        ;; This ensures that game-specific assets are found even if the binary is in a parent folder.
+                        (or content-root binary-root)))))
+    (if db-root
+        (let ((abs-root (expand-file-name db-root)))
+          ;; Only message if the cache was empty (first detection in this buffer)
+          (unless (or quiet dragonruby--project-root-cache)
+            (message "🐲 Radar: Detected Root [%s] for buffer [%s]" abs-root (buffer-name)))
+          
+          (setq-local dragonruby--project-root-cache abs-root)
+          ;; Update reference only
+          (when (or (file-exists-p (expand-file-name "dragonruby" abs-root))
+                    (file-exists-p (expand-file-name "app/main.rb" abs-root))
+                    (file-exists-p (expand-file-name "main.rb" abs-root))
+                    (file-exists-p (expand-file-name "metadata" abs-root))
+                    (file-exists-p (expand-file-name "metadata.xml" abs-root)))
+            (setq dragonruby--last-detected-project-root abs-root))
+          abs-root)
+      ;; No root found for this buffer
+      nil)))
 
 (defun dragonruby--cache-dir (subdir)
   "Return a safe cache directory path in .emacs.d/dragonruby/SUBDIR.
@@ -119,7 +130,7 @@ Ensures the directory exists."
 (defun dragonruby--resolve-path (raw-path type-or-extensions &optional allow-examples)
   "Resolve RAW-PATH based on TYPE-OR-EXTENSIONS."
   (let* ((root (dragonruby--find-project-root))
-         (current-dir (file-name-directory (or buffer-file-name default-directory))))
+         (current-dir (file-name-directory (or (buffer-file-name) default-directory))))
     (if (listp type-or-extensions)
         (let ((clean-path (string-trim (string-trim raw-path "['\"]") "['\"]")))
           (when (and root (not (string-empty-p clean-path)))
@@ -132,9 +143,9 @@ Ensures the directory exists."
       (let* ((type type-or-extensions)
              (base-dir (cond
                         ((eq type 'require_relative) current-dir)
-                        ((memq type '(sprite audio font data)) (or root current-dir))
+                        ((memq type '(require ruby sprite audio font data)) (or root current-dir))
                         (t (or root current-dir))))
-             (ensure-rb (memq type '(require require_relative)))
+             (ensure-rb (memq type '(require ruby require_relative)))
              (path (if (and ensure-rb (not (string-suffix-p ".rb" raw-path)))
                        (concat raw-path ".rb")
                      raw-path))
@@ -152,7 +163,7 @@ Ensures the directory exists."
 Includes a small margin (padding) to make scrolling smoother."
   (if (get-buffer-window (current-buffer))
       (let* ((start (window-start))
-             (end (window-end nil t))
+             (end (or (window-end nil t) (point-max)))
              (padding 3000))
         (cons (max (point-min) (- start padding))
               (min (point-max) (+ end padding))))
@@ -182,10 +193,18 @@ Launches as an Emacs subprocess to allow Stargate cable hookup."
   (interactive)
   (let* ((root (dragonruby--find-project-root))
          (binary (if (eq system-type 'windows-nt) "dragonruby.exe" "dragonruby"))
+         ;; 1. Use detected root as primary
          (binary-path (and root (expand-file-name binary root))))
+    
+    ;; 2. If not in root, look upwards (Hierarchy Alignment)
+    (unless (and binary-path (file-exists-p binary-path))
+      (let ((parent-binary (locate-dominating-file (or root default-directory) binary)))
+        (when parent-binary
+          (setq binary-path (expand-file-name binary parent-binary)))))
+
     (if (and binary-path (file-exists-p binary-path))
-        (let ((default-directory root))
-          (message "🐉 Stargate: Launching simulation from %s..." root)
+        (let ((default-directory (file-name-directory binary-path)))
+          (message "🐉 Stargate: Launching simulation from %s..." default-directory)
           ;; Kill existing process if any to avoid port/file conflicts
           (when (get-process "dragonruby")
             (delete-process "dragonruby"))
@@ -199,7 +218,7 @@ Launches as an Emacs subprocess to allow Stargate cable hookup."
             (display-buffer "*DragonRuby Simulation*")
             (message "🚀 STARGATE: Simulation active. Cable connection pending...")))
       (if root
-          (error "🐉 STARGATE: Binary 'dragonruby' not found in root: %s" root)
+          (error "🐉 STARGATE: Binary 'dragonruby' not found in root or parents: %s" root)
         (error "🐉 STARGATE: No project root found. Switch to your game code (main.rb) first!")))))
 
 (defun dragonruby-set-project-root (dir)
@@ -208,19 +227,48 @@ Use this if auto-detection fails or points to the wrong folder."
   (interactive "DSet DragonRuby Project Root: ")
   (let ((abs-path (expand-file-name dir)))
     (setq-local dragonruby--project-root-cache abs-path)
-    (setq dragonruby--global-project-root abs-path)
-    (message "🐲 Project Root manually set to: %s" abs-root)))
+    (setq dragonruby--last-detected-project-root abs-path)
+    (message "🐲 Project Root manually set to: %s" abs-path)))
 
 (defun dragonruby-diagnose ()
-  "Show complete diagnostic information."
+  "Show complete diagnostic information, including module lifecycle status."
   (interactive)
-  (let ((buf (get-buffer-create "*DragonRuby Diagnostics*")))
+  (let ((buf (get-buffer-create "*DragonRuby Diagnostics*"))
+        (root (dragonruby--find-project-root))
+        (modules (dragonruby-kernel-get-registered-modules)))
     (with-current-buffer buf
+      (read-only-mode -1)
       (erase-buffer)
-      (insert "🐲 DragonRuby Mode Diagnostics\n================================\n\n")
-      (insert (format "Project Root: %s\n" (or (dragonruby--find-project-root) "NOT FOUND")))
-      (insert (format "ImageMagick: %s\n" (if (or (executable-find "magick") (executable-find "convert")) "✅ FOUND" "❌ NOT FOUND")))
-      (insert "\nRun M-x dragonruby-mode to toggle the mode.\n"))
+      (insert "🐲 DragonRuby Mode Diagnostics (v0.7.3)\n")
+      (insert "========================================\n\n")
+      
+      (insert "📂 Project Sovereignty:\n")
+      (insert (format "   Project Root: %s\n" (or root "NOT FOUND (Radar Blind)")))
+      (insert (format "   Last Detected: %s\n" (or dragonruby--last-detected-project-root "NONE")))
+      
+      (insert "\n⚙️  External Assets:\n")
+      (insert (format "   ImageMagick:  %s\n" (if (or (executable-find "magick") (executable-find "convert")) "✅ FOUND" "❌ NOT FOUND")))
+      
+      (insert "\n🧩 Lego Module Registry:\n")
+      (insert "   NAME             TYPE      STATUS    REQUIRES\n")
+      (insert "   ----             ----      ------    --------\n")
+      (dolist (m modules)
+        (let* ((name (plist-get m :name))
+               (type (plist-get m :type))
+               (status (dragonruby-module-status name))
+               (reqs (plist-get m :requires)))
+          (insert (format "   %-16s %-9s %-9s %s\n" 
+                          name 
+                          (or type "main")
+                          (if (eq status :active) "✅ ACTIVE" "💤 INERT")
+                          (or reqs "none")))))
+      
+      (insert "\n💡 Note: If a module is 'INERT' but enabled in .emacs, \n")
+      (insert "   run M-x dragonruby-reset-and-reload to sync reality.\n")
+      
+      (insert "\n--- End of Ledger ---")
+      (goto-char (point-min))
+      (read-only-mode 1))
     (display-buffer buf)))
 
 (provide 'dragonruby-utils)

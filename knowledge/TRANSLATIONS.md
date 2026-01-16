@@ -77,19 +77,19 @@ Example: `[Translation] Español: tick.org`
 ```org
 #+TITLE: tick — DragonRuby Entry Point
 #+LANGUAGE: es
-#+DESCRIPTION: Punto de entrada principal del motor
+#+DESCRIPTION: Main engine entry point
 
-* Definición
+* Definition
   ...
 
-* Ejemplo
+* Example
   #+BEGIN_SRC ruby
   def tick(args)
     # Code stays in English/Ruby
   end
   #+END_SRC
 
-* Conceptos relacionados
+* Related concepts
   - [[file:args.org][args]]
 ```
 
@@ -104,4 +104,4 @@ Example: `[Translation] Español: tick.org`
 
 ---
 
-*DragonRuby Emacs Mode — v0.7.2*
+*DragonRuby Emacs Mode — v0.7.4*

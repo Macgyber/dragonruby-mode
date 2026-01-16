@@ -240,4 +240,4 @@ You can add your own snippets to the system using the `dragonruby-registry`. Add
 
 ---
 
-*DragonRuby Emacs Mode — v0.7.2*
+*DragonRuby Emacs Mode — v0.7.4*

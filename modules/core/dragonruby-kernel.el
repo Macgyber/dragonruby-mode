@@ -111,17 +111,32 @@ Only for Cold Boot or Unit Tests. NEVER for Hot Reload."
   (clrhash dragonruby--capabilities)
   (message "🧠 Kernel: Registry Wiped (Cold Boot)."))
 
-(defun dragonruby-kernel-reset-live ()
-  "OS-LEVEL EXORCISM: Kill all running DragonRuby activity."
+(defun dragonruby-kernel-buffer-cleanup ()
+  "Surgically deactivate all modules in the current buffer only.
+Does NOT affect other buffers or global Kernel state."
+  (let* ((active-hash (dragonruby--active-hash))
+         (active (cl-loop for k being the hash-keys in active-hash collect k)))
+    (when active
+      (message "🧹 Kernel: Cleaning up buffer [%s]..." (buffer-name))
+      (dolist (name active)
+        (ignore-errors (dragonruby-disable name)))
+      ;; Also purge local hooks specifically registered here
+      (dolist (pair dragonruby--live-hooks)
+        (let ((hook (car pair)) (fn (cdr pair)))
+          (remove-hook hook fn t))))))
+
+(defun dragonruby-kernel-system-halt ()
+  "OS-LEVEL EXORCISM: Kill all running DragonRuby activity globally.
+Caution: This wipes state across all buffers."
   (interactive)
-  (message "🧹 Kernel: EXORCISM START...")
+  (message "🧹 Kernel: GLOBAL SYSTEM HALT START...")
 
   ;; 1. Kill Timers
   (dolist (timer dragonruby--live-timers)
     (ignore-errors (cancel-timer timer)))
   (setq dragonruby--live-timers nil)
 
-  ;; 2. Remove Hooks
+  ;; 2. Remove Global Hooks
   (dolist (pair dragonruby--live-hooks)
     (ignore-errors (remove-hook (car pair) (cdr pair))))
   (setq dragonruby--live-hooks nil)
@@ -131,14 +146,13 @@ Only for Cold Boot or Unit Tests. NEVER for Hot Reload."
     (ignore-errors (delete-process proc)))
   (setq dragonruby--live-processes nil)
 
-  ;; 4. Module Cleanup
+  ;; 4. Module Cleanup across all buffers
   (dolist (buf (buffer-list))
     (with-current-buffer buf
-      (let ((active (cl-loop for k being the hash-keys in (dragonruby--active-hash) collect k)))
-        (dolist (name active)
-          (ignore-errors (dragonruby-disable name))))))
+      (when (bound-and-true-p dragonruby-mode)
+        (dragonruby-kernel-buffer-cleanup))))
 
-  ;; 5. Safety Net
+  ;; 5. Safety Net (Force kill any leaked timers)
   (dolist (timer (append timer-list timer-idle-list))
     (let* ((fn (timer--function timer))
            (fn-name (cond ((symbolp fn) (symbol-name fn))
@@ -146,7 +160,12 @@ Only for Cold Boot or Unit Tests. NEVER for Hot Reload."
       (when (string-prefix-p "dragonruby-" fn-name)
         (cancel-timer timer))))
 
-  (message "🧹 Kernel: System Halted."))
+  (message "🧹 Kernel: Global System Halted."))
+
+(defun dragonruby-kernel-reset-live ()
+  "Deprecated: Use dragonruby-kernel-system-halt instead."
+  (interactive)
+  (dragonruby-kernel-system-halt))
 
 (defun dragonruby-kernel-system-shutdown ()
   "Full system shutdown."
@@ -248,6 +267,7 @@ STACK prevents circular dependencies."
 
 (defun dragonruby-enable (module-name &optional stack)
   "Activate MODULE-NAME and its dependencies for the current buffer."
+  (message "🧠 Kernel: Processing ENABLE [%s]..." module-name)
   (let ((active-hash (dragonruby--active-hash))
         (stack (or stack (list module-name))))
     (unless (gethash module-name active-hash)
@@ -328,6 +348,12 @@ STACK prevents circular dependencies."
     ;; 3. Mark Inactive
     (remhash module-name active-hash)
     (message "🧠 Kernel: Module [%s] DISABLED and PURGED" module-name))))
+
+(defun dragonruby-kernel-get-registered-modules ()
+  "Return a list of all registered module manifests."
+  (let (acc)
+    (maphash (lambda (_k v) (push v acc)) dragonruby--modules)
+    (reverse acc)))
 
 (defun dragonruby-module-status (module-name)
   (if (gethash module-name (dragonruby--active-hash)) :active :inactive))
