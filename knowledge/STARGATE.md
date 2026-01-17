@@ -34,6 +34,19 @@ You don't need manual commands. When you save your code, Stargate injects it dir
 
 ---
 
+## 🚑 Critical Performance & Troubleshooting
+
+### 🪚 `M-x dragonruby-kernel-system-halt` (Emergency Exorcism)
+**The Ultimate Authority.**
+If you experience an exponential rise in CPU usage or the system becomes unstable after a complex reload, execute this command immediately.
+- **What it does**: It surgically identifies and terminates ALL active timers, event loops, and background processes of the DragonRuby Mode.
+- **Goal**: Returns the CPU to idle (e.g., from 97% to 2%) and purges all zombie states from Emacs memory. 
+- **Recovery**: After halting, you can safely re-enable the mode with `M-x dragonruby-stargate-enable`.
+
+---
+
+---
+
 ## 🚦 Nexus Signals (Mode-line)
 
 - 🌌 **Ecstasy of Synchrony (Bright Blue)**: The portal is open, and time flows safely between Emacs and DragonRuby.

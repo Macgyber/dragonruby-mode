@@ -24,3 +24,6 @@ dev/
 # Tests (Private)
 test/
 !test/modules/
+# System & Meta
+.stargate/
+**/*.dr-stargate

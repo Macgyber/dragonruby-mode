@@ -4,7 +4,6 @@
 (require 'dragonruby-utils)
 
 (defvar dragonruby-stargate-bridge--process nil)
-(defvar dragonruby-stargate-bridge--partial-buffer "")
 
 (defvar-local dragonruby-stargate-bridge-event-hook nil
   "Hook run when a Stargate event is received from the runtime.")
@@ -13,33 +12,39 @@
   "Remove ANSI escape codes from STRING."
   (replace-regexp-in-string "\e\\[[0-9;]*[a-zA-Z]" "" string))
 
-(defun dragonruby-stargate-bridge--filter (_process output)
-  "Filter and capture [STARGATE_MOMENT] events from PROCESS OUTPUT."
-  ;; 1. Accumulate raw output (Fragmentation handling)
-  (setq dragonruby-stargate-bridge--partial-buffer 
-        (concat dragonruby-stargate-bridge--partial-buffer output))
-  
-  ;; 2. Process complete lines only
-  (while (string-match "\\(\\[STARGATE_MOMENT\\].*\\)\\(?:\n\\|\r\n\\)" 
-                       dragonruby-stargate-bridge--partial-buffer)
-    (let* ((line (match-string 1 dragonruby-stargate-bridge--partial-buffer))
-           (clean-line (dragonruby-stargate-bridge--strip-ansi line))
-           (end-pos (match-end 0)))
-      
-      (if (string-match "{.*}" clean-line)
-          (let ((json-packet (match-string 0 clean-line)))
-            (message "📡 Stargate Bridge: Found moment packet (%d bytes)" (length json-packet))
-            (dragonruby-stargate-bridge-handle-event json-packet))
-        (message "⚠️ Stargate Bridge: No JSON block found in [STARGATE_MOMENT] line."))
-      
-      ;; 4. Consume buffer
-      (setq dragonruby-stargate-bridge--partial-buffer 
-            (substring dragonruby-stargate-bridge--partial-buffer end-pos))))
-  
-  ;; Safety cleanup if buffer gets too large without a match
-  (when (> (length dragonruby-stargate-bridge--partial-buffer) 500000)
-    (message "⚠️ Stargate Bridge: Buffer overflow, clearing.")
-    (setq dragonruby-stargate-bridge--partial-buffer "")))
+(defvar dragonruby-stargate-bridge--buffer-name " *stargate-bridge-work*")
+
+(defun dragonruby-stargate-bridge--get-buffer ()
+  "Get or create the hidden storage buffer for bridge telemetry."
+  (get-buffer-create dragonruby-stargate-bridge--buffer-name))
+
+(defun dragonruby-stargate-bridge--filter (process output)
+  "Filter and capture [STARGATE_MOMENT] events from PROCESS OUTPUT using buffer-based scanning."
+  (with-current-buffer (dragonruby-stargate-bridge--get-buffer)
+    ;; 1. Append new output to working buffer
+    (goto-char (point-max))
+    (insert output)
+    
+    ;; 2. Scan for complete [STARGATE_MOMENT] lines
+    (goto-char (point-min))
+    (let ((marker "[STARGATE_MOMENT] "))
+      (while (search-forward marker nil t)
+        (let ((start (point))
+              (end (line-end-position)))
+          (if (< end (point-max)) ;; Complete line found
+              (let ((line (buffer-substring-no-properties start end)))
+                (let ((json-start (string-match "{" line)))
+                  (when json-start
+                    (dragonruby-stargate-bridge-handle-event (substring line json-start))))
+                (delete-region (line-beginning-position) (1+ end))
+                (goto-char (point-min)))
+            (goto-char (point-max)))))) ;; Incomplete line, exit loop
+    
+    ;; 3. Safety: Trim ancient history if buffer grows too large
+    (when (> (buffer-size) 100000)
+      (goto-char (point-min))
+      ;; Keep only the last 50k if it's flooded without markers
+      (delete-region (point-min) (- (point-max) 50000)))))
 
 (defun dragonruby-stargate-bridge-handle-event (json-string)
   "Parse and distribute a JSON-STRING event from the runtime."
@@ -61,11 +66,19 @@
             (message "🛑 Stargate Bridge: Malformed packet ignored (Missing 'type'). JSON: %s" json-string))
            ((and (string= type "moment") (not mtype))
             (message "⚠️ Stargate Bridge: DEPRECATED PACKET - Missing 'moment_type'."))
-           ((and (string= type "moment") (not (numberp obs)))
-            (message "🛑 Stargate Bridge: CONTRACT VIOLATION - 'observed_at' must be an integer (is %S). JSON: %s" 
-                     obs json-string))
-           (t
-            (run-hook-with-args 'dragonruby-stargate-bridge-event-hook event)))))
+            ((and (string= type "moment") (not (numberp obs)))
+             (message "🛑 Stargate Bridge: CONTRACT VIOLATION - 'observed_at' must be an integer (is %S). JSON: %s" 
+                      obs json-string))
+            ((string= type "divergence")
+             (let ((addr (funcall get-val "address"))
+                   (exp (funcall get-val "expected"))
+                   (act (funcall get-val "actual")))
+               (message "⚡ STARGATE: DIVERGENCE DETECTED at %s!" addr)
+               (message "   Expected Hash: %s" exp)
+               (message "   Actual Hash:   %s" act)
+               (run-hook-with-args 'dragonruby-stargate-bridge-event-hook event)))
+            (t
+             (run-hook-with-args 'dragonruby-stargate-bridge-event-hook event)))))
     (error
      (message "❌ Stargate Bridge: JSON Parse Error: %s" err)
      (message "🔗 Raw Packet: %s" json-string))))
@@ -89,9 +102,12 @@ If SILENT is non-nil, don't message when the process is not found."
           (unless (eq (process-filter proc) #'dragonruby-stargate-bridge--filter)
             (set-process-filter proc #'dragonruby-stargate-bridge--filter))
           (unless silent
-            (message "📡 Stargate Bridge: Cabled to DragonRuby Simulation.")))
-      (unless silent
-        (message "❌ Stargate Bridge: No active 'dragonruby' process found. Launch the game with M-x dragonruby-run first.")))))
+            (message "📡 Stargate Bridge: Cabled to DragonRuby Simulation."))
+          t) ;; Return t on success
+      (progn
+        (unless silent
+          (message "❌ Stargate Bridge: No active 'dragonruby' process found. Launch the game with M-x dragonruby-run first."))
+        nil))))
 
 (defalias 'dragonruby-stargate-bridge-install #'dragonruby-stargate-bridge-find-and-install)
 (defalias 'stargate-bridge-cable #'dragonruby-stargate-bridge-find-and-install)
@@ -102,7 +118,7 @@ If SILENT is non-nil, don't message when the process is not found."
   (message "🔍 Stargate Diagnostic: ---------------------------")
   (message "🔍 Bridge Process: %s" (if dragonruby-stargate-bridge--process (process-name dragonruby-stargate-bridge--process) "NONE"))
   (message "🔍 Process Alive: %s" (if (and dragonruby-stargate-bridge--process (process-live-p dragonruby-stargate-bridge--process)) "YES" "NO"))
-  (message "🔍 Buffer Length: %d" (length dragonruby-stargate-bridge--partial-buffer))
+  (message "🔍 Buffer Length: %d" (buffer-size (dragonruby-stargate-bridge--get-buffer)))
   (if (and dragonruby-stargate-bridge--process (process-live-p dragonruby-stargate-bridge--process))
       (dragonruby-stargate-bridge-send-code "puts '[STARGATE_DEBUG] PONG: Communication Bridge is CABLED.'")
     (dragonruby-stargate-bridge-find-and-install))

@@ -2,63 +2,47 @@
 
 ;; --- PROJECT ROOT FINDER ---
 
-(defvar-local dragonruby--project-root-cache nil
-  "Cache for the project root to avoid constant disk access.")
+(defvar-local dragonruby--buffer-project-root :not-set
+  "The anchored project root for this buffer.
+Locking this value prevents recursive disk-crawling in idle pulses.")
 
-(defvar-local dragonruby--project-root-last-dir nil
-  "Last directory used to calculate the project root.")
+(defvar dragonruby--project-ignore-list 
+  '(".git" ".stargate" "node_modules" "$RECYCLE.BIN" "build" "native" "tmp")
+  "Directories to strictly ignore during any manual scans.")
 
-(defvar dragonruby--last-detected-project-root nil
-  "Last confirmed valid project root (For reference only).")
+(defun dragonruby--anchor-project-root ()
+  "Locate and LOCK the project root for the current buffer.
+This is an expensive procedure intended to run ONCE per buffer activation."
+  (let* ((search-dir (and (buffer-file-name) (file-name-directory (buffer-file-name))))
+         (root nil))
+    (when (and search-dir (file-directory-p search-dir))
+      (let* ((binary-root (locate-dominating-file search-dir
+                             (lambda (dir)
+                               (or (file-exists-p (expand-file-name "dragonruby" dir))
+                                   (file-exists-p (expand-file-name "dragonruby.exe" dir))))))
+             (content-root (locate-dominating-file search-dir
+                                (lambda (dir)
+                                  (or (file-exists-p (expand-file-name "app/main.rb" dir))
+                                      (file-exists-p (expand-file-name "main.rb" dir))
+                                      (file-exists-p (expand-file-name "dragonruby_api.yml" dir))
+                                      (file-exists-p (expand-file-name "mygame" dir))
+                                      (file-exists-p (expand-file-name ".dragonruby" dir)))))))
+        (setq root (or content-root binary-root))))
+    
+    (setq dragonruby--buffer-project-root 
+          (if root (expand-file-name root) nil))
+    
+    (when dragonruby--buffer-project-root
+      (setq dragonruby--last-detected-project-root dragonruby--buffer-project-root))
+    
+    dragonruby--buffer-project-root))
 
 (defun dragonruby--find-project-root (&optional quiet)
-  "Locate the DragonRuby project root directory safely.
-If QUIET is non-nil, suppress diagnostic messages.
-Prioritizes the folder containing the 'dragonruby' binary (The Master Root)."
-  (unless (equal default-directory dragonruby--project-root-last-dir)
-    (setq-local dragonruby--project-root-cache nil)
-    (setq-local dragonruby--project-root-last-dir default-directory))
-
-  (let ((db-root (or dragonruby--project-root-cache
-                     (let* ((search-dir default-directory)
-                            ;; 1. Absolute Priority: The folder with the actual Binary (The Toolkit Root)
-                            (binary-root (locate-dominating-file search-dir
-                                           (lambda (dir)
-                                             (or (file-exists-p (expand-file-name "dragonruby" dir))
-                                                 (file-exists-p (expand-file-name "dragonruby-macos" dir))
-                                                 (file-exists-p (expand-file-name "dragonruby.exe" dir))))))
-                            ;; 2. Sub-Root Fallback: The folder with code or markers (The Sovereign Root)
-                            (content-root (locate-dominating-file search-dir
-                                            (lambda (dir)
-                                              (let ((has-main (file-exists-p (expand-file-name "main.rb" dir)))
-                                                    (is-app-dir (string-suffix-p "app/" (file-name-as-directory dir))))
-                                                (or (file-exists-p (expand-file-name "app/main.rb" dir))
-                                                    (and has-main (not is-app-dir)) ;; Only count main.rb if NOT in /app/
-                                                    (file-exists-p (expand-file-name "mygame" dir))
-                                                    (file-exists-p (expand-file-name "metadata" dir))
-                                                    (file-exists-p (expand-file-name "metadata.xml" dir))
-                                                    (file-exists-p (expand-file-name ".dragonruby" dir))))))))
-                       
-                        ;; Prefer content-root (Sovereign) over binary-root (Master)
-                        ;; This ensures that game-specific assets are found even if the binary is in a parent folder.
-                        (or content-root binary-root)))))
-    (if db-root
-        (let ((abs-root (expand-file-name db-root)))
-          ;; Only message if the cache was empty (first detection in this buffer)
-          (unless (or quiet dragonruby--project-root-cache)
-            (message "🐲 Radar: Detected Root [%s] for buffer [%s]" abs-root (buffer-name)))
-          
-          (setq-local dragonruby--project-root-cache abs-root)
-          ;; Update reference only
-          (when (or (file-exists-p (expand-file-name "dragonruby" abs-root))
-                    (file-exists-p (expand-file-name "app/main.rb" abs-root))
-                    (file-exists-p (expand-file-name "main.rb" abs-root))
-                    (file-exists-p (expand-file-name "metadata" abs-root))
-                    (file-exists-p (expand-file-name "metadata.xml" abs-root)))
-            (setq dragonruby--last-detected-project-root abs-root))
-          abs-root)
-      ;; No root found for this buffer
-      nil)))
+  "Retrieve the anchored project root.
+GUARDS: Never performs upward disk searches if called from a pulse."
+  (if (eq dragonruby--buffer-project-root :not-set)
+      (dragonruby--anchor-project-root)
+    dragonruby--buffer-project-root))
 
 (defun dragonruby--cache-dir (subdir)
   "Return a safe cache directory path in .emacs.d/dragonruby/SUBDIR.
@@ -93,9 +77,30 @@ Ensures the directory exists."
     (when (and root exts)
       (dragonruby--files-in root exts))))
 
-;; --- DEBOUNCE UTILITY ---
+;; --- ASSET METADATA ---
+;; Caches expensive file attributes and image dimensions to stop CPU spikes.
 
-(defvar dragonruby--debounce-timers (make-hash-table :test 'eq))
+(defvar dragonruby--asset-metadata-cache (make-hash-table :test 'equal)
+  "Global cache for asset metadata. Key: absolute-path. Value: (attrs dims timestamp).")
+
+(defvar dragonruby--asset-cache-ttl 60
+  "Time-to-live for asset metadata in seconds (1 minute).")
+
+(defun dragonruby--get-asset-metadata (path &optional force-dims)
+  "Get metadata (attrs and optional dims) for asset at PATH.
+Uses a centralized cache to avoid redundant create-image calls."
+  (let* ((now (float-time))
+         (cached (gethash path dragonruby--asset-metadata-cache)))
+    (if (and cached (< (- now (nth 2 cached)) dragonruby--asset-cache-ttl))
+        cached
+      (let* ((attrs (file-attributes path))
+             (dims (when (and force-dims attrs (> (file-attribute-size attrs) 0))
+                     (let ((img (ignore-errors 
+                                 (create-image path (dragonruby--get-image-type path) nil :nostrap t))))
+                       (if img (image-size img t) '(0 . 0)))))
+             (result (list attrs dims now)))
+        (puthash path result dragonruby--asset-metadata-cache)
+        result))))
 
 (defun dragonruby--debounce (id func delay)
   "Run FUNC after DELAY seconds, coalescing calls."
@@ -226,7 +231,7 @@ Launches as an Emacs subprocess to allow Stargate cable hookup."
 Use this if auto-detection fails or points to the wrong folder."
   (interactive "DSet DragonRuby Project Root: ")
   (let ((abs-path (expand-file-name dir)))
-    (setq-local dragonruby--project-root-cache abs-path)
+    (setq-local dragonruby--buffer-project-root abs-path)
     (setq dragonruby--last-detected-project-root abs-path)
     (message "🐲 Project Root manually set to: %s" abs-path)))
 

@@ -44,15 +44,9 @@
     (when (called-interactively-p 'interactive)
       (error "No active Stargate session"))
   
-  (let* ((index-file (expand-file-name "session.json" dragonruby-stargate--active-session))
-         (json-object-type 'alist)
-         (json-key-type 'string)
-         (json-array-type 'list)
-         (index (condition-case nil (json-read-file index-file) (error nil)))
-         (branches (let ((b (cdr (assoc "branches" index))))
-                     (if (vectorp b) (append b nil) b)))
-         (moments (let ((m (cdr (assoc "moments" index))))
-                    (if (vectorp m) (append m nil) m)))
+  (let* ((index dragonruby-stargate--session-index)
+         (branches (cdr (assoc "branches" index)))
+         (moments (cdr (assoc "moments" index)))
          (buffer (get-buffer-create "*Stargate Timeline*")))
     
     (when index
@@ -70,36 +64,36 @@
           
           ;; Navigation logic: auto-scroll if we were at the end, else preserve position
           (let ((win (get-buffer-window buffer)))
-            (if was-at-end
-                (progn
-                  (goto-char (point-max))
-                  (when win (set-window-point win (point-max))))
-              (goto-char (if (= pos 1) (point-min) pos))
-              (when win (set-window-point win (point)))))
+            (when win
+              (if was-at-end
+                  (with-selected-window win
+                    (goto-char (point-max)))
+                (set-window-point win (if (= pos 1) (point-min) pos)))))
           
           (stargate-timeline-mode)
-          (message "🌌 Stargate: Timeline rendered (%d moments)" (length moments))))
+          (when (called-interactively-p 'interactive)
+            (message "🌌 Stargate: Timeline rendered from Hash Vault."))))
       (unless (get-buffer-window buffer)
         (display-buffer buffer))))))
 
-(defun dragonruby-stargate-timeline--render-branch (branch-id indent branches moments)
-  "Recursively render BRANCH-ID with INDENT."
-  (let ((prefix (make-string (* indent 2) ?\s)))
+(defun dragonruby-stargate-timeline--render-branch (branch-id indent branches-hash moments-hash)
+  "Recursively render BRANCH-ID with INDENT using Hash Tables and Local Maps."
+  (let* ((prefix (make-string (* indent 2) ?\s))
+         (index dragonruby-stargate--session-index)
+         (bmaps (cdr (assoc "branch-maps" index)))
+         (branch-addresses (gethash branch-id bmaps)))
     
     ;; Render Branch Header
     (insert prefix (propertize (format " 🌿 Branch: %s" branch-id) 
-                               'face 'dragonruby-stargate-branch-face 
-                               'help-echo (format "Branch ID: %s" branch-id)) "\n")
+                               'face 'dragonruby-stargate-branch-face) "\n")
     
-    ;; Render Moments for this branch
+    ;; Render moments for this branch (Fast path using local map)
     (let ((branch-moments '()))
-      (dolist (m moments)
-        (when m
-          (let ((addr (if (consp m) (car m) "INVALID")))
-            (when (string-prefix-p (concat branch-id "@") addr)
-              (push m branch-moments)))))
+      (dolist (addr branch-addresses)
+        (let ((meta (gethash addr moments-hash)))
+          (when meta
+            (push (cons addr meta) branch-moments))))
       
-      ;; Sort moments by frame number
       (setq branch-moments 
             (sort branch-moments 
                   (lambda (a b)
@@ -114,7 +108,6 @@
                (seed (cdr (assoc "seed" meta)))
                (moment-type (cdr (assoc "moment_type" meta)))
                (is-current (string= address dragonruby-stargate-timeline--last-jump))
-               ;; Selection logic for icons
                (state-char (if is-current "●" "○"))
                (type-char (cond 
                            ((string= moment-type "input") "⌨️ ")
@@ -131,19 +124,18 @@
                               'keymap (let ((map (make-sparse-keymap)))
                                         (define-key map [mouse-1] #'dragonruby-stargate-timeline-jump-at-point)
                                         (define-key map (kbd "RET") #'dragonruby-stargate-timeline-jump-at-point)
-                                        (define-key map (kbd "f") #'dragonruby-stargate-timeline-fork)
                                         map))
-                  "\n")))
+                  "\n"))))
     
     ;; Find children branches
-    (dolist (b branches)
-      (let* ((id (car b))
-             (parent (cdr (assoc "parent" (cdr b))))
-             (div (cdr (assoc "divergence" (cdr b)))))
-        (when (string= parent branch-id)
-          (insert prefix (propertize "   │\n" 'face 'shadow))
-          (insert prefix (propertize (format "   └─ ⚡ Divergence at frame %s\n" div) 'face 'dragonruby-stargate-divergence-face))
-          (dragonruby-stargate-timeline--render-branch id (+ indent 2) branches moments)))))))
+    (maphash (lambda (id data)
+               (let ((parent (cdr (assoc "parent" data)))
+                     (div (cdr (assoc "divergence" data))))
+                 (when (string= parent branch-id)
+                   (insert prefix (propertize "   │\n" 'face 'shadow))
+                   (insert prefix (propertize (format "   └─ ⚡ Divergence at frame %s\n" div) 'face 'dragonruby-stargate-divergence-face))
+                   (dragonruby-stargate-timeline--render-branch id (+ indent 2) branches-hash moments-hash))))
+             branches-hash)))
 
 (defun dragonruby-stargate-timeline-jump-at-point ()
   "Jump to the moment at the current point."
@@ -162,29 +154,21 @@
   (let* ((parts (split-string address "@"))
          (branch (nth 0 parts))
          (frame (string-to-number (nth 1 parts)))
-         (index-file (expand-file-name "session.json" dragonruby-stargate--active-session))
-         (json-object-type 'alist)
-         (json-key-type 'string)
-         (index (json-read-file index-file))
-         (moments (let ((m (cdr (assoc "moments" index))))
-                    (if (vectorp m) (append m nil) m)))
-         (moment (cdr (assoc address moments))))
+         (index dragonruby-stargate--session-index)
+         (moments (cdr (assoc "moments" index)))
+         (moment (gethash address moments)))
     
     (if moment
         (let* ((hash (cdr (assoc "hash" moment)))
-               (seed (cdr (assoc "seed" moment)))
-               (data (dragonruby-stargate-vault-get hash)))
-          (if data
-              (progn
-                (setq dragonruby-stargate-timeline--last-jump address)
-                (message "⏪ Stargate: Restoring state for %s (Seed: %s)..." address seed)
-                ;; Send the state data, coordinates AND seed to the Runtime
-                (dragonruby-stargate-bridge-send-code 
-                 (format "Stargate::Clock.restore_moment(%S, %s, %S, %s)" 
-                         branch frame data seed))
-                ;; Refresh to update highlights
-                (dragonruby-stargate-timeline))
-            (error "State blob %s not found in Vault" hash)))
+               (seed (cdr (assoc "seed" moment))))
+          (setq dragonruby-stargate-timeline--last-jump address)
+          (message "⏪ Stargate: Requesting restoration of %s (Hash: %s)..." address hash)
+          ;; Michael's Optimization: Send just metadata; DR will load from its native disk.
+          (dragonruby-stargate-bridge-send-code 
+           (format "Stargate::Clock.restore_moment(%S, %s, %S, %s)" 
+                   branch frame hash seed))
+          ;; Refresh to update highlights
+          (dragonruby-stargate-timeline))
       (error "Moment %s not found in Session Index" address))))
 (defun dragonruby-stargate-timeline-fork ()
   "Fork a new branch from the moment at point."
@@ -213,15 +197,17 @@
 ;; --- AUTO REFRESH ---
 
 (defun dragonruby-stargate-timeline-trigger-refresh (&rest _)
-  "Trigger a debounced refresh of the timeline buffer."
-  (when (get-buffer "*Stargate Timeline*")
-    (when dragonruby-stargate-timeline--refresh-timer
-      (cancel-timer dragonruby-stargate-timeline--refresh-timer))
-    (setq dragonruby-stargate-timeline--refresh-timer
-          (run-with-timer dragonruby-stargate-timeline-refresh-delay nil
-                          #'dragonruby-stargate-timeline))))
+  "Trigger a debounced refresh of the timeline buffer.
+Only refreshes if the buffer is actually visible to the user."
+  (let ((buffer (get-buffer "*Stargate Timeline*")))
+    (when (and buffer (get-buffer-window buffer))
+      (when dragonruby-stargate-timeline--refresh-timer
+        (cancel-timer dragonruby-stargate-timeline--refresh-timer))
+      (setq dragonruby-stargate-timeline--refresh-timer
+            (run-with-timer 0.8 nil ;; Increased delay for stability
+                            #'dragonruby-stargate-timeline)))))
 
-(add-hook 'dragonruby-stargate-bridge-event-hook #'dragonruby-stargate-timeline-trigger-refresh)
+(add-hook 'dragonruby-stargate-session-updated-hook #'dragonruby-stargate-timeline-trigger-refresh)
 
 (provide 'dragonruby-stargate-timeline)
 ;;; dragonruby-stargate-timeline.el ends here

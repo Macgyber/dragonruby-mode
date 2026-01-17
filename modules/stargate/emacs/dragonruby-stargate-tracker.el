@@ -41,7 +41,7 @@ Returns nil if all matches, or a list of mismatched file paths."
   "Halt the simulation due to integrity failure.
 This is the 'Stasis Mode' required by Law XV."
   (message "🛑 STARGATE: Simulation HALTED. External Mutation Detected!")
-  ;; TODO: Send explicit PAUSE command to the Ruby Runtime via Protocol bridge
+  (dragonruby-stargate-bridge-send-code "Stargate::Clock.pause!")
   (run-hooks 'dragonruby-stargate-tracker-mismatch-hook))
 
 (defun dragonruby-stargate-tracker-monitor-all ()

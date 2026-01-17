@@ -1,23 +1,23 @@
 # frozen_string_literal: true
 
 module Stargate
-  # The Word (Communication Layer).
-  # This module governs how the Body (Ruby) speaks to the Mind (Emacs).
   module Protocol
     class << self
-      # Sovereign entry point for frame metadata emission.
-      # Transmits via DragonRuby Console for Emacs interception.
       def emit_moment(address, state_packet, seed, moment_type = 'tick')
         return unless $gtk
-        return unless state_packet # Law V: Cannot emit what we didn't capture.
+        return unless state_packet
 
-        # Build JSON manually for maximum compatibility and protocol safety.
-        # We escape the raw state data string and compact it to a single line.
-        data_json = state_packet[:data].gsub(/\n/, ' ').gsub(/\s+/, ' ').gsub('"', '\"')
-        
-        json_payload = "{\"type\":\"moment\",\"address\":\"#{address}\",\"hash\":\"#{state_packet[:hash]}\",\"seed\":#{seed},\"moment_type\":\"#{moment_type}\",\"data\":\"#{data_json}\",\"observed_at\":#{Time.now.to_i}}"
+        frame_num = address.split('@').last.to_i
+        return unless (frame_num % 10 == 0) || moment_type == 'input' || moment_type == 'injection'
 
-        # [STARGATE_MOMENT] is for the Emacs Chronicler.
+        json_payload = "{\"type\":\"moment\",\"address\":\"#{address}\",\"hash\":\"#{state_packet[:hash]}\",\"seed\":#{seed},\"moment_type\":\"#{moment_type}\",\"observed_at\":#{Time.now.to_i}}"
+
+        puts "[STARGATE_MOMENT] #{json_payload}"
+      end
+
+      def emit_divergence(address, expected_hash, actual_hash)
+        return unless $gtk
+        json_payload = "{\"type\":\"divergence\",\"address\":\"#{address}\",\"expected\":\"#{expected_hash}\",\"actual\":\"#{actual_hash}\"}"
         puts "[STARGATE_MOMENT] #{json_payload}"
       end
 

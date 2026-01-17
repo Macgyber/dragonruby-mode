@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module Stargate
-  # The Authority of Time and Branching.
-  # This module governs the Laws of Time (II), The Past (III), and Branching (XI).
   module Clock
     @current_branch = "prime" # UUID for the main timeline
     @current_frame  = 0
@@ -11,35 +9,40 @@ module Stargate
     class << self
       attr_reader :current_branch, :current_frame
 
-      # The Ceremonial Tick.
-      # Enforces the Sacred Order (Seed -> Input -> Inject -> Tick -> Capture).
       def with_frame(seed, inputs)
-        # 1. SEED: Sovereignty over RNG (Law XVII).
+        if @paused
+          Protocol.emit_moment(current_address, { hash: "PAUSED" }, seed, "stasis")
+          return :paused
+        end
+
+        if @last_authoritative_hash
+          current_raw = $gtk.serialize_state
+          current_hash = $gtk.sha256(current_raw)
+          if current_hash != @last_authoritative_hash
+            Protocol.emit_divergence(current_address, @last_authoritative_hash, current_hash)
+            pause!
+            return :divergence
+          end
+        end
+
         Random.begin_frame(seed)
 
-        # 2. INPUT: Application of deterministic values.
         # Inputs.apply(inputs) if defined?(Inputs)
 
-        # 3. Checkpoint for Dead Hand Rollback (Law IX)
-        # We capture state BEFORE any potential mutations (Injection or Tick)
         Injection.checkpoint
 
         begin
-          # 4. INJECT: Trial frames for code hot-reloads (Law VI).
           Injection.perform_injections
 
-          # 5. TICK: The simulation step.
           yield if block_given?
 
-          # 6. CAPTURE: Preservation of the Moment (Law V).
           state_packet = State.capture
+          @last_authoritative_hash = state_packet[:hash]
           Protocol.emit_moment(current_address, state_packet, seed)
 
-          # 7. INCREMENT: Causal progression (Law II).
           @current_frame += 1
           :ok
         rescue => e
-          # DEAD HAND ROLLBACK: Revert to the checkpoint
           puts "[STARGATE_ERROR] CLOCK ERROR: #{e.message}"
           puts e.backtrace.join("\n") if $gtk
           Injection.rollback!
@@ -47,14 +50,12 @@ module Stargate
         end
       end
 
-      # Address as branch_id@frame (Law XI)
       def current_address
         "#{@current_branch}@#{@current_frame}"
       end
 
       # Fork the timeline (branching)
       def branch!(divergence_frame, parent_id = @current_branch)
-        # Custom ID Generation (Law XI) - Compatible with DragonRuby
         new_id = "branch_#{(Time.now.to_f * 1000).to_i}_#{rand(1000)}"
         @branch_forest[new_id] = {
           parent: parent_id,
@@ -68,14 +69,34 @@ module Stargate
         new_id
       end
 
-      # Restore a specific moment coordinates and state.
-      def restore_moment(branch_id, frame, state_data)
+      def restore_moment(branch_id, frame, hash, seed)
         @current_branch = branch_id
         @current_frame = frame
         
-        $gtk.console.log "⏪ Stargate: Restoring state for #{branch_id}@#{frame}"
-        State.apply(state_data) 
-        :ok
+        $gtk.console.log "⏪ Stargate: Restoring state for #{branch_id}@#{frame} (Hash: #{hash})"
+        
+        data = State.load_from_disk(hash)
+        if data
+          State.apply(data)
+          @last_authoritative_hash = hash
+          # Ensure RNG is also restored to this point
+          Random.begin_frame(seed)
+          :ok
+        else
+          $gtk.console.log "❌ ERROR: State blob #{hash} not found on disk!"
+          :error
+        end
+      end
+
+      def pause!
+        @paused = true
+        Random.reset!
+        $gtk.console.log "🛑 STARGATE: Simulation PAUSED (Stasis Mode)."
+      end
+
+      def resume!
+        @paused = false
+        $gtk.console.log "▶️ STARGATE: Simulation RESUMED."
       end
 
       # Jump to specific coordinates (Internal use or raw jumps)

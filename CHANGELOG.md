@@ -8,21 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <details open>
-<summary><h2>[0.7.4] - 2026-01-16 (DETERMINISTIC LOAD & LAZY IMPLEMENTATION)</h2></summary>
+### 🏛️ Sovereign Architecture Surgery (Performance Fix)
+- **Sovereign Root Anchor**: Implemented one-time project root detection per buffer. Eliminated recursive upward disk scans in idle pulses.
+- **Lazy Sprite Overlays**: Visual metadata and image creation are now deferred to hover time. 0% CPU impact during idle pulses.
+- **Architectural Throttling**: Increased idle delay to 1.5s. Implemented global guards that abort background logic if no Sovereign Root is anchored.
+- **Memory Hygiene**: Sanitized the Kernel ledger to eliminate defunct timers and hooks.
+- **Emergency Exorcism**: Introduced `M-x dragonruby-kernel-system-halt` (alias `stargate-halt`) for immediate system recovery.
 
-### 🏗️ Deterministic Load Model (MELPA Compliance)
-- **Manifest/Implementation Split**: Separated all 11 feature modules into lightweight manifests (`.el`) and heavy implementations (`--impl.el`).
-- **Lazy Loading**: Logic is now only loaded from disk when a module is explicitly enabled or an interactive command is triggered.
-- **Side-Effect Free**: `(require 'dragonruby-mode)` no longer modifies the global `load-path` or triggers project detection until explicitly initialized.
-
-### 🎯 Surgical Activation Policy
-- **Surgical Hooks**: `dragonruby-maybe-enable` is now restricted to a whitelist of major modes (`ruby-mode`, `image-mode`, `conf-mode`) and specific file extensions.
-- **Quiet Detection**: Optimized `dragonruby--find-project-root` to suppress diagnostic noise and only message the user once per buffer.
-- **Project Sovereignty**: Priority swap in root discovery to prefer the **Content Root** (game code) over the **Toolkit Root** (binary location).
-
-### 📂 Universal Code Navigation
-- **Fixed Paths Navigability**: Resolved a type mismatch that prevented `require` statements from being navigable.
-- **Instant Scan**: Forced an immediate scan pulse upon module activation for instant visual feedback.
+### 🌌 Stargate: Time-Travel & Determinism
+- **Metadata IPC**: Reduced bridge traffic by 90% using telemetry sampling (record every 10 frames).
+- **Native Disk Storage**: Game states are now saved directly by the engine. Emacs only tracks hashes and seeds.
+- **Divergence Detection**: Automatic detection of non-deterministic states with rollback warnings.
+- **Aliases**: New ultra-short aliases for all major commands: `stargate-timeline`, `stargate-enable`, etc.
 
 </details>
 

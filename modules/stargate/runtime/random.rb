@@ -20,6 +20,10 @@ module Stargate
         @prng.rand(max)
       end
 
+      def reset!
+        @prng = nil
+      end
+
       private
 
       def ensure_seeded!

@@ -23,28 +23,25 @@ Default: 20px."
 ;; --- VISUALS ---
 
 (defun dragonruby--create-tooltip-string (path)
-  "Create lightweight tooltip with dimensions and size."
-  (if (and path (file-exists-p path))
-      (let* ((attrs (file-attributes path))
-             (size (file-size-human-readable (or (file-attribute-size attrs) 0)))
-             (ext (upcase (or (file-name-extension path) "IMG")))
-             ;; Calculate dimensions (fast check)
-             (img (when (and (file-readable-p path) (> (file-attribute-size attrs) 0))
-                    (let ((inhibit-message t))
-                      (ignore-errors 
-                        (create-image path (dragonruby--get-image-type path) nil :nostrap t)))))
-             (dims (if img (image-size img t) '(0 . 0)))
-             (w (if (consp dims) (truncate (car dims)) 0))
-             (h (if (consp dims) (truncate (cdr dims)) 0)))
+  "Create lightweight tooltip with dimensions and size (Cached)."
+  (let* ((meta (dragonruby--get-asset-metadata path t))
+         (attrs (nth 0 meta))
+         (dims  (nth 1 meta))
+         (size (file-size-human-readable (or (file-attribute-size attrs) 0)))
+         (ext (upcase (or (file-name-extension path) "IMG")))
+         (w (if (consp dims) (truncate (car dims)) 0))
+         (h (if (consp dims) (truncate (cdr dims)) 0)))
+    (if attrs
         (propertize (format "📐 %dx%d | 📏 %s | 🖼️ %s\n💡 Click to open | [RET] Quick View" w h size ext)
-                    'face '(:weight bold)))
-    (if path "❌ File not found" "⚠️ Invalid")))
+                    'face '(:weight bold))
+      (if path "❌ File not found" "⚠️ Invalid"))))
 
 (defun dragonruby--create-inline-thumb (path)
-  "Create a fixed-size inline thumbnail for PATH."
-   (when (and path (display-graphic-p) (file-exists-p path))
-     (let* ((attrs (file-attributes path))
-            (image (when (and (file-readable-p path) (> (file-attribute-size attrs) 0))
+  "Create a fixed-size inline thumbnail for PATH (Throttled/Cached)."
+   (when (and path (display-graphic-p))
+     (let* ((meta (dragonruby--get-asset-metadata path))
+            (attrs (nth 0 meta))
+            (image (when (and attrs (> (file-attribute-size attrs) 0))
                      (let ((inhibit-message t)) 
                        (ignore-errors 
                          (create-image path (dragonruby--get-image-type path) nil 
@@ -59,8 +56,19 @@ Default: 20px."
 
 ;; --- OVERLAY CREATION ---
 
+(defun dragonruby--sprite-help-echo (_window ov _pos)
+  "On-demand tooltip calculation to avoid CPU spikes in background pulses."
+  (let ((path (overlay-get ov 'dragonruby-sprite-path))
+        (status (overlay-get ov 'dragonruby-sprite-status)))
+    (pcase status
+      ('valid (dragonruby--create-tooltip-string path))
+      ('missing (format "❌ File not found: %s" (overlay-get ov 'dragonruby-sprite-raw)))
+      ('unsupported (format "⚠️ Unsupported format: .%s" 
+                            (file-name-extension (or path (overlay-get ov 'dragonruby-sprite-raw)))))
+      (_ "Unknown status"))))
+
 (defun dragonruby--make-sprite-overlay (start end raw-path path status)
-  "Create overlay from START to END for sprite PATH with STATUS."
+  "Create a DORMANT overlay. It only calculates visuals when hovered."
   (let ((ov (make-overlay start end)))
     (unless (eq status 'valid)
       (let ((color (pcase status ('missing "red") ('unsupported "orange"))))
@@ -68,19 +76,15 @@ Default: 20px."
     
     (overlay-put ov 'dragonruby-sprite t)
     (overlay-put ov 'dragonruby-sprite-path path)
+    (overlay-put ov 'dragonruby-sprite-raw raw-path)
+    (overlay-put ov 'dragonruby-sprite-status status)
     
-    ;; Tooltip simple de texto (responsable y ligero)
-    (overlay-put ov 'help-echo (pcase status
-                                 ('valid (dragonruby--create-tooltip-string path))
-                                 ('missing (format "❌ File not found: %s" path))
-                                 ('unsupported (format "⚠️ Unsupported format: .%s" 
-                                                       (file-name-extension (or path raw-path))))
-                                 (_ "Unknown status")))
+    ;; LAZY TOOLTIP: Computed only when the mouse enters the overlay zone.
+    (overlay-put ov 'help-echo #'dragonruby--sprite-help-echo)
 
     (when (eq status 'valid)
-      (let ((thumb (dragonruby--create-inline-thumb path)))
-        (when thumb (overlay-put ov 'after-string thumb)))
-        
+      ;; NOTE: Inline thumbnails are currently DISABLED to protect the CPU.
+      ;; They will be restored as an OPT-IN feature later.
       (overlay-put ov 'keymap 
                    (let ((map (make-sparse-keymap)))
                      (define-key map (kbd "C-c C-o") 
@@ -89,6 +93,7 @@ Default: 20px."
                        (lambda () (interactive) (dragonruby-jump-to-sprite-source path)))
                      map))
       (overlay-put ov 'mouse-face '(:background "#2ECC71" :foreground "black")))
+    
     (overlay-put ov 'priority -50)
     (push ov dragonruby--sprite-overlays)))
 

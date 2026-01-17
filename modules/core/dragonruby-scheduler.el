@@ -24,9 +24,9 @@ Modules register synchronous analysis here.")
   "Light tasks: Run during every idle pulse (even if clean).
 Ideal for UI updates, hover checks, and ephemeral popups.")
 
-;; --- CONFIGURATION (The Nervous System Rhythm) ---
+;; --- CONFIGURATION ---
 
-(defcustom dragonruby-idle-delay 0.2
+(defcustom dragonruby-idle-delay 1.5
   "Seconds of idle time before triggering a scan pulse."
   :type 'float
   :group 'dragonruby)
@@ -43,12 +43,12 @@ Ideal for UI updates, hover checks, and ephemeral popups.")
 
 (defun dragonruby-scheduler--calculate-delay ()
   "Calculate adaptive debounce delay based on buffer size.
-Large buffers (the 'masa') get a longer delay to protect the CPU."
+Large buffers get a longer delay to protect the CPU."
   (let* ((size (buffer-size))
-         (base 0.4)
+         (base 0.8)
          ;; Scale: +0.2s for every 50kb
          (extra (* (/ size 50000.0) 0.2)))
-    (min 2.5 (+ base extra))))
+    (min 3.0 (+ base extra))))
 
 (defvar dragonruby-scan-debounce-delay 0.6
   "OBSOLETE: Use (dragonruby-scheduler--calculate-delay) instead.")
@@ -85,13 +85,15 @@ Governs both 'scan' (heavy) and 'monitor' (light) phases."
     (setq dragonruby--pulse-in-progress t)
     (unwind-protect
         (with-current-buffer buf
-          ;; 1. Visibility & State Check (The Heart only beats if someone is watching)
-          (when (and dragonruby-mode 
-                     (get-buffer-window buf t)
-                     (or dragonruby-scan-hook dragonruby-monitor-hook))
-            
-            (let ((now (float-time)))
-              ;; 1. Monitor Phase (Fast/Light)
+          ;; 1. Global Guard: No Project, No Pulse.
+          (let ((root (dragonruby--find-project-root)))
+            (when (and root 
+                       dragonruby-mode 
+                       (get-buffer-window buf t)
+                       (or dragonruby-scan-hook dragonruby-monitor-hook))
+              
+              (let ((now (float-time)))
+                ;; 1. Monitor Phase (Fast/Light)
               (dolist (fn dragonruby-monitor-hook)
                 (when (functionp fn)
                   (condition-case err (funcall fn)

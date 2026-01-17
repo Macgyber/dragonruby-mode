@@ -55,7 +55,10 @@ Ensures we are always working with a valid hash table, avoiding stale references
   "Legacy registry for per-module resources. (Deprecated in favor of global ledger)")
 
 (defun dragonruby-kernel-register-timer (timer)
-  "Register a TIMER with the Kernel for lifecycle management."
+  "Register a TIMER with the Kernel for lifecycle management.
+Cleans defunct timers from the ledger during registration."
+  (setq dragonruby--live-timers 
+        (cl-remove-if-not #'timerp dragonruby--live-timers))
   (when (timerp timer)
     (push timer dragonruby--live-timers))
   timer)
@@ -64,6 +67,11 @@ Ensures we are always working with a valid hash table, avoiding stale references
   "Register a global or local HOOK function FN.
 If LOCAL is non-nil, it is treated as a buffer-local hook."
   (add-hook hook fn nil local)
+  ;; Clean orphaned hook references
+  (setq dragonruby--live-hooks 
+        (cl-remove-if (lambda (pair) 
+                         (not (memq (cdr pair) (symbol-value (car pair)))))
+                       dragonruby--live-hooks))
   (push (cons hook fn) dragonruby--live-hooks)
   fn)
 

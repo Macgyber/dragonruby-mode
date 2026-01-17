@@ -1,15 +1,10 @@
 # frozen_string_literal: true
 
 module Stargate
-  # The Memory of the Universe.
-  # This module governs State Sovereignty (IV) and Integrity (V).
   module State
     class << self
-      # Captures the current canonical state of the simulation.
-      # Returns a Hash with :data (serialized string) and :hash (SHA-256).
       def capture
         begin
-          # Law V: SHA-256 state tracking
           raw_data = $gtk.serialize_state
           unless raw_data
             puts "[STARGATE_WARNING] Serialization returned EMPTY data."
@@ -17,6 +12,7 @@ module Stargate
           end
           
           hash = $gtk.sha256(raw_data)
+          save_to_disk(hash, raw_data)
           
           { data: raw_data, hash: hash }
         rescue => e
@@ -25,12 +21,16 @@ module Stargate
         end
       end
 
-      # Restores the canonical state from raw serialized data.
-      # returns :ok or :divergent (deserialization error).
+      def save_to_disk(hash, data)
+        return if hash == "000000"
+        $gtk.write_file(".stargate/blobs/#{hash}", data)
+      end
+
+      def load_from_disk(hash)
+        $gtk.read_file(".stargate/blobs/#{hash}")
+      end
+
       def apply(raw_data)
-        # Ontological Warning: This only restores data. 
-        # Code and assets must be externally aligned.
-        
         begin
           # Restore the state into DragonRuby's args.state
           restored = $gtk.deserialize_state(raw_data)
