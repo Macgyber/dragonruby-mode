@@ -9,7 +9,8 @@
 
 ---
 
-## 🏛️ The New Standard: A Quiet Revolution
+## The New Standard
+🏛️ **The New Standard: A Quiet Revolution**
 
 For years, we accepted that "powerful" meant "complicated" and "fast" meant "ugly". We didn't agree.
 
@@ -20,27 +21,30 @@ We haven't just added features; we have established an **Invisible Order**. From
 This is our contribution to the craft. This is the new baseline.
 ## 📑 Table of Contents
 
-- [🏛️ The New Standard: A Quiet Revolution](#the-new-standard-a-quiet-revolution)
-- [⚔️ The Stable Arsenal (The Foundational Base)](#the-stable-arsenal-the-foundational-base)
-  - [🎨 Level 1: Semantic Spectrum (Colors)](#level-1-semantic-spectrum-colors)
-  - [🖼️ Level 2: Reconnaissance Operations (Sprites)](#level-2-reconnaissance-operations-sprites)
-  - [🎨 The Forge: Integrated Image Editor](#the-forge-integrated-image-editor)
-  - [🌐 Level 4: The Creative Hub (Beta)](#level-4-the-creative-hub-beta)
-  - [⚡ Level 3: Curvature Navigation (The Law)](#level-3-curvature-navigation-the-law)
-- [💎 Tactical Arsenal (Beta)](#tactical-arsenal-beta)
-  - [🔊 The Resonance Engine (Audio) — Beta](#the-resonance-engine-audio-beta)
-  - [🅰️ The Glyph Engine (Fonts)](#the-glyph-engine-fonts)
-  - [🌌 Level 5: The Time Machine (Stargate) — EXPERIMENTAL](#level-5-the-time-machine-stargate-experimental)
-- [📦 Installation](#installation)
-- [🏗️ Architecture: The Lego System (v0.8.0)](#architecture-the-lego-system-v080)
-  - [🧠 The Sovereign Kernel (v0.8.0)](#the-sovereign-kernel-v080)
-- [📚 Documentation and Resources](#documentation-and-resources)
+- [The New Standard](#the-new-standard)
+- [The Stable Arsenal](#the-stable-arsenal)
+  - [Level 1: Semantic Spectrum](#level-1-semantic-spectrum)
+  - [Level 2: Reconnaissance Operations](#level-2-reconnaissance-operations)
+  - [The Forge: Integrated Image Editor](#the-forge-integrated-image-editor)
+  - [Level 4: The Creative Hub](#level-4-the-creative-hub)
+  - [Level 3: Curvature Navigation](#level-3-curvature-navigation)
+- [Tactical Arsenal](#tactical-arsenal)
+  - [The Resonance Engine](#the-resonance-engine)
+  - [The Glyph Engine](#the-glyph-engine)
+  - [Level 5: The Time Machine (Stargate)](#level-5-the-time-machine)
+- [Installation](#installation)
+- [Architecture: The Lego System](#architecture-the-lego-system)
+  - [The Kernel](#the-kernel)
+  - [The Sovereign Kernel](#the-sovereign-kernel)
+- [Documentation and Resources](#documentation-and-resources)
 
 ---
 
-## ⚔️ The Stable Arsenal (The Foundational Base)
+## The Stable Arsenal
+⚔️ **The Stable Arsenal (The Foundational Base)**
 
-### 🎨 Level 1: Semantic Spectrum (Colors)
+### Level 1: Semantic Spectrum
+🎨 **Level 1: Semantic Spectrum (Colors)**
 Visualize the invisible. Your game's palette, alive in your code.
 - **Living Color Blocks**: Hex literals (`0xFF00FF`), RGB/RGBA Arrays `[255, 0, 0]`, and Hashes `{r: 255, g: 0, b:0}` — the moment you type them, they transform into visual beacons revealing their true color. Multi-line hashes handled with surgical precision.
 - **Contrast Intelligence**: Text automatically adapts (black or white) to ensure readability on any background.
@@ -50,7 +54,8 @@ Visualize the invisible. Your game's palette, alive in your code.
   <br><em>Arrays, RGBA hashes, and hexadecimal — all detected and visualized.</em>
 </div>
 
-### 🖼️ Level 2: Reconnaissance Operations (Sprites)
+### Level 2: Reconnaissance Operations
+🖼️ **Level 2: Reconnaissance Operations (Sprites)**
 Stop coding blind. See your world as you build it.
 - **Inline Intelligence**: High-definition thumbnails embedded directly in your code.
 - **The Validation Law**: Cyan = Ready, Red = Missing, Orange = Illegal Format.
@@ -66,7 +71,8 @@ Stop coding blind. See your world as you build it.
 > (global-company-mode)
 > ```
 
-### 🎨 The Forge: Integrated Image Editor
+### The Forge: Integrated Image Editor
+🎨 **The Forge: Integrated Image Editor**
 
 Press `RET` or `C-c C-o` on any sprite in your code and the header-line transforms into a **complete workstation**. You'll have access to a professional arsenal with non-destructive timeline, tool groups (VIEW, TRANSFORM, COLOR, SYSTEM, CREATIVE), and over 15 operations: remove backgrounds, trim margins, pixel-perfect scaling (2x/0.5x), apply effects, rotate, invert, compress, and much more. All without leaving Emacs.
 
@@ -75,7 +81,8 @@ Press `RET` or `C-c C-o` on any sprite in your code and the header-line transfor
   <br><em>VIEW, TRANSFORM, COLOR, SYSTEM, CREATIVE — Five tool groups, infinite power.</em>
 </div>
 
-### 🌐 Level 4: The Creative Hub (Beta)
+### Level 4: The Creative Hub
+🌐 **Level 4: The Creative Hub (Beta)**
 Your bridge to the ecosystem. Located within the Image Editor header-line:
 - **Instant Web Tools**: One-click access to **Graphite**, **Piskel**, **Lospec**, **Itch.io**, and the DragonRuby Discord.
 - **Customizable**: Add your own tools (Web URLs or Local Executables) via the `[+]` button.
@@ -84,7 +91,8 @@ Your bridge to the ecosystem. Located within the Image Editor header-line:
 **→ [📖 Complete Image Editor Guide](knowledge/IMAGE_EDITOR.md)** (Timeline, Tool groups, Creative Hub)
 
 
-### ⚡ Level 3: Curvature Navigation (The Law)
+### Level 3: Curvature Navigation
+⚡ **Level 3: Curvature Navigation (The Law)**
 Eliminate journey friction. Move at the speed of thought.
 - **Contextual Intelligence**: The plugin knows when you're in a `require`, a `read_file`, or a `path:` assignment and filters your destinations accordingly.
 - **Dimensional Links**: Every path is a portal. `C-c C-o` or `RET` to jump directly to any file or asset.
@@ -92,15 +100,18 @@ Eliminate journey friction. Move at the speed of thought.
 
 ---
 
-## 💎 Tactical Arsenal (Beta)
+## Tactical Arsenal
+💎 **Tactical Arsenal (Beta)**
 
-### 🔊 The Resonance Engine (Audio) — Beta
+### The Resonance Engine
+🔊 **The Resonance Engine (Audio) — Beta**
 Audio components are no longer silent text. Feel your game's heartbeat.
 - **Emerald Pulse**: Valid assets shine with vibrant green energy (`#2ECC71`).
 - **Format Sentinel**: Instant suppression of weak formats. `.mp3` is marked and neutralized.
 - **Chronicle Tooltips**: Instant file size information on hover.
 
-### 🅰️ The Glyph Engine (Fonts)
+### The Glyph Engine
+🅰️ **The Glyph Engine (Fonts)**
 
 > ⚠️ **Requires [ImageMagick](https://imagemagick.org/)** to render previews.
 
@@ -118,7 +129,8 @@ Did you pick the right font? Why doesn't it look like you expected? Stop guessin
 
 **→ [📖 Complete Font System Guide](knowledge/FONTS.md)** (ABC/Pangram Viewer, Typography resources, Troubleshooting)
 
-### 🌌 Level 5: The Time Machine (Stargate) — EXPERIMENTAL
+### Level 5: The Time Machine
+🌌 **Level 5: The Time Machine (Stargate) — EXPERIMENTAL**
 Master the simulation. Record, Mutate, and Rewind with atomic precision.
 
 - **The Chronicler**: Continuous recording of states and seeds into a JSON-backed history.
@@ -158,7 +170,8 @@ We have re-engineered the core to meet **SRE & Performance Engineering** standar
 
 ---
 
-## 📦 Installation
+## Installation
+📦 **Installation**
 
 Choose your preferred method. For a quick setup in **Doom Emacs**, simply copy these blocks:
 
@@ -176,12 +189,14 @@ Choose your preferred method. For a quick setup in **Doom Emacs**, simply copy t
 
 ---
 
-## 🏗️ Architecture: The Lego System (v0.8.0)
+## Architecture: The Lego System
+🏗️ **Architecture: The Lego System (v0.8.0)**
 "Complexity is the enemy. Modularity is the shield."
 
 We have re-forged the core into a **Lego Architecture**. The system is no longer a monolith; it is a collection of independent, intelligent pieces orchestrated by a central Kernel.
 
-### 🧠 The Kernel
+### The Kernel
+🧠 **The Kernel**
 The Kernel is the central nervous system. It strictly enforces the **Three Laws**:
 1.  **Namespace Law**: Every module owns its space. No collisions.
 2.  **Capability Law**: Modules request powers (e.g. `:rendering`), and the Kernel finds the provider.
@@ -216,7 +231,8 @@ You have total control. You can enable or disable individual pieces in your conf
 
 If you disable a parent (e.g., `sprites`), the Kernel **automatically** powers down its children (`sprite-tools`) to prevent errors. You don't have to manage dependencies. Just build your perfect editor.
 
-### 🧠 The Sovereign Kernel (v0.8.0)
+### The Sovereign Kernel
+🧠 **The Sovereign Kernel (v0.8.0)**
 The v0.8.0 update introduces the **Sovereign Kernel**, a central authority inspired by micro-kernel operating systems.
 - **The Ledger of Life**: Every timer, hook, and process must be registered. If the Kernel doesn't know it, it shouldn't exist.
 - **Sovereign Root Anchor**: Project root is detected once and locked. No more background disk crawling.
@@ -254,7 +270,8 @@ An artisan autocompletion system that respects your definitions. It is **NOT** a
 
 ---
 
-## 📚 Documentation and Resources
+## Documentation and Resources
+📚 **Documentation and Resources**
 
 - **[📖 IMAGE_EDITOR.md](knowledge/IMAGE_EDITOR.md)**: Complete image editor guide
 - **[📖 FONTS.md](knowledge/FONTS.md)**: Font system and typography
