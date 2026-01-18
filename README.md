@@ -20,21 +20,21 @@ We haven't just added features; we have established an **Invisible Order**. From
 This is our contribution to the craft. This is the new baseline.
 ## 📑 Table of Contents
 
-- [🏛️ The New Standard](#the-new-standard-a-quiet-revolution)
-- [⚔️ The Stable Arsenal (Foundational Base)](#the-stable-arsenal-the-foundational-base)
-  - [🎨 Level 1: Semantic Spectrum (Colors)](#level-1-semantic-spectrum-colors)
-  - [🖼️ Level 2: Reconnaissance Operations (Sprites)](#level-2-reconnaissance-operations-sprites)
-  - [🎨 The Forge: Integrated Image Editor](#the-forge-integrated-image-editor)
-  - [🌐 Level 4: The Creative Hub (Beta)](#level-4-the-creative-hub-beta)
-  - [⚡ Level 3: Curvature Navigation (The Law)](#level-3-curvature-navigation-the-law)
-- [💎 Tactical Arsenal (Beta)](#tactical-arsenal-beta)
-  - [🔊 The Resonance Engine (Audio)](#the-resonance-engine-audio-beta)
-  - [🅰️ The Glyph Engine (Fonts)](#the-glyph-engine-fonts)
-  - [🌌 Level 5: The Time Machine (Stargate)](#level-5-the-time-machine-stargate-experimental)
-- [📦 Installation](#installation)
-- [🏗️ Architecture: The Lego System (v0.8.0)](#architecture-the-lego-system-v080)
-  - [🧠 The Sovereign Kernel](#the-sovereign-kernel-v080)
-- [📚 Documentation and Resources](#documentation-and-resources)
+- [🏛️ The New Standard: A Quiet Revolution](#-the-new-standard-a-quiet-revolution)
+- [⚔️ The Stable Arsenal (The Foundational Base)](#-the-stable-arsenal-the-foundational-base)
+  - [🎨 Level 1: Semantic Spectrum (Colors)](#-level-1-semantic-spectrum-colors)
+  - [🖼️ Level 2: Reconnaissance Operations (Sprites)](#-level-2-reconnaissance-operations-sprites)
+  - [🎨 The Forge: Integrated Image Editor](#-the-forge-integrated-image-editor)
+  - [🌐 Level 4: The Creative Hub (Beta)](#-level-4-the-creative-hub-beta)
+  - [⚡ Level 3: Curvature Navigation (The Law)](#-level-3-curvature-navigation-the-law)
+- [💎 Tactical Arsenal (Beta)](#-tactical-arsenal-beta)
+  - [🔊 The Resonance Engine (Audio) — Beta](#-the-resonance-engine-audio-beta)
+  - [🅰️ The Glyph Engine (Fonts)](#-the-glyph-engine-fonts)
+  - [🌌 Level 5: The Time Machine (Stargate) — EXPERIMENTAL](#-level-5-the-time-machine-stargate-experimental)
+- [📦 Installation](#-installation)
+- [🏗️ Architecture: The Lego System (v0.8.0)](#-architecture-the-lego-system-v080)
+  - [🧠 The Sovereign Kernel (v0.8.0)](#-the-sovereign-kernel-v080)
+- [📚 Documentation and Resources](#-documentation-and-resources)
 
 ---
 
