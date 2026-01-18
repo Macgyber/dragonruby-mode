@@ -27,10 +27,11 @@ Low priority, contextual, and manual (triggered by user)."
               :exit-function (lambda (_str status)
                                (when (memq status '(finished sole))
                                  ;; Aggressively jump out of the string
-                                 (or (search-forward "\"" (line-end-position) t)
-                                     (let ((p (syntax-ppss)))
-                                       (when (nth 3 p)
-                                         (ignore-errors (forward-sexp))))))))))))
+                                 (unless (search-forward "\"" (line-end-position) t)
+                                   (let ((p (syntax-ppss)))
+                                     (when (nth 3 p) ;; Still inside string
+                                       (goto-char (nth 8 p)) ;; Back to quote start
+                                       (ignore-errors (forward-sexp))))))))))))
 
 (defun dragonruby--path-context ()
   "Determine if point is in a path context.

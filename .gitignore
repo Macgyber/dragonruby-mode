@@ -27,3 +27,6 @@ test/
 # System & Meta
 .stargate/
 **/*.dr-stargate
+
+# Logs
+*.log

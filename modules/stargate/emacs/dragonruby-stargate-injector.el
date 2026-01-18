@@ -1,8 +1,15 @@
-;;; injector.el --- Stargate Code Change Classifier -*- lexical-binding: t -*-
+;;; dragonruby-stargate-injector.el --- Stargate Code Change Classifier -*- lexical-binding: t -*-
+
+;; Author: Macgyber <esteban3261g@gmail.com>
+;; Version: 0.8.0
+;; Package-Requires: ((emacs "26.1"))
+;; URL: https://github.com/Macgyber/dragonruby-mode
 
 ;;; Commentary:
 ;; This module classifies code changes into risk categories: 
 ;; Alpha (safe), Beta (risky), or Gamma (dangerous) as required by Law VI.
+
+;;; Code:
 
 (require 'dragonruby-stargate-bridge)
 
@@ -40,4 +47,4 @@ Returns a symbol: `alpha', `beta', or `gamma'."
     category))
 
 (provide 'dragonruby-stargate-injector)
-;;; injector.el ends here
+;;; dragonruby-stargate-injector.el ends here

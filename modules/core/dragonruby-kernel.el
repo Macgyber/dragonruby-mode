@@ -1,10 +1,9 @@
 ;;; dragonruby-kernel.el --- The Central Nervous System of DragonRuby Mode -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2024 DragonRuby Mode
-;; Author: DragonRuby Mode Team
-;; Keywords: tools, convenience, games
-
-;; This file is NOT part of GNU Emacs.
+;; Author: Macgyber <esteban3261g@gmail.com>
+;; Version: 0.8.0
+;; Package-Requires: ((emacs "26.1"))
+;; URL: https://github.com/Macgyber/dragonruby-mode
 
 ;;; Commentary:
 

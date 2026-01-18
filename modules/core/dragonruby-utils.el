@@ -1,6 +1,18 @@
 ;;; dragonruby-utils.el --- Generic utility functions -*- lexical-binding: t; -*-
 
-;; --- PROJECT ROOT FINDER ---
+;; Author: Macgyber <esteban3261g@gmail.com>
+;; Version: 0.8.0
+;; Package-Requires: ((emacs "26.1"))
+;; URL: https://github.com/Macgyber/dragonruby-mode
+
+;;; Commentary:
+;; This module provides project detection, file collection, asset metadata
+;; caching, and other generic utilities used by DragonRuby mode.
+
+;;; Code:
+
+(require 'cl-lib)
+
 
 (defvar-local dragonruby--buffer-project-root :not-set
   "The anchored project root for this buffer.
@@ -277,3 +289,4 @@ Use this if auto-detection fails or points to the wrong folder."
     (display-buffer buf)))
 
 (provide 'dragonruby-utils)
+;;; dragonruby-utils.el ends here

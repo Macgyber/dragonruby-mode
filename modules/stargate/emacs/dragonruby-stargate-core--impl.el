@@ -1,4 +1,14 @@
-;;; core-impl.el --- Stargate Main Orchestrator implementation -*- lexical-binding: t -*-
+;;; dragonruby-stargate-core--impl.el --- Stargate Main Orchestrator implementation -*- lexical-binding: t -*-
+
+;; Author: Macgyber <esteban3261g@gmail.com>
+;; Version: 0.8.0
+;; Package-Requires: ((emacs "26.1"))
+;; URL: https://github.com/Macgyber/dragonruby-mode
+
+;;; Commentary:
+;; Internal implementation of Stargate enable/disable and background monitoring.
+
+;;; Code:
 
 (require 'dragonruby-kernel)
 (require 'dragonruby-stargate-manager)
@@ -103,4 +113,4 @@ The system checks for connections periodically."
     (dragonruby-stargate-tracker-update-hash (or file (buffer-file-name)))))
 
 (provide 'dragonruby-stargate-core--impl)
-;;; core-impl.el ends here
+;;; dragonruby-stargate-core--impl.el ends here

@@ -1,7 +1,7 @@
 ;;; dragonruby-mode.el --- Semantic tooling for DragonRuby (Kernel Architecture) -*- lexical-binding: t; -*-
 
 ;; Author: Macgyber <esteban3261g@gmail.com>
-;; Version: 0.7.4
+;; Version: 0.8.0
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: games, dragonruby, tools
 ;; URL: https://github.com/Macgyber/dragonruby-mode
@@ -67,6 +67,10 @@
 
 (defcustom dragonruby-enable-sprites nil "Enable sprite system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-sprite-tools nil "Enable sprite tools." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-sprites-lazy-visuals t
+  "When non-nil, only render sprite previews when explicitly requested.
+If nil, renders previews automatically for all paths."
+  :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-fonts nil "Enable font system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-font-tools nil "Enable font tools." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-audio nil "Enable audio system." :type 'boolean :group 'dragonruby)
@@ -76,8 +80,8 @@
   :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-paths nil "Enable path system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-concepts nil "Enable concept system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-completion nil "Enable completion system." :type 'boolean :group 'dragonruby)
-(defcustom dragonruby-enable-stargate t "Enable Stargate time-traveling system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-completion t "Enable completion system." :type 'boolean :group 'dragonruby)
+(defcustom dragonruby-enable-stargate nil "Enable Stargate time-traveling system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-guide nil "Enable knowledge guidance system." :type 'boolean :group 'dragonruby)
 
 ;; -----------------------------------------------------------------------------

@@ -1,5 +1,16 @@
 ;;; dragonruby-scheduler.el --- Centralized Event Loop & State Machine -*- lexical-binding: t; -*-
 
+;; Author: Macgyber <esteban3261g@gmail.com>
+;; Version: 0.8.0
+;; Package-Requires: ((emacs "26.1"))
+;; URL: https://github.com/Macgyber/dragonruby-mode
+
+;;; Commentary:
+;; This module implements the "Heartbeat" of DragonRuby Mode, orchestrating
+;; analysis tasks and UI updates safely during idle time.
+
+;;; Code:
+
 (require 'dragonruby-core)
 
 ;; --- STATE MACHINE ---

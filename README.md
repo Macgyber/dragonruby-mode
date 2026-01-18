@@ -20,20 +20,20 @@ We haven't just added features; we have established an **Invisible Order**. From
 This is our contribution to the craft. This is the new baseline.
 ## 📑 Table of Contents
 
-- [🏛️ The New Standard](#-the-new-standard-a-quiet-revolution)
-- [⚔️ The Stable Arsenal (Foundational Base)](#-the-stable-arsenal-the-foundational-base)
-  - [🎨 Level 1: Semantic Spectrum (Colors)](#-level-1-semantic-spectrum-colors)
-  - [🖼️ Level 2: Reconnaissance Operations (Sprites)](#-level-2-reconnaissance-operations-sprites)
-  - [🎨 The Forge: Integrated Image Editor](#-the-forge-integrated-image-editor)
-  - [🌐 Level 4: The Creative Hub (Beta)](#-level-4-the-creative-hub-beta)
-  - [⚡ Level 3: Curvature Navigation (The Law)](#-level-3-curvature-navigation-the-law)
-- [💎 Tactical Arsenal (Beta)](#-tactical-arsenal-beta)
-  - [🔊 The Resonance Engine (Audio)](#-the-resonance-engine-audio--beta)
-  - [🅰️ The Glyph Engine (Fonts)](#-the-glyph-engine-fonts)
-  - [🌌 Level 5: The Time Machine (Stargate)](#-level-5-the-time-machine-stargate--experimental)
+- [🏛️ The New Standard](#the-new-standard-a-quiet-revolution)
+- [⚔️ The Stable Arsenal (Foundational Base)](#the-stable-arsenal-the-foundational-base)
+  - [🎨 Level 1: Semantic Spectrum (Colors)](#level-1-semantic-spectrum-colors)
+  - [🖼️ Level 2: Reconnaissance Operations (Sprites)](#level-2-reconnaissance-operations-sprites)
+  - [🎨 The Forge: Integrated Image Editor](#the-forge-integrated-image-editor)
+  - [🌐 Level 4: The Creative Hub (Beta)](#level-4-the-creative-hub-beta)
+  - [⚡ Level 3: Curvature Navigation (The Law)](#level-3-curvature-navigation-the-law)
+- [💎 Tactical Arsenal (Beta)](#tactical-arsenal-beta)
+  - [🔊 The Resonance Engine (Audio)](#the-resonance-engine-audio--beta)
+  - [🅰️ The Glyph Engine (Fonts)](#the-glyph-engine-fonts)
+  - [🌌 Level 5: The Time Machine (Stargate)](#level-5-the-time-machine-stargate--experimental)
 - [📦 Installation](#-installation)
-- [🏗️ Architecture: The Lego System (Beta)](#-architecture-the-lego-system-beta)
-  - [🧠 The Sovereign Kernel](#-the-sovereign-kernel-v073-architect)
+- [🏗️ Architecture: The Lego System (v0.8.0)](#architecture-the-lego-system-v080)
+  - [🧠 The Sovereign Kernel](#the-sovereign-kernel-v080)
 - [📚 Documentation and Resources](#-documentation-and-resources)
 
 ---
@@ -176,7 +176,7 @@ Choose your preferred method. For a quick setup in **Doom Emacs**, simply copy t
 
 ---
 
-## 🏗️ Architecture: The Lego System (Beta)
+## 🏗️ Architecture: The Lego System (v0.8.0)
 "Complexity is the enemy. Modularity is the shield."
 
 We have re-forged the core into a **Lego Architecture**. The system is no longer a monolith; it is a collection of independent, intelligent pieces orchestrated by a central Kernel.
@@ -210,14 +210,14 @@ You have total control. You can enable or disable individual pieces in your conf
 | `colors` | Hex/RGB highlighting | 🔴 OFF |
 | `concepts` | Educational concept popups | 🔴 OFF |
 | `paths` | Project navigation, file jumping | 🔴 OFF |
-| `stargate` | Time travel, atomic injections (Experimental) | ✅ ON |
-| `completion` | Strict YAML API Schema | 🔴 OFF |
+| `stargate` | Time travel, branching, replay | 🔴 OFF |
+| `completion` | Strict YAML API Schema | ✅ ON |
 | `guide` | Knowledge guidance system (Sidebar) | 🔴 OFF |
 
 If you disable a parent (e.g., `sprites`), the Kernel **automatically** powers down its children (`sprite-tools`) to prevent errors. You don't have to manage dependencies. Just build your perfect editor.
 
-### 🧠 The Sovereign Kernel (v0.7.3 Architect)
-The v0.7.3 update introduces the **Sovereign Kernel**, a central authority inspired by micro-kernel operating systems.
+### 🧠 The Sovereign Kernel (v0.8.0)
+The v0.8.0 update introduces the **Sovereign Kernel**, a central authority inspired by micro-kernel operating systems.
 - **The Ledger of Life**: Every timer, hook, and process must be registered. If the Kernel doesn't know it, it shouldn't exist.
 - **Sovereign Root Anchor**: Project root is detected once and locked. No more background disk crawling.
 - **Lazy Implementation**: Heavy logic is split from manifests. Functions and modes are only loaded from disk when a module is actually used.
@@ -232,7 +232,7 @@ The v0.7.3 update introduces the **Sovereign Kernel**, a central authority inspi
 
 ---
 
-### 📜 Level 5: The Schema (v0.1 Validated)
+### 📜 API Schema (Validated)
 **"No magic. Just truth."**
 
 An artisan autocompletion system that respects your definitions. It is **NOT** an LSP. It does not infer, guess, or think. It simply allows you to define a schema for your API, and the editor honors it.
@@ -266,7 +266,7 @@ An artisan autocompletion system that respects your definitions. It is **NOT** a
 
 *Forged for creators who refuse to settle. Forged for DragonRuby.*
 
-**DragonRuby Emacs Mode — v0.7.4 (Sovereign Architecture)**
+**DragonRuby Emacs Mode — v0.8.0 (Sovereign Architecture)**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/Macgyber/dragonruby-mode/actions/workflows/ci.yml/badge.svg)](https://github.com/Macgyber/dragonruby-mode/actions/workflows/ci.yml)

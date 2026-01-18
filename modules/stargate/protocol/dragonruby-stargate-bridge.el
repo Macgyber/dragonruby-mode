@@ -1,5 +1,16 @@
 ;;; dragonruby-stargate-bridge.el --- Stargate Bridge for DragonRuby -*- lexical-binding: t -*-
 
+;; Author: Macgyber <esteban3261g@gmail.com>
+;; Version: 0.8.0
+;; Package-Requires: ((emacs "26.1"))
+;; URL: https://github.com/Macgyber/dragonruby-mode
+
+;;; Commentary:
+;; Communication layer that captures [STARGATE_MOMENT] markers from the
+;; DragonRuby process output and distributes them as JSON events.
+
+;;; Code:
+
 (require 'json)
 (require 'dragonruby-utils)
 
@@ -35,7 +46,7 @@
               (let ((line (buffer-substring-no-properties start end)))
                 (let ((json-start (string-match "{" line)))
                   (when json-start
-                    (dragonruby-stargate-bridge-handle-event (substring line json-start))))
+                    (dragonruby-stargate-bridge--handle-event (substring line json-start))))
                 (delete-region (line-beginning-position) (1+ end))
                 (goto-char (point-min)))
             (goto-char (point-max)))))) ;; Incomplete line, exit loop
@@ -46,7 +57,7 @@
       ;; Keep only the last 50k if it's flooded without markers
       (delete-region (point-min) (- (point-max) 50000)))))
 
-(defun dragonruby-stargate-bridge-handle-event (json-string)
+(defun dragonruby-stargate-bridge--handle-event (json-string)
   "Parse and distribute a JSON-STRING event from the runtime."
   (condition-case err
       (let* ((json-object-type 'alist)
@@ -125,4 +136,4 @@ If SILENT is non-nil, don't message when the process is not found."
   (message "🔍 Stargate Diagnostic: ---------------------------"))
 
 (provide 'dragonruby-stargate-bridge)
-;;; bridge.el ends here
+;;; dragonruby-stargate-bridge.el ends here

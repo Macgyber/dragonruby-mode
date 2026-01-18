@@ -8,7 +8,7 @@
 
 In traditional development, an error is the end of the road. In **DragonRuby Mode**, an error is just a divergent branch. 
 
-Stargate is born from the ambition to eliminate the friction between **thought** and **reality**. Our purpose is to turn the simulation into a malleable fabric, where the programmer can travel to the past to correct the present, and project the future without fear of collapse. It is the definitive bridge between the editor's static logic and the engine's heartbeat.
+Stargate is born from the ambition to eliminate the friction between **thought** and **reality**. Our purpose is to turn the simulation into a malleable fabric, where the programmer can travel to the past to correct the present, and project the future without fear of collapse. With **Phase 5 (v0.8.0)**, we introduce **Phylogenetic Inheritance**, allowing you to fork reality and navigate any divergent path with zero performance penalty.
 
 ---
 
@@ -24,9 +24,13 @@ Activates the sensor nerves of the plugin. Without this command, Stargate remain
 **The chronicler's Genesis.**
 Clears all previous history and establishes a new point zero. Use it when you wish to purify the flow of time and begin a new saga of states and seeds.
 
-### 🗺️ `M-x stargate-timeline` (Alias of `dragonruby-stargate-timeline-render`)
+### 🗺️ `M-x stargate-timeline` (Alias: `dragonruby-stargate-timeline-render`)
 **The Vision of Eternity.**
-Displays the visual time viewer. It allows you to "scrub" through recorded frames. By selecting an instant, the live simulation will immediately jump to that exact state.
+Displays the visual timeline viewer. It renders the **Branch Forest**, allowing you to "scrub" through recorded frames across different realities. By selecting an instant (Moment), the live simulation will immediately jump to that exact state, resolving any inherited historical data through the branch lineage.
+
+### 🍴 `M-x stargate-fork` (Alias: `dragonruby-stargate-session-fork`)
+**Bifurcation of Fate.**
+Creates a new branch starting from the current moment. This is a metadata-only operation (O(1)) that allows you to experiment with new code or inputs without corrupting your original timeline.
 
 ### 💉 `dragonruby-stargate-inject-buffer` (Automatic on Save)
 **The Atomic Surgery.**

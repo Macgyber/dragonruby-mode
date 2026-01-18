@@ -8,7 +8,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <details open>
-<summary><h2>[0.7.4] - 2026-01-17 (SOVEREIGN SURGERY & ARTISAN CI)</h2></summary>
+<summary><h2>[0.8.0] - 2026-01-17 (STARGATE PHASE 5: FORKS & REPLAY)</h2></summary>
+
+### 🌌 Stargate Phase 5: Forks & Replay
+- **O(1) Branching**: Implemented `stargate-fork` for metadata-only branch creation without data duplication.
+- **Hierarchical Inheritance**: Developed recursive moment retrieval with shadowing support (local branch overrides parent).
+- **Deterministic Replay**: Enhanced Timeline Jump to resolve inherited state correctly using the recursive getter.
+- **Protocol v1.0 Standard**: Finalized and enforced internal string-key mappings across all session data structures.
+
+### 🌌 Stargate Persistence (Layer 2)
+- **Schema v1**: Formalized the `.dr-stargate` JSON index with explicit versioning and nested temporal schema (`tick`/`monotonic_ms`).
+- **Sovereign Lifecycle**: Implemented `on-idle` (30s deferred), `on-exit` (atomic flush), and `on-demand` persistence.
+- **Session Recovery**: Built `dragonruby-stargate-session-load` for O(1) restoration of historical hash tables from disk.
+
+### 🛡️ Guardian Module (Layer 3)
+- **Robust Hashing**: Optimized SHA-256 verification in `tracker.el` to ignore non-semantic whitespace, eliminating false-positive stasis triggers.
+- **Stasis Authority**: Verified immediate `Clock.pause!` invocation upon authoritative buffer mismatch.
+
+### 🧠 Mind & Determinism (Layer 4)
+- **Law XIV Compliance**: Enforced nested `observed_at` validation across the whole IPC bridge to ensure state reproducibility.
+- **Timeline Consumer**: Decoupled rendering logic from capture state; the Timeline now operates as a passive observer of the session index.
+
+### 🎨 UX & Polish
+- **Contextual CAPF**: Refined path completion exit-function to correctly position the cursor post-insertion.
+- **Lazy Visuals Toggle**: Introduced `dragonruby-sprites-lazy-visuals` to allow users to opt-out of automatic sprite thumbnailing.
+
+</details>
+
+<details>
+<summary><h2>[0.7.4] - 2026-01-16 (SOVEREIGN SURGERY & ARTISAN CI)</h2></summary>
 
 ### 🛡️ Artisan CI (MELPA-Grade Integrity)
 - **CI Technical Standard**: Drafted and implemented a formal, isolated environment standard for all future contributions.

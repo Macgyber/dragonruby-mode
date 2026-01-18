@@ -1,5 +1,15 @@
 ;;; dragonruby-core.el --- Core aggregator and constants -*- lexical-binding: t; -*-
 
+;; Author: Macgyber <esteban3261g@gmail.com>
+;; Version: 0.8.0
+;; Package-Requires: ((emacs "26.1"))
+;; URL: https://github.com/Macgyber/dragonruby-mode
+
+;;; Commentary:
+;; Core constants and group definitions for DragonRuby mode.
+
+;;; Code:
+
 ;; Protection against re-loading core logic accidentally
 (defvar dragonruby--core-loaded nil)
 

@@ -1,4 +1,14 @@
-;;; manager.el --- Stargate Session Management and Asset Vault -*- lexical-binding: t -*-
+;;; dragonruby-stargate-manager.el --- Stargate Session Management and Asset Vault -*- lexical-binding: t -*-
+
+;; Author: Macgyber <esteban3261g@gmail.com>
+;; Version: 0.8.0
+;; Package-Requires: ((emacs "26.1"))
+;; URL: https://github.com/Macgyber/dragonruby-mode
+
+;;; Commentary:
+;; Manages the persistence, tree-structure, and inheritance of Stargate moments.
+
+;;; Code:
 
 (require 'cl-lib)
 (require 'json)
@@ -15,10 +25,10 @@
   "Queue of pending events to be processed during idle time.")
 
 (defvar dragonruby-stargate--persist-timer nil
-  "Timer for background persistence of the session index.")
+  "Timer for background persistence. Sovereign: Reinjected on session load.")
 
 (defvar dragonruby-stargate--idle-timer nil
-  "Timer for processing the event queue.")
+  "Timer for event processing. Sovereign: Reinjected on session load.")
 
 (defun dragonruby-stargate-session-init (&optional project-root)
   "Initialize a new Stargate session in PROJECT-ROOT.
@@ -38,12 +48,15 @@ If PROJECT-ROOT is nil, attempt to find it automatically."
           (branches (make-hash-table :test 'equal))
           (branch-maps (make-hash-table :test 'equal)))
       ;; Initial branch
-      (puthash "prime" '((parent . nil) (divergence . 0)) branches)
+      (puthash "prime" (list (cons "parent" nil) (cons "divergence" 0)) branches)
       (puthash "prime" '() branch-maps)
       
-      (setq dragonruby-stargate--session-index
-            (list (cons "version" "1.0.0")
-                  (cons "metadata" (list (cons "observed_at" (float-time))))
+       (setq dragonruby-stargate--session-index
+            (list (cons "schema_version" 1) ;; Versioned for future migrations
+                  (cons "version" "1.0.0")
+                  (cons "metadata" (list (cons "observed_at" 
+                                               (list (cons "tick" 0)
+                                                     (cons "monotonic_ms" (floor (* (float-time) 1000)))))))
                   (cons "branches" branches)
                   (cons "moments" moments)
                   (cons "branch-maps" branch-maps))))
@@ -61,9 +74,57 @@ If PROJECT-ROOT is nil, attempt to find it automatically."
       (cancel-timer dragonruby-stargate--idle-timer))
     ;; Process every 0.1s when idle, batching events.
     (setq dragonruby-stargate--idle-timer
-          (run-with-idle-timer 0.2 t #'dragonruby-stargate-session-process-queue))
+          (run-with-idle-timer 0.2 t #'dragonruby-stargate-session--process-queue))
     
     (message "🌌 Stargate: Session initialized (High-Performance Mode)")))
+
+(defun dragonruby-stargate-session-load (session-dir)
+  "Load an existing Stargate session from SESSION-DIR."
+  (interactive (list (read-directory-name "Stargate Session to load: " 
+                                          (expand-file-name ".stargate/" (dragonruby--find-project-root)))))
+  (let ((index-file (expand-file-name "session.json" session-dir)))
+    (if (not (file-exists-p index-file))
+        (error "Session index not found: %s" index-file)
+      
+      (let* ((json-object-type 'alist)
+             (json-array-type 'list)
+             (json-key-type 'string)
+             (json-data (json-read-file index-file))
+             (moments-alist (cdr (assoc "moments" json-data)))
+             (branches-alist (cdr (assoc "branches" json-data)))
+             (bmaps-alist (cdr (assoc "branch-maps" json-data)))
+             (moments (make-hash-table :test 'equal :size (max 5000 (length moments-alist))))
+             (branches (make-hash-table :test 'equal))
+             (bmaps (make-hash-table :test 'equal)))
+        
+        ;; Recover Hash Tables from Alists
+        (dolist (m moments-alist) (puthash (car m) (cdr m) moments))
+        (dolist (b branches-alist) (puthash (car b) (cdr b) branches))
+        (dolist (bm bmaps-alist) (puthash (car bm) (cdr bm) bmaps))
+        
+        (setq dragonruby-stargate--active-session session-dir)
+        (setq dragonruby-stargate--session-index
+              (list (cons "schema_version" (or (cdr (assoc "schema_version" json-data)) 1))
+                    (cons "version" (cdr (assoc "version" json-data)))
+                    (cons "metadata" (cdr (assoc "metadata" json-data)))
+                    (cons "branches" branches)
+                    (cons "moments" moments)
+                    (cons "branch-maps" bmaps)))
+        
+        ;; Restart Timers (Sovereign Lifecycle)
+        (when dragonruby-stargate--persist-timer
+          (cancel-timer dragonruby-stargate--persist-timer))
+        (setq dragonruby-stargate--persist-timer
+              (run-with-idle-timer 30 t #'dragonruby-stargate-session-persist))
+        
+        (when dragonruby-stargate--idle-timer
+          (cancel-timer dragonruby-stargate--idle-timer))
+        (setq dragonruby-stargate--idle-timer
+              (run-with-idle-timer 0.2 t #'dragonruby-stargate-session--process-queue))
+        
+        (message "🌌 Stargate: Session restored (Moments: %d | Schema: %s)" 
+                 (hash-table-count moments)
+                 (cdr (assoc "schema_version" dragonruby-stargate--session-index)))))))
 
 (defun dragonruby-stargate-session-persist (&optional force)
   "Persist the in-memory session index to disk.
@@ -76,7 +137,8 @@ If FORCE is non-nil, ignore size limits and user input status."
            (branches-hash (cdr (assoc "branches" dragonruby-stargate--session-index)))
            (bmaps-hash (cdr (assoc "branch-maps" dragonruby-stargate--session-index))))
       
-      ;; Throttling: Only persist in background if the index isn't pathologically large
+      ;; Throttling: Only persist in background if the index isn't pathologically large.
+      ;; Note: Skips are silent but can be tracked via (hash-table-count moments-hash).
       (when (or force (< (hash-table-count moments-hash) 10000))
         (let ((index-file (expand-file-name "session.json" dragonruby-stargate--active-session))
               (moments-alist nil)
@@ -88,7 +150,8 @@ If FORCE is non-nil, ignore size limits and user input status."
           (maphash (lambda (k v) (push (cons k v) branches-alist)) branches-hash)
           (maphash (lambda (k v) (push (cons k v) bmaps-alist)) bmaps-hash)
           
-          (let ((json-data (list (cons "version" "1.0.0")
+          (let ((json-data (list (cons "schema_version" 1)
+                                 (cons "version" "1.0.0")
                                  (cons "metadata" (cdr (assoc "metadata" dragonruby-stargate--session-index)))
                                  (cons "branches" branches-alist)
                                  (cons "moments" moments-alist)
@@ -97,20 +160,20 @@ If FORCE is non-nil, ignore size limits and user input status."
               (let ((json-encoding-object-type 'alist))
                 (insert (json-encode json-data))))))))))
 
-(defun dragonruby-stargate-session-handle-event (event)
+(defun dragonruby-stargate-session--handle-event (event)
   "Queue Stargate EVENT for asynchronous processing.
 Exceptional events (divergence) bypass the queue for immediate action."
   (let ((type (cdr (assoc "type" event))))
     (if (string= type "divergence")
         (progn
           (setq dragonruby-stargate--event-queue nil) ;; Clear queue on disaster
-          (dragonruby-stargate-session-record-divergence event))
+          (dragonruby-stargate-session--record-divergence event))
       (push event dragonruby-stargate--event-queue))))
 
 (defvar dragonruby-stargate-session-updated-hook nil
   "Hook run after a batch of events has been processed.")
 
-(defun dragonruby-stargate-session-process-queue ()
+(defun dragonruby-stargate-session--process-queue ()
   "Consume and process queued events during idle time."
   (when dragonruby-stargate--event-queue
     (let ((batch (reverse dragonruby-stargate--event-queue)))
@@ -118,12 +181,12 @@ Exceptional events (divergence) bypass the queue for immediate action."
       (dolist (event batch)
         (let ((type (cdr (assoc "type" event))))
           (cond
-           ((string= type "moment") (dragonruby-stargate-session-record-moment event))
-           ((string= type "branch") (dragonruby-stargate-session-record-branch event)))))
+           ((string= type "moment") (dragonruby-stargate-session--record-moment event))
+           ((string= type "branch") (dragonruby-stargate-session--record-branch event)))))
       ;; Trigger UI refresh hooks
       (run-hooks 'dragonruby-stargate-session-updated-hook))))
 
-(defun dragonruby-stargate-session-record-moment (event)
+(defun dragonruby-stargate-session--record-moment (event)
   "Record an incoming Stargate moment from EVENT into the hash table."
   (let* ((address (cdr (assoc "address" event)))
          (hash (cdr (assoc "hash" event)))
@@ -135,17 +198,17 @@ Exceptional events (divergence) bypass the queue for immediate action."
       (let ((moments (cdr (assoc "moments" dragonruby-stargate--session-index)))
             (bmaps (cdr (assoc "branch-maps" dragonruby-stargate--session-index)))
             (branch-id (car (split-string address "@"))))
-        ;; 1. Store global metadata
-        (puthash address `((hash . ,hash)
-                           (seed . ,seed)
-                           (moment_type . ,moment-type)
-                           (observed_at . ,observed-at))
+        ;; 1. Store global metadata (supporting nested observed_at)
+        (puthash address (list (cons "hash" hash)
+                               (cons "seed" seed)
+                               (cons "moment_type" moment-type)
+                               (cons "observed_at" observed-at))
                  moments)
         ;; 2. Update branch-local map for fast rendering
         (let ((existing (gethash branch-id bmaps)))
           (puthash branch-id (cons address existing) bmaps))))))
 
-(defun dragonruby-stargate-session-record-branch (event)
+(defun dragonruby-stargate-session--record-branch (event)
   "Record an incoming Stargate branch from EVENT into the hash table."
   (let* ((id (cdr (assoc "id" event)))
          (parent (cdr (assoc "parent" event)))
@@ -153,9 +216,44 @@ Exceptional events (divergence) bypass the queue for immediate action."
     
     (when (and dragonruby-stargate--active-session dragonruby-stargate--session-index)
       (let ((branches (cdr (assoc "branches" dragonruby-stargate--session-index))))
-        (puthash id `((parent . ,parent) (divergence . ,divergence)) branches)))))
+        (puthash id (list (cons "parent" parent) (cons "divergence" divergence)) branches)))))
 
-(defun dragonruby-stargate-session-record-divergence (event)
+(defun dragonruby-stargate-session-fork (source-branch divergence-tick new-branch)
+  "Create a new NEW-BRANCH by forking SOURCE-BRANCH at DIVERGENCE-TICK.
+This is a metadata-only operation (O1) that enables Law XIV inheritance."
+  (interactive (list (read-string "Source Branch (empty for current): ")
+                     (read-number "Divergence Tick: ")
+                     (read-string "New Branch ID: ")))
+  (when (and dragonruby-stargate--active-session dragonruby-stargate--session-index)
+    (let* ((branches (cdr (assoc "branches" dragonruby-stargate--session-index)))
+           (bmaps (cdr (assoc "branch-maps" dragonruby-stargate--session-index)))
+           (source (if (string-empty-p source-branch) "prime" source-branch)))
+      (if (gethash new-branch branches)
+          (error "Branch [%s] already exists" new-branch)
+        (puthash new-branch (list (cons "parent" source) (cons "divergence" divergence-tick)) branches)
+        (puthash new-branch '() bmaps)
+        (dragonruby-stargate-timeline-trigger-refresh)
+        (message "🌌 Stargate: Branch [%s] born from [%s] at tick %d (Inheritance Enabled)" 
+                 new-branch source divergence-tick)))))
+
+(defun dragonruby-stargate-session-get-moment (branch-id tick)
+  "Get moment at TICK for BRANCH-ID, traversing hierarchical inheritance.
+Supports 'Shadowing': local branch moments override parent moments at the same tick."
+  (when (and dragonruby-stargate--active-session dragonruby-stargate--session-index)
+    (let* ((moments (cdr (assoc "moments" dragonruby-stargate--session-index)))
+           (branches (cdr (assoc "branches" dragonruby-stargate--session-index)))
+           (address (format "%s@%d" branch-id tick))
+           (local-moment (gethash address moments)))
+      (if local-moment
+          local-moment ;; Shadowing: Local reality overrides history
+        ;; Inheritance: Check parent if within divergence bounds
+        (let* ((branch-data (gethash branch-id branches))
+               (parent (cdr (assoc "parent" branch-data)))
+               (divergence (cdr (assoc "divergence" branch-data))))
+          (when (and parent (<= tick divergence))
+            (dragonruby-stargate-session-get-moment parent tick)))))))
+
+(defun dragonruby-stargate-session--record-divergence (event)
   "Handle a divergence event immediately."
   (let ((address (cdr (assoc "address" event)))
         (expected (cdr (assoc "expected" event)))
@@ -178,6 +276,6 @@ Exceptional events (divergence) bypass the queue for immediate action."
   (setq dragonruby-stargate--session-index nil)
   (message "🌙 Stargate: Session finalized and persisted."))
 
-(add-hook 'dragonruby-stargate-bridge-event-hook #'dragonruby-stargate-session-handle-event)
+(add-hook 'dragonruby-stargate-bridge-event-hook #'dragonruby-stargate-session--handle-event)
 
 (provide 'dragonruby-stargate-manager)

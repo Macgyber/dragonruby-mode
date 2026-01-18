@@ -1,8 +1,15 @@
-;;; timeline.el --- Stargate Branch Forest Visualizer -*- lexical-binding: t -*-
+;;; dragonruby-stargate-timeline.el --- Stargate Branch Forest Visualizer -*- lexical-binding: t -*-
+
+;; Author: Macgyber <esteban3261g@gmail.com>
+;; Version: 0.8.0
+;; Package-Requires: ((emacs "26.1"))
+;; URL: https://github.com/Macgyber/dragonruby-mode
 
 ;;; Commentary:
 ;; This module implements the "Perception" of the Branch Forest (Law XVI).
 ;; It renders the timeline graph and handles scrubbing/jumping between Moments.
+
+;;; Code:
 
 (require 'dragonruby-stargate-bridge)
 (require 'dragonruby-stargate-manager)
@@ -119,8 +126,11 @@
                               'mouse-face 'highlight
                               'address address
                               'seed seed
-                              'help-echo (format "Click to jump to %s\nType: %s\nHash: %s\nSeed: %s" 
-                                                 address moment-type hash seed)
+                              'help-echo (lambda (_window _object _pos)
+                                           (let* ((tick (cdr (assoc "tick" (cdr (assoc "observed_at" meta)))))
+                                                  (ms (cdr (assoc "monotonic_ms" (cdr (assoc "observed_at" meta))))))
+                                             (format "Moment: %s\nType: %s\nTick: %s\nPhysical: %sms\nHash: %s" 
+                                                     address moment-type (or tick "N/A") (or ms "N/A") hash)))
                               'keymap (let ((map (make-sparse-keymap)))
                                         (define-key map [mouse-1] #'dragonruby-stargate-timeline-jump-at-point)
                                         (define-key map (kbd "RET") #'dragonruby-stargate-timeline-jump-at-point)
@@ -154,9 +164,7 @@
   (let* ((parts (split-string address "@"))
          (branch (nth 0 parts))
          (frame (string-to-number (nth 1 parts)))
-         (index dragonruby-stargate--session-index)
-         (moments (cdr (assoc "moments" index)))
-         (moment (gethash address moments)))
+         (moment (dragonruby-stargate-session-get-moment branch frame)))
     
     (if moment
         (let* ((hash (cdr (assoc "hash" moment)))
