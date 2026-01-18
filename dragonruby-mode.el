@@ -166,7 +166,7 @@ If nil, renders previews automatically for all paths."
   (dragonruby-kernel-buffer-cleanup)
   (message "【 🐉 】 DragonRuby Mode Shutdown Complete."))
 
-(defcustom dragonruby-auto-activation-modes '(ruby-mode image-mode conf-mode)
+(defcustom dragonruby-auto-activation-modes '(ruby-mode ruby-ts-mode image-mode conf-mode)
   "List of major modes that trigger auto-detection of DragonRuby project."
   :type '(repeat symbol)
   :group 'dragonruby)
@@ -185,6 +185,7 @@ If nil, renders previews automatically for all paths."
 ;; Register hooks
 (add-hook 'find-file-hook #'dragonruby-maybe-enable)
 (add-hook 'ruby-mode-hook #'dragonruby-maybe-enable)
+(add-hook 'ruby-ts-mode-hook #'dragonruby-maybe-enable)
 (add-hook 'image-mode-hook #'dragonruby-maybe-enable)
 
 (defun dragonruby-reset-and-reload ()
