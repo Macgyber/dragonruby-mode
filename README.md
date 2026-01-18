@@ -28,13 +28,13 @@ This is our contribution to the craft. This is the new baseline.
   - [🌐 Level 4: The Creative Hub (Beta)](#level-4-the-creative-hub-beta)
   - [⚡ Level 3: Curvature Navigation (The Law)](#level-3-curvature-navigation-the-law)
 - [💎 Tactical Arsenal (Beta)](#tactical-arsenal-beta)
-  - [🔊 The Resonance Engine (Audio)](#the-resonance-engine-audio--beta)
+  - [🔊 The Resonance Engine (Audio)](#the-resonance-engine-audio-beta)
   - [🅰️ The Glyph Engine (Fonts)](#the-glyph-engine-fonts)
-  - [🌌 Level 5: The Time Machine (Stargate)](#level-5-the-time-machine-stargate--experimental)
-- [📦 Installation](#-installation)
+  - [🌌 Level 5: The Time Machine (Stargate)](#level-5-the-time-machine-stargate-experimental)
+- [📦 Installation](#installation)
 - [🏗️ Architecture: The Lego System (v0.8.0)](#architecture-the-lego-system-v080)
   - [🧠 The Sovereign Kernel](#the-sovereign-kernel-v080)
-- [📚 Documentation and Resources](#-documentation-and-resources)
+- [📚 Documentation and Resources](#documentation-and-resources)
 
 ---
 
