@@ -21,9 +21,8 @@ dev/
 .emacs.d/
 
 
-# Tests (Private)
-test/
-!test/modules/
+# Tests (Public)
+!test/
 # System & Meta
 .stargate/
 **/*.dr-stargate
