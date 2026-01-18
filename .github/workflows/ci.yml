@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📦 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐉 Set up Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: '29.1'
+
+      - name: 🚀 Verify Plugin Initialization (Batch Load)
+        run: |
+          emacs -Q --batch -L . -l dragonruby-mode.el
+
+      - name: 🧪 Run Unit Tests (ERT Batch)
+        run: |
+          set -e
+          # Test Individual Modules
+          for test_file in test/dragonruby-*-test.el; do
+            echo "Running $test_file..."
+            emacs -Q --batch -L . -l dragonruby-mode.el -l "$test_file" -f ert-run-tests-batch-and-exit
+          done
+
+      - name: 🧩 Run Integration Tests
+        run: |
+          set -e
+          echo "Running Integration Tests..."
+          emacs -Q --batch -L . -l dragonruby-mode.el -l test/modules/integration_test.el -f ert-run-tests-batch-and-exit

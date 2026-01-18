@@ -68,6 +68,13 @@ DragonRuby Mode follows a strict "Observe and Paint" philosophy.
 -   **Debounce**: Scanning waits for user to pause typing.
 -   **Zero Blocking**: Heavy assets (images) are loaded lazily on hover.
 
+## 🛡️ CI Guardrail (The MELPA-Grade Guarantee)
+
+To protect this modular architecture, the project adheres to a **Strict CI Standard**:
+-   **Batch Verification**: Every push is verified with `emacs -Q --batch -L . -l dragonruby-mode.el`.
+-   **Zero Intervention**: The plugin must handle its own `load-path` setup. If it doesn't work with only `-L .`, it is considered a bug.
+-   **Layout-Agnostic Tests**: ERT tests must never assume a local path. They `require` the package and verify behavior in a clean environment.
+
 ---
 
 *DragonRuby Emacs Mode — v0.7.4*

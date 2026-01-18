@@ -8,8 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <details open>
+<summary><h2>[0.7.4] - 2026-01-17 (SOVEREIGN SURGERY & ARTISAN CI)</h2></summary>
+
+### 🛡️ Artisan CI (MELPA-Grade Integrity)
+- **CI Technical Standard**: Drafted and implemented a formal, isolated environment standard for all future contributions.
+- **Strict Load-Path**: Enforced `-L .` constraint to ensure the package is architecturally self-sufficient.
+- **Test Standardization**: Modernized 13+ test files to be layout-agnostic, relying exclusively on internal module resolution.
+- **GitHub Actions**: Deployed the official CI workflow on Ubuntu-latest with Emacs 29.1.
+
 ### 🏛️ Sovereign Architecture Surgery (Performance Fix)
-- **Sovereign Root Anchor**: Implemented one-time project root detection per buffer. Eliminated recursive upward disk scans in idle pulses.
+- **Project Root Anchor**: Implemented one-time project root detection per buffer. Eliminated recursive upward disk scans in idle pulses.
 - **Lazy Sprite Overlays**: Visual metadata and image creation are now deferred to hover time. 0% CPU impact during idle pulses.
 - **Architectural Throttling**: Increased idle delay to 1.5s. Implemented global guards that abort background logic if no Sovereign Root is anchored.
 - **Memory Hygiene**: Sanitized the Kernel ledger to eliminate defunct timers and hooks.

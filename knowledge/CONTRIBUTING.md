@@ -22,7 +22,7 @@ We don't hide our kitchen. Some features are shipped in the codebase but disable
 
 ### Enabling Experimental Features
 
-Add these to your `init.el` or `config.el` to unlock early-access tools:
+Add these explicitly at your own risk to your `init.el` or `config.el` to unlock early-access tools:
 
 | Feature Flag | Description | Status |
 |--------------|-------------|--------|
@@ -35,7 +35,7 @@ If you enable these and find a bug or have an idea, please use the **Experimenta
 ## Pull Requests
 
 ### Before submitting:
-- Read the [Architecture](ARCHITECTURE.md) and [Manifesto](MANIFESTO.md)
+- Read the [Architecture](ARCHITECTURE.md)
 - Ensure your change aligns with the project's design philosophy
 
 ### Good PRs:
@@ -58,11 +58,11 @@ If you enable these and find a bug or have an idea, please use the **Experimenta
 
 ## Testing
 
-Run tests before submitting:
+Run tests before submitting. The project uses a MELPA-grade CI standard:
 ```bash
-cd tests/
-emacs --batch -l run-tests.el
+emacs -Q --batch -L . -l dragonruby-mode.el -l test/dragonruby-core-test.el -f ert-run-tests-batch-and-exit
 ```
+If CI fails, the implementation is considered incorrect.
 
 ## Questions?
 

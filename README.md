@@ -269,3 +269,4 @@ An artisan autocompletion system that respects your definitions. It is **NOT** a
 **DragonRuby Emacs Mode — v0.7.4 (Sovereign Architecture)**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CI](https://github.com/Macgyber/dragonruby-mode/actions/workflows/ci.yml/badge.svg)](https://github.com/Macgyber/dragonruby-mode/actions/workflows/ci.yml)

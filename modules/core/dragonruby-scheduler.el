@@ -115,7 +115,7 @@ Governs both 'scan' (heavy) and 'monitor' (light) phases."
                     
                     (setq dragonruby--last-scan-time now)
                     (setq dragonruby--buffer-state 'clean)
-                    (dragonruby--log "PULSE SCAN END")))))))
+                    (dragonruby--log "PULSE SCAN END"))))))))
       (setq dragonruby--pulse-in-progress nil))))
 
 (defun dragonruby--schedule-pulse ()
