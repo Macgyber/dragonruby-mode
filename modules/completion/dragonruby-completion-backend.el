@@ -53,6 +53,8 @@
         ;; This is useful for simple "args: ..." files without the metadata wrapper.
         (setq-local dragonruby-completion--roots (hash-table-keys dragonruby-completion--contract))))))
 
+;; (require 'dragonruby-symbols)
+
 (defun dragonruby-completion-at-point ()
   "CAPF function. STRICTLY matches explicit paths."
   ;; 1. Check if we have a contract
@@ -101,11 +103,6 @@
             (when matching-roots
               (list start end 
                     all-roots ;; Return ALL roots so Emacs can show alternatives, but only if we had at least one match.
-                    ;; actually, better to return all-roots if there is a match? 
-                    ;; Or just return matching-roots? 
-                    ;; Emacs standard is to return the full table, but if we return full table for 'req', it blocks.
-                    ;; We must return NIL if matching-roots is empty.
-                    ;; So:
                     :exclusive 'no
                     :exit-function 
                     (lambda (str status)

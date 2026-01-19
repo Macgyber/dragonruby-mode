@@ -235,7 +235,8 @@ The module MUST adhere to the Life-Cycle Contract:
       (unless (memq name existing)
         (puthash cap (cons name existing) dragonruby--capabilities))))
 
-  (message "🧠 Kernel: Registered Module [%s]" name))
+  ;; (message "🧠 [%s]" name)
+  )
 
 ;; -----------------------------------------------------------------------------
 ;; 🔌 Dependency Resolution (Capabilities)

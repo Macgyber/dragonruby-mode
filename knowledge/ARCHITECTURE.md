@@ -42,7 +42,8 @@ dragonruby-mode/
 │   ├── concepts/            ;; Educational overlays (Retina)
 │   ├── paths/               ;; Navigation system
 │   ├── completion/          ;; API Contract (YAML)
-│   └── guide/               ;; Knowledge Guidance (Memory)
+│   ├── guide/               ;; Knowledge Guidance (Memory)
+│   └── stargate/           ;; Time Travel & Simulation control
 │
 ├── knowledge/               ;; The Unified Brain (Content)
 │   ├── definitions/         ;; Org files for concepts

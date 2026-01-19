@@ -175,6 +175,13 @@
           (dragonruby-stargate-bridge-send-code 
            (format "Stargate::Clock.restore_moment(%S, %s, %S, %s)" 
                    branch frame hash seed))
+          
+          ;; Clear divergence flag after jump
+          (dolist (buf (buffer-list))
+            (with-current-buffer buf
+              (when (boundp 'dragonruby-stargate--divergence-detected)
+                (setq dragonruby-stargate--divergence-detected nil))))
+          
           ;; Refresh to update highlights
           (dragonruby-stargate-timeline))
       (error "Moment %s not found in Session Index" address))))

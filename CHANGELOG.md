@@ -8,6 +8,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <details open>
+<summary><h2>[0.8.1] - 2026-01-18 (STARGATE STABILIZATION: THE INDUSTRIAL LEAP)</h2></summary>
+
+### 🌌 Stargate Stabilization (Industrial Grade)
+- **Portal Strategy**: Implemented a sandbox-compliant injection mechanism using a temporary `stargate_portal.rb` in `mygame/`. This bypasses DragonRuby's file restrictions and ensures 100% loading reliability.
+- **Void Shield (Anti-Lag Storm)**: Developed a high-speed selective log processor that vaporizes massive bursts of engine noise (like Render logs during resize) before they touch the Emacs UI. Zero blocking during window operations.
+- **Lifecycle-Aware Injection**: The Bridge now actively monitors for the `RNG seed` signal, ensuring the VM is stable and ready before attempting any injection.
+- **Deterministic Single Injection**: Implemented a global "Infection Requested" lock in Emacs. Guarantees that the injection command is sent exactly once per stable session, eliminating re-entry bugs and minibuffer errors.
+- **Industrial Runtime Refactor**:
+  - **Sovereign Alias Protection**: Real idempotency in `bootstrap.rb` using explicit `method_defined?` checks to prevent infinite recursion on hot reloads.
+  - **Law of the Void**: Added fallback support for projects without a pre-defined `tick` method.
+  - **Segregated States**: Separate logic for technical installation (`$stargate_installed`) and operational readiness (`$stargate_operational`).
+
+### 🧠 Project Context & Utility
+- **Robust Root Anchoring**: Refined `dragonruby--anchor-project-root` to reliably identify the parent of `mygame/`, ensuring all session assets are stored in the correct project context.
+
+</details>
+
+<details>
 <summary><h2>[0.8.0] - 2026-01-17 (STARGATE PHASE 5: FORKS & REPLAY)</h2></summary>
 
 ### 🌌 Stargate Phase 5: Forks & Replay

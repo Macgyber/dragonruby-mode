@@ -9,7 +9,9 @@ require_relative 'bootstrap'
 # 1. require 'modules/stargate/runtime/stargate_init' at the top of your main.rb
 # 2. Call Stargate::Bootstrap.tick(args) { your_game_tick(args) } inside your global tick.
 
-puts "🌌 STARGATE: The Machine of Time is Levelled."
+puts "STARGATE: The Machine of Time is Levelled."
 puts "  [Status] Body is ready. Mind is watching."
+puts "  [Path] Runtime loaded."
 
 Stargate::Bootstrap.install!
+puts "STARGATE: Initializer sequence complete."

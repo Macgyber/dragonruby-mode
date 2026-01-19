@@ -32,17 +32,18 @@ This is an expensive procedure intended to run ONCE per buffer activation."
                              (lambda (dir)
                                (or (file-exists-p (expand-file-name "dragonruby" dir))
                                    (file-exists-p (expand-file-name "dragonruby.exe" dir))))))
-             (content-root (locate-dominating-file search-dir
-                                (lambda (dir)
-                                  (or (file-exists-p (expand-file-name "app/main.rb" dir))
-                                      (file-exists-p (expand-file-name "main.rb" dir))
-                                      (file-exists-p (expand-file-name "dragonruby_api.yml" dir))
-                                      (file-exists-p (expand-file-name "mygame" dir))
-                                      (file-exists-p (expand-file-name ".dragonruby" dir)))))))
-        (setq root (or content-root binary-root))))
+             (content-root (locate-dominating-file search-dir "mygame")))
+        (setq root content-root)
+        
+        ;; DOWN DRILL: If we don't find a parent with mygame/, look for it downwards
+        (unless root
+           (let ((sub-mygame (directory-files-recursively search-dir "^mygame$" t)))
+             (when sub-mygame
+               (setq root (file-name-directory (directory-file-name (file-name-directory (car sub-mygame))))))))))
     
     (setq dragonruby--buffer-project-root 
-          (if root (expand-file-name root) nil))
+          (or (if root (expand-file-name root) nil)
+              dragonruby--last-detected-project-root))
     
     (when dragonruby--buffer-project-root
       (setq dragonruby--last-detected-project-root dragonruby--buffer-project-root))
@@ -229,7 +230,8 @@ Launches as an Emacs subprocess to allow Stargate cable hookup."
           ;; Start as a dedicated Emacs process
           (let ((proc (start-process "dragonruby" "*DragonRuby Simulation*" binary-path)))
             ;; Re-install bridge via the standard installer for consistency
-            (run-at-time 1 nil #'dragonruby-stargate-bridge-install proc)
+            (when (fboundp 'dragonruby-stargate-bridge-install)
+              (run-at-time 1 nil #'dragonruby-stargate-bridge-install proc))
             
             ;; Show the output buffer to the Architect
             (display-buffer "*DragonRuby Simulation*")

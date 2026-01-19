@@ -8,7 +8,7 @@
 
 In traditional development, an error is the end of the road. In **DragonRuby Mode**, an error is just a divergent branch. 
 
-Stargate is born from the ambition to eliminate the friction between **thought** and **reality**. Our purpose is to turn the simulation into a malleable fabric, where the programmer can travel to the past to correct the present, and project the future without fear of collapse. With **Phase 5 (v0.8.0)**, we introduce **Phylogenetic Inheritance**, allowing you to fork reality and navigate any divergent path with zero performance penalty.
+Stargate is born from the ambition to eliminate the friction between **thought** and **reality**. Our purpose is to turn the simulation into a malleable fabric, where the programmer can travel to the past to correct the present, and project the future without fear of collapse. With **Phase 6 (v0.8.1)**, we bridge **Phylogenetic Inheritance**—which allows forking reality with zero penalty—with **Industrial Stability**, ensuring the portal remains steady even under the most chaotic execution conditions.
 
 ---
 
@@ -53,9 +53,13 @@ If you experience an exponential rise in CPU usage or the system becomes unstabl
 
 ## 🚦 Nexus Signals (Mode-line)
 
-- 🌌 **Ecstasy of Synchrony (Bright Blue)**: The portal is open, and time flows safely between Emacs and DragonRuby.
-- 💤 **The Dragon's Sleep (Gray)**: Stargate is active, but awaits the awakening of the DragonRuby process to begin recording.
+- 🌌 **Ecstasy of Synchrony (Bright Blue)**: The portal is open, and time flows safely. SUCCESS.
+- ⚠️ **Temporal Desync (Red)**: Infection timeout. The Dragon is not responding.
+- ⚡ **Divergent Reality (Orange)**: Code or state has diverged from the chronicler's record.
+- 💤 **The Dragon's Sleep (Gray)**: Stargate is sensing, awaiting the stable `RNG seed` signal to leap.
+- 🚀 **Leap Imminent (Green-ish)**: Stable VM detected. Ready to inject.
 
 ---
 
 *“Do not accept linearity. Master the moment with Stargate.”*
+*v0.8.1 - The Industrial Leap*

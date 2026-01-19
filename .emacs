@@ -1,5 +1,13 @@
 ;;; .emacs --- DragonRuby Local Dev Configuration (TRUE HOT RELOAD)
 
+;; Guard: Prevent double-loading
+(when (bound-and-true-p dragonruby-local-config-loaded)
+  ;; (message "⚠️ DragonRuby .emacs already loaded. Skipping duplicate load.")
+  )
+
+(unless (bound-and-true-p dragonruby-local-config-loaded)
+  (defvar dragonruby-local-config-loaded t)
+
 (require 'cl-lib)
 
 ;; ============================================================
@@ -81,7 +89,7 @@
 ;; ============================================================
 ;; 🧩 User Lego Profile
 ;; ============================================================
-(setq dragonruby-enable-completion   t)   ;✅ON
+(setq dragonruby-enable-completion   nil) ;❌OFF
 (setq dragonruby-enable-colors       nil) ;❌OFF
 (setq dragonruby-enable-sprites      nil) ;❌OFF
 (setq dragonruby-enable-sprite-tools nil) ;❌OFF
@@ -90,7 +98,7 @@
 (setq dragonruby-enable-audio        nil) ;❌OFF
 (setq dragonruby-enable-paths        nil) ;❌OFF
 (setq dragonruby-enable-concepts     nil) ;❌OFF
-(setq dragonruby-enable-stargate     nil) ;❌OFF
+(setq dragonruby-enable-stargate     t)   ;✅ON
 (setq dragonruby-enable-guide        nil) ;❌OFF
 
 ;; ============================================================
@@ -119,8 +127,9 @@
 ;; ============================================================
 (defun reload-local-emacs ()
   (interactive)
-  (load-file (expand-file-name ".emacs" dragonruby-project-root))
-  (message "♻️ Local profile reloaded and synchronized"))
+  (setq dragonruby-local-config-loaded nil)  ;; Reset guard for manual reload
+  (load (expand-file-name ".emacs" dragonruby-project-root) nil t)  ;; NOMESSAGE = t
+  (message "♻️ Local profile reloaded"))
 
 (global-set-key (kbd "<f5>") #'reload-local-emacs)
 (global-set-key (kbd "<f6>") #'dragonruby-hot-reload)
@@ -145,6 +154,8 @@
  '(org-level-2 ((t (:height 1.2 :weight bold :foreground "#ABB2BF"))))
  '(org-level-3 ((t (:height 1.1 :weight semi-bold :foreground "#DCDFE4")))))
 
-(message "🚀 DragonRuby kernel online")
+;; (message "🚀 DragonRuby kernel online")
+
+) ;; End of unless guard
 
 ;;; .emacs ends here

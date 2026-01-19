@@ -64,4 +64,15 @@ Emitted when non-determinism is detected.
 - **Breaking Changes**: Changing field types or removing mandatory fields requires a `schema_version` increment.
 - **Reserved Keys**: Any key prefixed with `_` is reserved for implementation-specific internal use.
 
+---
+
+## 5. Infection & Lifecycle Protocol (The Leap of Faith)
+Before telemetry can begin, the Bridge must establish a secure interposition.
+
+1. **Detection Phase**: Emacs monitors for the `[Engine] RNG seed` signal. This marks the transition from binary boot to Ruby VM stability.
+2. **Portal Phase**: Emacs writes `mygame/stargate_portal.rb`. This is the ONLY bridge-authorized file for sandbox crossing.
+3. **Leap Phase**: Emacs sends `load 'mygame/stargate_portal.rb'`.
+4. **ACK Phase**: The runtime MUST emit `{ "type": "infection_ack" }` upon successful `tick` interposition.
+
 **"Before we expand the universe, we define its physics."** 🌌⚖️🐉🦾💎
+*v1.1 - Industrial Stability Update*

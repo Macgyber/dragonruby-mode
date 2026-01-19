@@ -70,4 +70,4 @@ Open an issue with the `question` label.
 
 ---
 
-*DragonRuby Emacs Mode — v0.7.4*
+*DragonRuby Emacs Mode — v0.8.1*

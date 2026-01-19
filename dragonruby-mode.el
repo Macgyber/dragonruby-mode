@@ -18,11 +18,15 @@
 ;; 🧱 Bootloader (Load Path & Registry)
 ;; -----------------------------------------------------------------------------
 
+(defvar dragonruby-mode-root nil
+  "The root directory of the dragonruby-mode plugin.")
+
 (defun dragonruby--setup-load-path ()
   "Setup the load path for DragonRuby mode modules."
   (let* ((load-path-source (or load-file-name (buffer-file-name)))
          (plugin-root (and load-path-source (file-name-directory load-path-source))))
     (when plugin-root
+      (setq dragonruby-mode-root plugin-root)
       (let ((mod-dir (expand-file-name "modules" plugin-root)))
         ;; Core
         (add-to-list 'load-path (expand-file-name "core" mod-dir))
@@ -33,8 +37,12 @@
           (add-to-list 'load-path (expand-file-name dir mod-dir)))
         
         ;; Stargate
-        (dolist (dir '("stargate/emacs" "stargate/protocol" "stargate/sessions"))
-          (add-to-list 'load-path (expand-file-name dir mod-dir)))))))
+        (dolist (dir '("stargate/emacs" "stargate/protocol" "stargate/sessions" "stargate/ui"))
+          (add-to-list 'load-path (expand-file-name dir mod-dir)))
+        
+        ;; DRDS (Dev Support) - DISABLED FOR NOW
+        ;; (add-to-list 'load-path (expand-file-name "drds" mod-dir))
+        ))))
 
 ;; Initialize Load Path
 (eval-and-compile
@@ -46,6 +54,8 @@
 ;; 2. Load Core Libraries
 (require 'dragonruby-core)
 (require 'dragonruby-utils)
+;; (require 'dragonruby-symbols)
+;; (require 'dragonruby-navigation)
 (require 'dragonruby-scheduler)
 
 ;; 3. Register Modules (Manifests)
@@ -81,7 +91,12 @@ If nil, renders previews automatically for all paths."
 (defcustom dragonruby-enable-paths nil "Enable path system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-concepts nil "Enable concept system." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-completion t "Enable completion system." :type 'boolean :group 'dragonruby)
+;; (defcustom dragonruby-completion-enable-project-symbols t
+;;   "When non-nil, collect symbols from the project for enhanced autocompletion."
+;;   :type 'boolean :group 'dragonruby)
+;; (defcustom dragonruby-enable-navigation t "Enable DRDS navigation (xref)." :type 'boolean :group 'dragonruby)
 (defcustom dragonruby-enable-stargate nil "Enable Stargate time-traveling system." :type 'boolean :group 'dragonruby)
+
 (defcustom dragonruby-enable-guide nil "Enable knowledge guidance system." :type 'boolean :group 'dragonruby)
 
 ;; -----------------------------------------------------------------------------
@@ -96,6 +111,7 @@ If nil, renders previews automatically for all paths."
   :keymap (let ((map (make-sparse-keymap)))
             (define-key map (kbd "C-.") #'completion-at-point)
             (define-key map (kbd ".") #'dragonruby-completion-self-insert-dot)
+            (define-key map (kbd "C-c C-s") dragonruby-stargate-mode-map)
             map)
   (if dragonruby-mode
       (dragonruby--boot-session)
@@ -117,44 +133,65 @@ If nil, renders previews automatically for all paths."
           (setq step (1+ step))
           (progress-reporter-update reporter step "Scheduler Heartbeat")
           
-          ;; 3. Kernel Activation (Global Services)
-          (let (enabled-msgs disabled-msgs)
-            (cl-labels ((activate-mod (mod var &optional req-mod label)
+          ;; 3. Activation & Categorization
+          (let (active-foundations active-features active-tools disabled)
+            (cl-labels ((check-mod (mod var type &optional req-mod)
                           (let ((is-enabled (symbol-value var)))
                             (setq step (1+ step))
                             (if is-enabled
                                 (if (or (not req-mod) (eq (dragonruby-module-status req-mod) :active))
                                     (progn
                                       (dragonruby-enable mod)
-                                      (progress-reporter-update reporter step (or label (symbol-name mod)))
-                                      (push (format "🧠 Kernel: Module [%s] ENABLED" mod) enabled-msgs))
-                                  (progn
-                                    (progress-reporter-update reporter step (format "Skipped [%s] (Missing Dep)" mod))
-                                    (push (format "🧠 Kernel: Module [%s] DISABLED (requires [%s])" mod req-mod) disabled-msgs)))
-                              (progn
-                                (progress-reporter-update reporter step (format "Off [%s]" mod))
-                                (push (format "🧠 Kernel: Module [%s] DISABLED" mod) disabled-msgs))))))
+                                      (let ((name (symbol-name mod)))
+                                        (pcase type
+                                          ('foundation (push name active-foundations))
+                                          ('feature (push name active-features))
+                                          ('tool (push name active-tools)))))
+                                  (push (format "%s (missing %s)" mod req-mod) disabled))
+                              (push (symbol-name mod) disabled))
+                            (progress-reporter-update reporter step (symbol-name mod)))))
 
-              ;; Order (Steps 3-13)
-              (activate-mod 'colors 'dragonruby-enable-colors nil "Optics")
-              (activate-mod 'audio 'dragonruby-enable-audio nil "Sonics")
-              (activate-mod 'sprites 'dragonruby-enable-sprites nil "Visuals")
-              (activate-mod 'fonts 'dragonruby-enable-fonts nil "Glyphs")
-              (activate-mod 'paths 'dragonruby-enable-paths nil "Navigation")
-              (activate-mod 'completion 'dragonruby-enable-completion nil "Prediction")
-              (activate-mod 'concepts 'dragonruby-enable-concepts nil "Knowledge")
-              (activate-mod 'guide 'dragonruby-enable-guide nil "Guidance")
-              (activate-mod 'font-tools 'dragonruby-enable-font-tools 'fonts "Typography")
-              (activate-mod 'sprite-tools 'dragonruby-enable-sprite-tools 'sprites "Artisan")
-              (activate-mod 'stargate 'dragonruby-enable-stargate nil "Timeline")
+              ;; Define Categories
+              (check-mod 'colors 'dragonruby-enable-colors 'tool)
+              (check-mod 'audio 'dragonruby-enable-audio 'tool)
+              (check-mod 'sprites 'dragonruby-enable-sprites 'feature)
+              (check-mod 'fonts 'dragonruby-enable-fonts 'feature)
+              (check-mod 'paths 'dragonruby-enable-paths 'feature)
+              (check-mod 'completion 'dragonruby-enable-completion 'feature)
+              (check-mod 'concepts 'dragonruby-enable-concepts 'tool)
+              (check-mod 'guide 'dragonruby-enable-guide 'tool)
+              (check-mod 'font-tools 'dragonruby-enable-font-tools 'tool 'fonts)
+              (check-mod 'sprite-tools 'dragonruby-enable-sprite-tools 'tool 'sprites)
+              (check-mod 'stargate 'dragonruby-enable-stargate 'tool)
 
-              ;; --- Final Reporting ---
               (progress-reporter-done reporter)
-              (dolist (msg (reverse enabled-msgs)) (message msg))
-              (dolist (msg (reverse disabled-msgs)) (message msg))))
+
+              ;; --- Categorized Reporting ---
+              (message "--------------------------------------------------")
+              (message "🧱 FOUNDATIONS  : core, scheduler")
+              (when active-features
+                (message "🚀 FEATURES ENABLED : %s" (mapconcat #'identity (reverse active-features) ", ")))
+              (when active-tools
+                (message "🛠️ TOOLS ENABLED    : %s" (mapconcat #'identity (reverse active-tools) ", ")))
+              (when disabled
+                (message "🌑 DISABLED         : %s" (mapconcat #'identity (reverse disabled) ", ")))
+              (message "--------------------------------------------------")))
 
           ;; 4. Local Safety
-          (setq-local enable-recursive-minibuffers t))
+          (setq-local enable-recursive-minibuffers t)
+          
+          ;; 5. Navigation (DRDS xref) - DISABLED
+          ;; (when dragonruby-enable-navigation
+          ;;   (add-hook 'xref-backend-functions #'dragonruby-navigation-xref-backend nil t))
+          
+          ;; 6. Symbol Maintenance - DISABLED
+          ;; (add-hook 'after-save-hook #'dragonruby-symbols-on-save nil t)
+          ;; Initial scan
+          ;; (when (and dragonruby-completion-enable-project-symbols
+          ;;            dragonruby-symbols-auto-scan)
+          ;;   (dragonruby-symbols-scan-project))
+          )
+
       (error
        (when reporter (progress-reporter-done reporter))
        (message "❌ BOOT FAILED at %d%%: %s" (floor (* (/ (float step) 13.0) 100)) err)
@@ -214,7 +251,7 @@ Use this to apply changes made to `.emacs` without restarting Emacs."
         (dragonruby-mode 1))))
   (message "✨ DragonRuby: Reality Synced. Configuration Applied."))
 
-(message "【 🐉 】 DragonRuby Mode (Lego) LOADED.")
+(message "🐉 DragonRuby Mode (%d modules)" (hash-table-count dragonruby--modules))
 
 (provide 'dragonruby-mode)
 ;;; dragonruby-mode.el ends here

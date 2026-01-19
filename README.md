@@ -125,19 +125,22 @@ Did you pick the right font? Why doesn't it look like you expected? Stop guessin
   <br><em>The plugin reads "Press Start" from nearby text: and renders it in the font.</em>
 </div>
 
+- **Concept Exploration**: Explore game concepts and patterns.
+- **Stargate (Time-Travel)**: Record, rewind, and branch your game's timeline (experimental). [Read more](./modules/stargate/SOVEREIGN_STARGATE.md).
 - **Creative Hub**: Explore fonts from within the editor. Available buttons: **Google Fonts**, **DaFont**, **Font Squirrel**. Add `[+]` or remove `[-]` your own links to customize.
 
 **→ [📖 Complete Font System Guide](knowledge/FONTS.md)** (ABC/Pangram Viewer, Typography resources, Troubleshooting)
 
 ### Level 5: The Time Machine
-🌌 **Level 5: The Time Machine (Stargate) — EXPERIMENTAL**
+🌌 **Level 5: The Time Machine (Stargate) — BETA (Stability Verified)**
 Master the simulation. Record, Mutate, and Rewind with atomic precision.
 
 - **The Chronicler**: Continuous recording of states and seeds into a JSON-backed history.
-- **The Surgeon**: Real-time code injection with **Dead Hand Rollback** safety.
-- **Timeline Navigation**: Visual scrubber to jump between divergent realities.
+- **The Surgeon**: Real-time code injection with **Industrial-Grade Idempotency** and sandbox-compliant portal loading.
+- **Void Shield**: Advanced IPC filtering that keeps Emacs fluid even during massive engine log bursts.
+- **Timeline Navigation**: Visual scrubber to jump between divergent realities with hierarchical inheritance.
 
-**→ [📖 Complete Stargate Guide](knowledge/STARGATE.md)** (State tracking, Atomic Injections, Timeline Navigation)
+**→ [📖 Complete Stargate Guide](modules/stargate/SOVEREIGN_STARGATE.md)** (State tracking, Atomic Injections, Timeline Navigation)
 
 
 ### 🤝 Compatibility with Other Plugins
@@ -283,7 +286,7 @@ An artisan autocompletion system that respects your definitions. It is **NOT** a
 
 *Forged for creators who refuse to settle. Forged for DragonRuby.*
 
-**DragonRuby Emacs Mode — v0.8.0 (Sovereign Architecture)**
+**DragonRuby Emacs Mode — v0.8.1 (Industrial Stability)**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/Macgyber/dragonruby-mode/actions/workflows/ci.yml/badge.svg)](https://github.com/Macgyber/dragonruby-mode/actions/workflows/ci.yml)
