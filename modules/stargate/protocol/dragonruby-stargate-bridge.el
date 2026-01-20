@@ -146,9 +146,22 @@ Invariants: Never mutates the bridge buffer, provides debug visibility."
        (message "📡 [BRIDGE] JSON/Event Error: %S in payload: %S" err payload)))))
 
 (defun dragonruby-stargate-bridge-send-code (code)
-  "Send CODE to the DragonRuby runtime via the bridge."
+  "Send CODE to the DragonRuby runtime via the bridge.
+
+⚠️  DEPRECATED (Law XIX: Hot Reload Contract) ⚠️
+
+This function attempts to send commands via STDIN, but DragonRuby is NOT a REPL
+and does not read commands from STDIN. This will be silently ignored by DragonRuby.
+
+Use file-based injection instead:
+  - Write code to a .rb file in mygame/
+  - DragonRuby's hot-reload will detect and load it automatically
+
+This function is kept for diagnostic purposes only."
+  (declare (obsolete "Use file-based injection instead" "0.8.1"))
+  (warn "dragonruby-stargate-bridge-send-code is deprecated. DragonRuby doesn't read STDIN. Use file-based injection (Law XIX).")
   (when dragonruby-stargate-bridge--debug
-    (message "📡 [BRIDGE >>] %s" code))
+    (message "📡 [BRIDGE >>] (DEPRECATED - WILL BE IGNORED) %s" code))
   (if (and dragonruby-stargate-bridge--process (process-live-p dragonruby-stargate-bridge--process))
       (let ((coding-system-for-write 'utf-8-dos))
         (process-send-string dragonruby-stargate-bridge--process (concat code "\r\n")))
