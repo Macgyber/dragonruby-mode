@@ -9,6 +9,16 @@ module Stargate
     class << self
       attr_reader :current_branch, :current_frame
 
+      def tick(args)
+        # Law XVII: Continuous Determinism via Seed Locking
+        # We use a deterministic seed derived from tick_count.
+        frame_seed = (args.state.tick_count + 1) * 1000
+        
+        with_frame(frame_seed, args.inputs) do
+          yield if block_given?
+        end
+      end
+
       def with_frame(seed, inputs)
         if @paused
           Protocol.emit_moment(current_address, { hash: "PAUSED" }, seed, "stasis")
@@ -27,8 +37,7 @@ module Stargate
 
         Random.begin_frame(seed)
 
-        # Inputs.apply(inputs) if defined?(Inputs)
-
+        # Law of the Frontier: Speculative state must be isolated.
         Injection.checkpoint
 
         begin
@@ -36,11 +45,13 @@ module Stargate
 
           yield if block_given?
 
+          # Law of Authority: The frame represents the state AFTER execution.
+          @current_frame += 1
+          
           state_packet = State.capture
           @last_authoritative_hash = state_packet[:hash]
           Protocol.emit_moment(current_address, state_packet, seed)
 
-          @current_frame += 1
           :ok
         rescue => e
           puts "[STARGATE_ERROR] CLOCK ERROR: #{e.message}"
@@ -55,7 +66,11 @@ module Stargate
       end
 
       # Fork the timeline (branching)
-      def branch!(divergence_frame, parent_id = @current_branch)
+      # Sovereign Law: Branching requires a hash to anchor authority.
+      def branch!(divergence_frame, parent_id = @current_branch, hash:)
+        # Law of Isolation: Branches start with a clean slate of intentions.
+        Injection.reset!
+        
         new_id = "branch_#{(Time.now.to_f * 1000).to_i}_#{rand(1000)}"
         @branch_forest[new_id] = {
           parent: parent_id,
@@ -66,10 +81,16 @@ module Stargate
         
         @current_branch = new_id
         @current_frame = divergence_frame
+        @last_authoritative_hash = hash
         new_id
       end
 
       def restore_moment(branch_id, frame, hash, seed)
+        # Law of Restoration: Speculative state must die.
+        Injection.rollback!
+        Injection.reset!
+        @last_authoritative_hash = nil
+        
         @current_branch = branch_id
         @current_frame = frame
         

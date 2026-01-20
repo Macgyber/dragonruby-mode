@@ -1,13 +1,14 @@
 ;;; dragonruby-stargate-timeline.el --- Stargate Branch Forest Visualizer -*- lexical-binding: t -*-
 
 ;; Author: Macgyber <esteban3261g@gmail.com>
-;; Version: 0.8.0
+;; Version: 1.0.0
 ;; Package-Requires: ((emacs "26.1"))
 ;; URL: https://github.com/Macgyber/dragonruby-mode
 
 ;;; Commentary:
 ;; This module implements the "Perception" of the Branch Forest (Law XVI).
 ;; It renders the timeline graph and handles scrubbing/jumping between Moments.
+;; Hardened for v1.0 Blindada: State-Aware scrubbing and integrity checks.
 
 ;;; Code:
 
@@ -127,10 +128,8 @@
                               'address address
                               'seed seed
                               'help-echo (lambda (_window _object _pos)
-                                           (let* ((tick (cdr (assoc "tick" (cdr (assoc "observed_at" meta)))))
-                                                  (ms (cdr (assoc "monotonic_ms" (cdr (assoc "observed_at" meta))))))
-                                             (format "Moment: %s\nType: %s\nTick: %s\nPhysical: %sms\nHash: %s" 
-                                                     address moment-type (or tick "N/A") (or ms "N/A") hash)))
+                                           (format "Moment: %s\nType: %s\nHash: %s" 
+                                                   address (or moment-type "unknown") hash))
                               'keymap (let ((map (make-sparse-keymap)))
                                         (define-key map [mouse-1] #'dragonruby-stargate-timeline-jump-at-point)
                                         (define-key map (kbd "RET") #'dragonruby-stargate-timeline-jump-at-point)
@@ -158,9 +157,11 @@
 (defun dragonruby-stargate-timeline-scrub (address)
   "Jump the simulation to a specific moment ADDRESS (branch@frame)."
   (interactive "sJump to address (branch@frame): ")
-  (unless dragonruby-stargate--active-session
-    (error "No active Stargate session"))
-  
+  (unless (and dragonruby-stargate--active-session dragonruby-stargate--runtime-infected)
+    (error "Stargate: Interaction requires active interposition"))
+  (unless (and dragonruby-stargate-bridge--process (process-live-p dragonruby-stargate-bridge--process))
+    (error "Stargate: DragonRuby process is dead"))
+
   (let* ((parts (split-string address "@"))
          (branch (nth 0 parts))
          (frame (string-to-number (nth 1 parts)))
@@ -171,33 +172,39 @@
                (seed (cdr (assoc "seed" moment))))
           (setq dragonruby-stargate-timeline--last-jump address)
           (message "⏪ Stargate: Requesting restoration of %s (Hash: %s)..." address hash)
-          ;; Michael's Optimization: Send just metadata; DR will load from its native disk.
           (dragonruby-stargate-bridge-send-code 
            (format "Stargate::Clock.restore_moment(%S, %s, %S, %s)" 
                    branch frame hash seed))
           
-          ;; Clear divergence flag after jump
           (dolist (buf (buffer-list))
             (with-current-buffer buf
               (when (boundp 'dragonruby-stargate--divergence-detected)
                 (setq dragonruby-stargate--divergence-detected nil))))
           
-          ;; Refresh to update highlights
           (dragonruby-stargate-timeline))
       (error "Moment %s not found in Session Index" address))))
+
 (defun dragonruby-stargate-timeline-fork ()
   "Fork a new branch from the moment at point."
   (interactive)
+  (unless (and dragonruby-stargate--runtime-infected 
+               dragonruby-stargate-bridge--process 
+               (process-live-p dragonruby-stargate-bridge--process))
+    (error "Stargate: Cannot fork without active interposition"))
+
   (let ((address (get-text-property (point) 'address)))
     (if address
         (let* ((parts (split-string address "@"))
                (parent-id (car parts))
-               (frame (string-to-number (cadr parts))))
-          (message "🌱 Stargate: Forking new branch from %s@%d..." parent-id frame)
-          (dragonruby-stargate-bridge-send-code 
-           (format "Stargate::Clock.branch!(%d, %S)" frame parent-id))
-          ;; Refresh slightly later to allow the bridge to catch the new branch packet
-          (run-with-timer 0.8 nil #'dragonruby-stargate-timeline))
+               (frame (string-to-number (cadr parts)))
+               (moment (dragonruby-stargate-session-get-moment parent-id frame))
+               (hash (and moment (cdr (assoc "hash" moment)))))
+          (if (not hash)
+              (error "Could not find hash for moment %s" address)
+            (message "🌱 Stargate: Forking new branch from %s@%d (Hash: %s)..." parent-id frame hash)
+            (dragonruby-stargate-bridge-send-code 
+             (format "Stargate::Clock.branch!(%d, %S, hash: %S)" frame parent-id hash))
+            (run-with-timer 0.8 nil #'dragonruby-stargate-timeline)))
       (message "No moment at point to fork from."))))
 
 (define-derived-mode stargate-timeline-mode special-mode "Stargate-Timeline"
@@ -212,15 +219,13 @@
 ;; --- AUTO REFRESH ---
 
 (defun dragonruby-stargate-timeline-trigger-refresh (&rest _)
-  "Trigger a debounced refresh of the timeline buffer.
-Only refreshes if the buffer is actually visible to the user."
+  "Trigger a debounced refresh of the timeline buffer."
   (let ((buffer (get-buffer "*Stargate Timeline*")))
     (when (and buffer (get-buffer-window buffer))
       (when dragonruby-stargate-timeline--refresh-timer
         (cancel-timer dragonruby-stargate-timeline--refresh-timer))
       (setq dragonruby-stargate-timeline--refresh-timer
-            (run-with-timer 0.8 nil ;; Increased delay for stability
-                            #'dragonruby-stargate-timeline)))))
+            (run-with-timer 0.8 nil #'dragonruby-stargate-timeline)))))
 
 (add-hook 'dragonruby-stargate-session-updated-hook #'dragonruby-stargate-timeline-trigger-refresh)
 

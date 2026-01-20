@@ -1,6 +1,6 @@
 # Stargate Protocol Specification (v1.0)
 
-This document formalizes the communication and storage protocols for Stargate. It serves as the "Sovereign Law" for all future implementations of forks, replays, and cross-system state synchronization.
+This document formalizes the communication and storage protocols for Stargate. It serves as the core specification for all future implementations of forks, replays, and cross-system state synchronization.
 
 ## 1. Session Schema (The Index)
 The `.stargate/session-YYYYMMDD-HHMMSS/session.json` file is the authoritative index of a simulation session.
@@ -8,10 +8,9 @@ The `.stargate/session-YYYYMMDD-HHMMSS/session.json` file is the authoritative i
 | Field | Type | Description |
 | :--- | :--- | :--- |
 | `schema_version` | integer | Must be `1` for this version. |
-| `version` | string | SemVer of the emitter (e.g., `"1.0.0"`). |
-| `metadata` | object | Global session information. |
+| `session_id` | string | Unique identifier for the current simulation run. |
 | `branches` | object | Map of branch-id to parent and divergence data. |
-| `moments` | object | Map of `branch@frame` to state metadata. |
+| `moments` | object | Map of `session_id@branch@frame` to state metadata. |
 | `branch-maps` | object | Optimized lookup for rendering (Ordered list of moments per branch). |
 
 ### Moment Metadata Object
@@ -31,11 +30,11 @@ Emitted for every authoritative frame.
 ```json
 {
   "type": "moment",
+  "session_id": "session-2026...",
   "address": "branch@frame",
   "hash": "sha256...",
   "seed": 123456,
-  "moment_type": "prime",
-  "observed_at": { "tick": 0, "monotonic_ms": 0 }
+  "moment_type": "prime"
 }
 ```
 
@@ -66,7 +65,7 @@ Emitted when non-determinism is detected.
 
 ---
 
-## 5. Infection & Lifecycle Protocol (The Leap of Faith)
+## 5. Connection & Lifecycle Protocol
 Before telemetry can begin, the Bridge must establish a secure interposition.
 
 1. **Detection Phase**: Emacs monitors for the `[Engine] RNG seed` signal. This marks the transition from binary boot to Ruby VM stability.
@@ -74,5 +73,5 @@ Before telemetry can begin, the Bridge must establish a secure interposition.
 3. **Leap Phase**: Emacs sends `load 'mygame/stargate_portal.rb'`.
 4. **ACK Phase**: The runtime MUST emit `{ "type": "infection_ack" }` upon successful `tick` interposition.
 
-**"Before we expand the universe, we define its physics."** 🌌⚖️🐉🦾💎
-*v1.1 - Industrial Stability Update*
+Establishing a deterministic protocol is the foundation of reliable state management. 🌌⚖️🐉🦾💎
+*v1.0.0 - Stargate Stable (Hardened Update)*

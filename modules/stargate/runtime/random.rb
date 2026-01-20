@@ -6,22 +6,28 @@ module Stargate
   # All non-deterministic RNG calls are intercepted or replaced.
   module Random
     @prng = nil
+    @calls_this_frame = 0
 
     class << self
+      attr_reader :calls_this_frame
+
       # Sovereign entry point for each frame.
       # Controls Law XVII (Randomness).
       def begin_frame(seed)
         @prng = ::Random.new(seed)
+        @calls_this_frame = 0
       end
 
       # Deterministic random value.
       def rand(max = 1.0)
         ensure_seeded!
+        @calls_this_frame += 1
         @prng.rand(max)
       end
 
       def reset!
         @prng = nil
+        @calls_this_frame = 0
       end
 
       private

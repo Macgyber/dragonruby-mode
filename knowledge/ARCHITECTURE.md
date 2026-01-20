@@ -2,7 +2,7 @@
 
 ## 🏗️ Core Philosophy: Lego Architecture
 
-The system (v0.7.2+) is built on a **Kernel-Driven Modular Architecture**.
+The system (v1.0.0+) is built on a **Kernel-Driven Modular Architecture**.
 It is not a monolithic plugin; it is a collection of independent modules ("Legos") orchestrated by a central Kernel.
 
 ## 🧠 The Kernel (`modules/core/dragonruby-kernel.el`)
@@ -13,7 +13,7 @@ The Kernel is the absolute authority. It manages:
 3.  **Dependency Resolution**: Ensuring `sprite-tools` logic waits for `sprites` logic.
 4.  **Lazy Loading**: The Kernel manages the loading of implementation files (`--impl.el`) only when needed.
 
-### The Three Laws
+### The Three Base Policies
 1.  **Namespace Law**: Every module MUST own its namespace (e.g., `dragonruby-sprite-`).
 2.  **Capability Law**: Modules provide/require capabilities (e.g., `:rendering`, `:audio`).
 3.  **Cold Boot Law**: The system starts with ZERO active modules.
@@ -42,10 +42,12 @@ dragonruby-mode/
 │   ├── concepts/            ;; Educational overlays (Retina)
 │   ├── paths/               ;; Navigation system
 │   ├── completion/          ;; API Contract (YAML)
-│   ├── guide/               ;; Knowledge Guidance (Memory)
-│   └── stargate/           ;; Time Travel & Simulation control
+│   ├── stargate/           ;; Time Travel & Simulation control
+│   │   ├── emacs/          ;; UI and Perception logic
+│   │   └── sessions/       ;; Persistent Session Store
+│   └── guide/               ;; Knowledge Guidance (Memory)
 │
-├── knowledge/               ;; The Unified Brain (Content)
+├── knowledge/               ;; Knowledge Base (Content)
 │   ├── definitions/         ;; Org files for concepts
 │   └── feedback/            ;; User feedback storage
 └── ...
@@ -62,7 +64,7 @@ dragonruby-mode/
     *   `dragonruby-mode` checks `defcustom` flags (e.g. `dragonruby-enable-sprites`).
     *   It calls `(dragonruby-enable 'sprites)` -> Kernel requires the **Implementation** (`--impl.el`) -> Module goes ONLINE.
 
-## 🧘 Visual Policy (The "Good Citizen" Protocol)
+## 🧘 Visual Policy (User Interaction)
 
 DragonRuby Mode follows a strict "Observe and Paint" philosophy.
 -   **Overlays**: We paint on top of text. We never modify buffer content.
@@ -78,4 +80,4 @@ To protect this modular architecture, the project adheres to a **Strict CI Stand
 
 ---
 
-*DragonRuby Emacs Mode — v0.7.4*
+*DragonRuby Emacs Mode — v1.0.0 (Stable)*

@@ -1,12 +1,13 @@
 ;;; dragonruby-stargate-core.el --- Stargate manifest for DragonRuby -*- lexical-binding: t -*-
 
 ;; Author: Macgyber <esteban3261g@gmail.com>
-;; Version: 0.8.0
+;; Version: 1.0.0
 ;; Package-Requires: ((emacs "26.1"))
 ;; URL: https://github.com/Macgyber/dragonruby-mode
 
 ;;; Commentary:
-;; Stargate: Time-traveling state management for DragonRuby.
+;; Stargate: Time-traveling state management for DragonRuby (v1.0 Blindada).
+;; Provides authoritative time-travel, branching, and state integrity.
 
 ;;; Code:
 

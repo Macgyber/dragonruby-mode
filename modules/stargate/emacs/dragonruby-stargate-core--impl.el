@@ -1,10 +1,11 @@
 ;;; dragonruby-stargate-core--impl.el --- Stargate Private Implementation -*- lexical-binding: t -*-
 
 ;; Author: Macgyber <esteban3261g@gmail.com>
-;; Version: 0.8.0
+;; Version: 1.0.0
 
 ;;; Commentary:
-;; This provides the internal machinery for Stargate.
+;; This provides the internal machinery for Stargate (v1.0 Blindada).
+;; It coordinates processes, maintains interposition state, and monitors system health.
 
 ;;; Code:
 
@@ -25,11 +26,7 @@
 
 (defvar dragonruby-stargate--state) ; Defined in manager.el
 
-(defvar-local dragonruby--buffer-project-root :not-set
-  "The anchored project root for this buffer.")
-
-(defvar dragonruby--last-detected-project-root nil
-  "The last valid project root detected globally.")
+;; Using centralized definitions from dragonruby-utils.el
 
 (defvar-local dragonruby-stargate--divergence-detected nil
   "Flag indicating if a state divergence has been detected in this buffer.")
@@ -133,6 +130,7 @@ CONTRACT: Must only be called after `dragonruby-stargate--ensure-session` return
         
         ;; 1. Lock the leap IMMEDIATELY
         (setq dragonruby-stargate--infection-requested t)
+        (dragonruby-stargate--set-state :infecting)
         
         (condition-case err
             (with-temp-file portal-file
@@ -150,7 +148,7 @@ CONTRACT: Must only be called after `dragonruby-stargate--ensure-session` return
            (message "❌ STARGATE: Failed to create portal: %s" (error-message-string err))))
         
         (when dragonruby-stargate--infection-requested
-          (let ((ruby-cmd "begin; load 'mygame/stargate_portal.rb'; Stargate::Bootstrap.infect!; rescue Exception => e; puts \"[STARGATE_ERROR] #{e.class}: #{e.message}\"; end"))
+          (let ((ruby-cmd "begin; $stdout.sync = true; load 'mygame/stargate_portal.rb'; Stargate::Bootstrap.infect!; rescue Exception => e; puts \"[STARGATE_ERROR] #{e.class}: #{e.message}\"; end"))
             (dragonruby-stargate-bridge-send-code ruby-cmd))
           (setq dragonruby-stargate--infection-request-time (current-time))))))))
 
@@ -187,7 +185,7 @@ CONTRACT: Must only be called after `dragonruby-stargate--ensure-session` return
            (timeout (and connected 
                          (not infected)
                          dragonruby-stargate--infection-request-time
-                         (> (float-time (time-subtract (current-time) dragonruby-stargate--infection-request-time)) 30.0)))
+                         (> (float-time (time-subtract (current-time) dragonruby-stargate--infection-request-time)) 15.0)))
            (state dragonruby-stargate--state) ; Get current state
            (char (cond ((not connected) " 💤")
                        (diverged " ⚡")
@@ -208,7 +206,7 @@ CONTRACT: Must only be called after `dragonruby-stargate--ensure-session` return
                        (t "Connected: Waiting for DragonRuby tick to interpose..."))))
       
       (when timeout
-        (message "📡 STARGATE: Infection Timeout! Re-trying...")
+        (message "❌ STARGATE: Infection Timeout! The Bridge is deaf or the Runtime failed to respond.")
         (setq dragonruby-stargate--infection-requested nil) ;; Unlock for retry
         (dragonruby-stargate--set-state nil)
         (setq dragonruby-stargate--infection-request-time nil))

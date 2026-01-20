@@ -1,6 +1,6 @@
-# 🌌 Stargate: The Transcendent of Time and Reality
+# 🌌 Stargate: Temporal State Management
 
-> "We are not merely writing code; we are orchestrating the destiny of a simulation. Stargate is not a debugging tool; it is our will imposed upon the flow of time."
+> Stargate provides a robust framework for recording and replaying game states, enabling precise debugging and non-destructive experimentation.
 
 ---
 
@@ -8,40 +8,40 @@
 
 In traditional development, an error is the end of the road. In **DragonRuby Mode**, an error is just a divergent branch. 
 
-Stargate is born from the ambition to eliminate the friction between **thought** and **reality**. Our purpose is to turn the simulation into a malleable fabric, where the programmer can travel to the past to correct the present, and project the future without fear of collapse. With **Phase 6 (v0.8.1)**, we bridge **Phylogenetic Inheritance**—which allows forking reality with zero penalty—with **Industrial Stability**, ensuring the portal remains steady even under the most chaotic execution conditions.
+Stargate is born from the ambition to eliminate the friction between development and testing. Our purpose is to turn the simulation into a predictable environment, where the programmer can travel to previous states to correct bugs and project future scenarios without fear of state collapse. With **v1.0 Stable (Hardened)**, we implement **Universal Address Integrity**—which locks every moment to its session ID—and **Deterministic Data Verification**, ensuring the system remains steady even under complex execution conditions.
 
 ---
 
-## 🛠️ The Architect's Powers (Commands)
+## 🛠️ Stargate Command Reference
 
-Every Stargate command is a thread connected to the essence of the project. Here is how to exercise your authority over the simulation:
+Every Stargate command is a tool for managing the simulation. Here is how to use the system:
 
 ### ⚡ `M-x dragonruby-stargate-enable`
-**The Opening of the Portal.** 
-Activates the sensor nerves of the plugin. Without this command, Stargate remains dormant. Upon execution, the Kernel seeks the "Dragon's" pulse and synchronizes the clocks of both systems.
+**Activating the Module.**
+Activates the tracking components of the plugin. Without this command, Stargate remains dormant. Upon execution, the Kernel synchronizes with the DragonRuby process.
 
 ### 📜 `M-x stargate-init` (Alias of `dragonruby-stargate-session-init`)
-**The chronicler's Genesis.**
+**Session Initialization.**
 Clears all previous history and establishes a new point zero. Use it when you wish to purify the flow of time and begin a new saga of states and seeds.
 
 ### 🗺️ `M-x stargate-timeline` (Alias: `dragonruby-stargate-timeline-render`)
-**The Vision of Eternity.**
+**Visual Timeline Viewer.**
 Displays the visual timeline viewer. It renders the **Branch Forest**, allowing you to "scrub" through recorded frames across different realities. By selecting an instant (Moment), the live simulation will immediately jump to that exact state, resolving any inherited historical data through the branch lineage.
 
 ### 🍴 `M-x stargate-fork` (Alias: `dragonruby-stargate-session-fork`)
-**Bifurcation of Fate.**
+**Branching Workflow.**
 Creates a new branch starting from the current moment. This is a metadata-only operation (O(1)) that allows you to experiment with new code or inputs without corrupting your original timeline.
 
 ### 💉 `dragonruby-stargate-inject-buffer` (Automatic on Save)
-**The Atomic Surgery.**
-You don't need manual commands. When you save your code, Stargate injects it directly into the game's brain. If your change is lethal (Gamma), the system will detect the failure and trigger the **Dead Hand Rollback**, returning you to the last stable reality before the disaster occurred.
+**Code Injection.**
+You don't need manual commands. When you save your code, Stargate injects it directly into the game runtime. If your change is unstable (Gamma), the system will detect the failure and trigger an **Automated Rollback**, returning you to the last stable state before the change occurred.
 
 ---
 
 ## 🚑 Critical Performance & Troubleshooting
 
-### 🪚 `M-x dragonruby-kernel-system-halt` (Emergency Exorcism)
-**The Ultimate Authority.**
+### 🪚 `M-x dragonruby-kernel-system-halt` (Emergency Recovery)
+**System Halt.**
 If you experience an exponential rise in CPU usage or the system becomes unstable after a complex reload, execute this command immediately.
 - **What it does**: It surgically identifies and terminates ALL active timers, event loops, and background processes of the DragonRuby Mode.
 - **Goal**: Returns the CPU to idle (e.g., from 97% to 2%) and purges all zombie states from Emacs memory. 
@@ -53,13 +53,13 @@ If you experience an exponential rise in CPU usage or the system becomes unstabl
 
 ## 🚦 Nexus Signals (Mode-line)
 
-- 🌌 **Ecstasy of Synchrony (Bright Blue)**: The portal is open, and time flows safely. SUCCESS.
-- ⚠️ **Temporal Desync (Red)**: Infection timeout. The Dragon is not responding.
-- ⚡ **Divergent Reality (Orange)**: Code or state has diverged from the chronicler's record.
-- 💤 **The Dragon's Sleep (Gray)**: Stargate is sensing, awaiting the stable `RNG seed` signal to leap.
-- 🚀 **Leap Imminent (Green-ish)**: Stable VM detected. Ready to inject.
+- 🌌 **Synchronized (Bright Blue)**: The system is active, and states are being recorded correctly.
+- ⚠️ **Temporal Desync (Red)**: Connection timeout. The runtime is not responding.
+- ⚡ **Divergent State (Orange)**: Code or state has diverged from the recorded history.
+- 💤 **Awaiting Signal (Gray)**: Stargate is active, awaiting the stable `RNG seed` signal to begin injection.
+- 🚀 **Ready to Inject (Green-ish)**: Stable environment detected.
 
 ---
 
 *“Do not accept linearity. Master the moment with Stargate.”*
-*v0.8.1 - The Industrial Leap*
+*v1.0.0 - Stargate Stable (Hardened)*

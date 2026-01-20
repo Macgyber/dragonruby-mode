@@ -22,6 +22,10 @@ Locking this value prevents recursive disk-crawling in idle pulses.")
   '(".git" ".stargate" "node_modules" "$RECYCLE.BIN" "build" "native" "tmp")
   "Directories to strictly ignore during any manual scans.")
 
+(defvar dragonruby--last-detected-project-root nil
+  "The last valid project root detected globally.
+Used during early boot or when no buffer-local root is anchored.")
+
 (defun dragonruby--anchor-project-root ()
   "Locate and LOCK the project root for the current buffer.
 This is an expensive procedure intended to run ONCE per buffer activation."
@@ -230,8 +234,8 @@ Launches as an Emacs subprocess to allow Stargate cable hookup."
           ;; Start as a dedicated Emacs process
           (let ((proc (start-process "dragonruby" "*DragonRuby Simulation*" binary-path)))
             ;; Re-install bridge via the standard installer for consistency
-            (when (fboundp 'dragonruby-stargate-bridge-install)
-              (run-at-time 1 nil #'dragonruby-stargate-bridge-install proc))
+            (when (fboundp 'dragonruby-stargate-bridge-find-and-install)
+              (run-at-time 1 nil #'dragonruby-stargate-bridge-find-and-install proc))
             
             ;; Show the output buffer to the Architect
             (display-buffer "*DragonRuby Simulation*")

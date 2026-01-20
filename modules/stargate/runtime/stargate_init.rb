@@ -1,17 +1,18 @@
 # frozen_string_literal: true
+$stdout.sync = true
+puts "STARGATE: [BOOT] Initializing Sovereign Runtime..."
 
 # Stargate: Sovereign Initiation Script
 # Purpose: Activate the Stargate Runtime in a DragonRuby project.
 
+puts "STARGATE: [TRACE] Protocol loading..."
 require_relative 'bootstrap'
 
-# Instructions for the Architect:
-# 1. require 'modules/stargate/runtime/stargate_init' at the top of your main.rb
-# 2. Call Stargate::Bootstrap.tick(args) { your_game_tick(args) } inside your global tick.
-
-puts "STARGATE: The Machine of Time is Levelled."
-puts "  [Status] Body is ready. Mind is watching."
-puts "  [Path] Runtime loaded."
-
+puts "STARGATE: [TRACE] Asserting Authority (Prepend)..."
 Stargate::Bootstrap.install!
-puts "STARGATE: Initializer sequence complete."
+
+puts "STARGATE: [BOOT] Law of Absolute Randomness ACTIVE."
+puts "STARGATE: [BOOT] Law of Irreversible Code ACTIVE."
+
+puts "STARGATE: [TRACE] Initializer sequence complete."
+$stdout.flush

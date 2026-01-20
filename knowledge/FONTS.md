@@ -165,4 +165,4 @@ DragonRuby only supports **TTF and OTF**. Web formats (WOFF, WOFF2, EOT) won't w
 
 ---
 
-**DragonRuby Emacs Mode — Font System v0.7.4**
+**DragonRuby Emacs Mode — Font System v1.0.0 (Stable)**

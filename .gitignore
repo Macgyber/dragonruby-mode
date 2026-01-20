@@ -9,23 +9,15 @@
 # macOS
 .DS_Store
 
-
-
 # Build artifacts
 /dist/
 
-# Development Scripts (Private)
-dev/
-
-# Local Config (Private)
-.emacs.d/
-
-
 # Tests (Public)
 !test/
+
 # System & Meta
 .stargate/
 **/*.dr-stargate
 
-# Logs
+# General Logs
 *.log

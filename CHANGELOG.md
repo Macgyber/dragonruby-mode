@@ -8,16 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <details open>
+<summary><h2>[1.0.0] - 2026-01-19 (STARGATE v1.0 STABLE: SESSION INTEGRITY)</h2></summary>
+
+### 🌌 Stargate v1.0 Stable (Hardened)
+- **Universal Address Integrity**: Implemented `session_id@branch@tick` globally. History is now immutable and immune to cross-session contamination.
+- **Deterministic Data**: Purged physical time (`observed_at`) from the core logic. The simulation now relies exclusively on deterministic hashes and seeds.
+- **Failsafe FSM**: The Finite State Machine in `manager.el` now strictly prevents operational leaps (Record/Jump/Fork) unless the system is in a verified stable interposition.
+- **Hierarchical Shadowing**: Finalized the inheritance engine. Branches correctly shadow parent moments while maintaining perfect isolation for divergent frames.
+- **Meta-Programming Detection**: The Injector now detects risky Ruby patterns (`eval`, `send`, `define_method`) as **GAMMA** changes, requiring user confirmation for irreversible mutations.
+- **Historical Audit**: External filesystem mutations are now recorded as physical events in the session index, making "time leakage" fully observable.
+- **Automated Verification**: Established a dedicated `verify_stargate_inheritance.el` suite to guarantee the integrity of the temporal engine.
+
+### 🛡️ Core & System
+- **Hardened Git Privacy**: Specialized `.gitignore` logic to exclude private debug registries, test logs, and experimental artifacts while keeping the public codebase clean.
+- **Global Sentinel**: Added defensive `boundp` and `fboundp` guards across the Stargate module to ensure stability even when bridge components are partially loaded or unavailable.
+
+</details>
+
+<details>
 <summary><h2>[0.8.1] - 2026-01-18 (STARGATE STABILIZATION: THE INDUSTRIAL LEAP)</h2></summary>
 
-### 🌌 Stargate Stabilization (Industrial Grade)
+### 🌌 Stargate Stabilization (Deployment Grade)
 - **Portal Strategy**: Implemented a sandbox-compliant injection mechanism using a temporary `stargate_portal.rb` in `mygame/`. This bypasses DragonRuby's file restrictions and ensures 100% loading reliability.
 - **Void Shield (Anti-Lag Storm)**: Developed a high-speed selective log processor that vaporizes massive bursts of engine noise (like Render logs during resize) before they touch the Emacs UI. Zero blocking during window operations.
 - **Lifecycle-Aware Injection**: The Bridge now actively monitors for the `RNG seed` signal, ensuring the VM is stable and ready before attempting any injection.
 - **Deterministic Single Injection**: Implemented a global "Infection Requested" lock in Emacs. Guarantees that the injection command is sent exactly once per stable session, eliminating re-entry bugs and minibuffer errors.
 - **Industrial Runtime Refactor**:
-  - **Sovereign Alias Protection**: Real idempotency in `bootstrap.rb` using explicit `method_defined?` checks to prevent infinite recursion on hot reloads.
-  - **Law of the Void**: Added fallback support for projects without a pre-defined `tick` method.
+  - **Standard Alias Protection**: Real idempotency in `bootstrap.rb` using explicit `method_defined?` checks to prevent infinite recursion on hot reloads.
+  - **Fallback Strategy**: Added fallback support for projects without a pre-defined `tick` method.
   - **Segregated States**: Separate logic for technical installation (`$stargate_installed`) and operational readiness (`$stargate_operational`).
 
 ### 🧠 Project Context & Utility
@@ -36,15 +54,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🌌 Stargate Persistence (Layer 2)
 - **Schema v1**: Formalized the `.dr-stargate` JSON index with explicit versioning and nested temporal schema (`tick`/`monotonic_ms`).
-- **Sovereign Lifecycle**: Implemented `on-idle` (30s deferred), `on-exit` (atomic flush), and `on-demand` persistence.
+- **Session Lifecycle**: Implemented `on-idle` (30s deferred), `on-exit` (atomic flush), and `on-demand` persistence.
 - **Session Recovery**: Built `dragonruby-stargate-session-load` for O(1) restoration of historical hash tables from disk.
 
 ### 🛡️ Guardian Module (Layer 3)
 - **Robust Hashing**: Optimized SHA-256 verification in `tracker.el` to ignore non-semantic whitespace, eliminating false-positive stasis triggers.
-- **Stasis Authority**: Verified immediate `Clock.pause!` invocation upon authoritative buffer mismatch.
+- **Pause Reliability**: Verified immediate `Clock.pause!` invocation upon authoritative buffer mismatch.
 
 ### 🧠 Mind & Determinism (Layer 4)
-- **Law XIV Compliance**: Enforced nested `observed_at` validation across the whole IPC bridge to ensure state reproducibility.
+- **Verification Compliance**: Enforced nested `observed_at` validation across the whole IPC bridge to ensure state reproducibility.
 - **Timeline Consumer**: Decoupled rendering logic from capture state; the Timeline now operates as a passive observer of the session index.
 
 ### 🎨 UX & Polish
@@ -54,7 +72,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 </details>
 
 <details>
-<summary><h2>[0.7.4] - 2026-01-16 (SOVEREIGN SURGERY & ARTISAN CI)</h2></summary>
+<summary><h2>[0.7.4] - 2026-01-16 (CORE ARCHITECTURE & IMPROVED CI)</h2></summary>
 
 ### 🛡️ Artisan CI (MELPA-Grade Integrity)
 - **CI Technical Standard**: Drafted and implemented a formal, isolated environment standard for all future contributions.
@@ -62,12 +80,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Test Standardization**: Modernized 13+ test files to be layout-agnostic, relying exclusively on internal module resolution.
 - **GitHub Actions**: Deployed the official CI workflow on Ubuntu-latest with Emacs 29.1.
 
-### 🏛️ Sovereign Architecture Surgery (Performance Fix)
+### 🏛️ Core Architecture Refactor (Performance Fix)
 - **Project Root Anchor**: Implemented one-time project root detection per buffer. Eliminated recursive upward disk scans in idle pulses.
 - **Lazy Sprite Overlays**: Visual metadata and image creation are now deferred to hover time. 0% CPU impact during idle pulses.
-- **Architectural Throttling**: Increased idle delay to 1.5s. Implemented global guards that abort background logic if no Sovereign Root is anchored.
+- **Architectural Throttling**: Increased idle delay to 1.5s. Implemented global guards that abort background logic if no project root is anchored.
 - **Memory Hygiene**: Sanitized the Kernel ledger to eliminate defunct timers and hooks.
-- **Emergency Exorcism**: Introduced `M-x dragonruby-kernel-system-halt` (alias `stargate-halt`) for immediate system recovery.
+- **Emergency Recovery**: Introduced `M-x dragonruby-kernel-system-halt` (alias `stargate-halt`) for immediate system recovery.
 
 ### 🌌 Stargate: Time-Travel & Determinism
 - **Metadata IPC**: Reduced bridge traffic by 90% using telemetry sampling (record every 10 frames).
@@ -78,14 +96,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 </details>
 
 <details>
-<summary><h2>[0.7.3] - 2026-01-12 (SOVEREIGN KERNEL & SURGICAL RELOAD)</h2></summary>
+<summary><h2>[0.7.3] - 2026-01-12 (CORE KERNEL & RELIABLE RELOAD)</h2></summary>
 
-### 🧠 Sovereign Micro-Kernel (OS Architecture)
+### 🧠 Unified Micro-Kernel (System Architecture)
 - **Central Life Registry**: Implementation of a global "Registry Book" for Timers, Hooks, and Processes. No resource can be born without being registered by the Kernel.
-- **Sovereign Shutdown**: The shutdown system (`system-shutdown`) is now an atomic operation that guarantees the death of all old activity before any change.
+- **Atomic Shutdown**: The shutdown system (`system-shutdown`) is now an atomic operation that guarantees the death of all old activity before any change.
 - **Zombie Hunt**: Safety net that scans the global Emacs timer list to cancel orphan functions from the `dragonruby-` namespace.
 
-### 🔄 Surgical Hot-Reload (F6)
+### 🔄 Reliable Hot-Reload (F6)
 - **OS Life Cycle**: Implementation of the `Shutdown -> Unload -> Load -> Reboot` flow.
 - **Symbol Integrity**: Destructive `mapatoms` purging was removed. Now symbols remain but code is surgically refreshed without corrupting the global Emacs state.
 - **Atomic Reload**: Guaranteed background reload of critical modules (Kernel, Scheduler, Audio) to apply logic changes instantly.
@@ -98,20 +116,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🖼️ Scan Optimization
 - **Visible Retinal Vision**: Sprites, Audio, Fonts, and Colors modules now operate exclusively in the visible region (with 3000 chars padding), eliminating lag in files with thousands of lines.
 
-### 🌌 Stargate Module (The Time Machine) — EXPERIMENTAL
+### 🌌 Stargate Module (Time Travel) — EXPERIMENTAL
 - **Kernel Organ**: First module designed as a "living organ" that beats synchronized with the Kernel Heartbeat (Scheduler).
-- **The Chronicler (Bridge)**: JSON pulse reassembly via console for real-time simulation moment capture.
-- **The Surgeon (Injector)**: Atomic injection system with risk classification (Alpha/Beta/Gamma) and automatic reversion (*Dead Hand Rollback*).
+- **Session Recorder (Bridge)**: JSON pulse reassembly via console for real-time simulation moment capture.
+- **Code Injector**: Atomic injection system with risk classification (Alpha/Beta/Gamma) and automatic reversion.
 - **Temporal Navigation**: Visual visualization of the "Forest of Branches" and capability of instant jump between historical states.
 - **Forced Determinism**: RNG and state capture tools to guarantee total reproducibility of the simulation.
 
 </details>
 
 <details>
-<summary><h2>[0.7.2] - 2026-01-12 (LIBRARY OF ALEXANDRIA & STABILITY)</h2></summary>
+<summary><h2>[0.7.2] - 2026-01-12 (KNOWLEDGE BASE & STABILITY)</h2></summary>
 
-### 📖 Guide Module (LIBRARY OF ALEXANDRIA)
-- **Grimoire Aesthetics**: Org-mode visual transformation with hierarchical titles (1.4x), intelligent margins, and sacred book ellipsis (`▾`).
+### 📖 Guide Module (KNOWLEDGE BASE)
+- **Guide Aesthetics**: Org-mode visual transformation with hierarchical titles (1.4x), intelligent margins, and visual ellipsis (`▾`).
 - **RET Navigation**: Implemented direct jump to documentation by pressing `RET` over concepts in the code with optimized memory management.
 - **Right Sidebar**: Persistent and anchored lateral panel (`no-delete-other-windows`) for knowledge consultation without interruptions.
 - **Wisdom Lathes**: `args.org`, `state.org`, and `sprite.org` volumes structured under the new encyclopedic aesthetic.
@@ -121,7 +139,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Object Isolation**: Proximity logic and restart by duplicity to avoid mixing colors between nearby variables.
 
 ### 💓 Stability and Engineering (Zero-Blocking)
-- **Overlay Exorcism**: Total reengineering of the overlay life cycle. Elimination of memory leaks and dynamic closures that caused blockages.
+- **Overlay Cleanup**: Total reengineering of the overlay life cycle. Elimination of memory leaks and dynamic closures that caused blockages.
 - **Smart Scheduler**: Single-shot beat at 0.5s guaranteeing smooth scroll even in massive files.
 - **Hot-Reload (F6)**: Purified global restart cycle, `load-path` reconstruction, and atomic buffer reload.
 
@@ -130,7 +148,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details>
 <summary><h2>[0.7.1] - 2026-01-10 (TOTAL SYNC & SMART DOT)</h2></summary>
 
-### 📜 Total Synchrony Contract
+### 📜 Unified Configuration Standard
 - **Ultra-Minimalist Core**: New factory standard where **all** optional modules (`colors`, `sprites`, `fonts`, `audio`, etc.) are disabled by default, **except completion**. The plugin now starts as a purely productivity tool.
 - **Code-Doc Parity**: Absolute synchronization between the code's `defcustom` and the "Lego Piece" tables in the README. No fine print.
 - **Smart Dot**: Autocompletion triggers automatically when typing a dot, **only** if it follows a valid contract string (e.g., `args.`). Radical improvement of writing flow.
@@ -157,7 +175,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🏗️ Lego Architecture (The Kernel)
 The system has been restructured from scratch. It is no longer a collection of scripts; it is a modular **Operating System**.
 - **The Kernel**: A central orchestrator that manages the life and death of each functionality.
-- **The Three Laws**:
+- **The Three Core Policies**:
   1. **Namespace Law**: Each module owns its exclusive space.
   2. **Capability Law**: Modules declare what they *need* (e.g., `:rendering`) and what they *provide*, not who they know.
   3. **Cold Boot Law**: Nothing runs by default. Zero zombies.

@@ -11,13 +11,16 @@
 
 ;;; Code:
 
+(message "📡 STARGATE BRIDGE: [NERVE-TRACKER] Version 1.1.2 Loaded (Absolute Hardened).")
+
 (require 'json)
 (require 'dragonruby-utils)
 
 (defvar dragonruby-stargate-bridge--process nil)
 (defvar dragonruby-stargate-bridge--debug t "Enable atomic debugging for Stargate communication.")
+(defvar dragonruby-stargate-bridge--processing nil "Guard against re-entrant processing.")
 
-(defvar-local dragonruby-stargate-bridge-event-hook nil
+(defvar dragonruby-stargate-bridge-event-hook nil
   "Hook run when a Stargate event is received from the runtime.")
 
 (defun dragonruby-stargate-bridge--strip-ansi (string)
@@ -31,49 +34,84 @@
   (get-buffer-create dragonruby-stargate-bridge--buffer-name))
 
 (defun dragonruby-stargate-bridge--filter (process output)
-  "Filter incoming OUTPUT from PROCESS using optimized batch processing."
-  (when (and dragonruby-stargate-bridge--debug (not (string-blank-p output)))
-    (message "📡 [BRIDGE <<] %s" (string-trim output)))
-  (let ((work-buf (dragonruby-stargate-bridge--get-buffer)))
-    (when (buffer-live-p work-buf)
-      (with-current-buffer work-buf
-        ;; 1. Void Shield: Ignore massive render storms
-        (when (> (length output) 10000)
-          (when (string-match-p "Render\\|Engine" output)
-            (unless (string-match-p "moment\\|infection" output)
-              (setq output "[STARGATE] Void Shield: Noise Filtered.\n"))))
-
+  "Minimalist output aggregator for Stargate PROTCOL (Step 1).
+Failsafe: Mirrors output back to the Simulation buffer for visibility."
+  (let ((work-buf (dragonruby-stargate-bridge--get-buffer))
+        (sim-buf (process-buffer process)))
+    ;; 1. Visibility Mirror (So the Architect isn't blind)
+    (when (buffer-live-p sim-buf)
+      (with-current-buffer sim-buf
         (save-excursion
           (goto-char (point-max))
-          (insert output))
-        
-        ;; 2. Line Processing
-        (goto-char (point-min))
-        (let ((limit (save-excursion (goto-char (point-max)) (line-beginning-position))))
-          (while (< (point) limit)
-            (let* ((line-end (line-end-position))
-                   (line (buffer-substring-no-properties (line-beginning-position) line-end)))
-              ;; Scrub ANSI
-              (setq line (replace-regexp-in-string "\e\\[[0-9;]*[mKk]" "" line))
-              
-              (when (string-match-p "RNG seed has been set to" line)
-                (message "🚀 STARGATE: DragonRuby VM is STABLE. Ready for leap."))
-              
-              (when (string-match-p "\\(stargate\\|moment\\|infection\\|SUCCESS\\|{\\)" line)
-                (dragonruby-stargate-bridge--handle-event line))
-              
-              (forward-line 1)))
-          
-          ;; 3. Cleanup
-          (delete-region (point-min) (point)))))))
+          (let ((inhibit-read-only t))
+            (insert output)))))
+
+    ;; 2. Deep Logging (Loud and clear)
+    (message "📡 BRIDGE: Filter triggered (%d bytes from %s)" 
+             (length output) (process-name process))
+
+    ;; 3. State Accumulation
+    (when (buffer-live-p work-buf)
+      (with-current-buffer work-buf
+        (save-excursion
+          (goto-char (point-max))
+          (insert output)))
+      ;; Trigger processing (Step 2)
+      (dragonruby-stargate-bridge--process-buffer))))
+
+(defun dragonruby-stargate-bridge--process-buffer ()
+  "Process complete lines in the bridge buffer (Step 2).
+Sovereign Invariants: Re-entrant safe, Idempotent, Line-Safe."
+  (let ((work-buf (dragonruby-stargate-bridge--get-buffer)))
+    (when (and (buffer-live-p work-buf)
+               (not dragonruby-stargate-bridge--processing))
+      (setq dragonruby-stargate-bridge--processing t)
+      (unwind-protect
+          (with-current-buffer work-buf
+            (goto-char (point-min))
+            (let ((last-newline (save-excursion
+                                  (goto-char (point-max))
+                                  (when (search-backward "\n" nil t)
+                                    (point)))))
+              (if (not last-newline)
+                  (when (and dragonruby-stargate-bridge--debug (> (buffer-size) 0))
+                    (message "📡 BRIDGE: Buffer has %d bytes but NO newline yet. Waiting..." (buffer-size)))
+                ;; Process found lines
+                (while (< (point) last-newline)
+                  (let* ((line-end (line-end-position))
+                         (line (buffer-substring-no-properties (line-beginning-position) line-end)))
+                    
+                    ;; 1. Global Debug Logging (Before Scrub)
+                    (when (and dragonruby-stargate-bridge--debug (not (string-blank-p line)))
+                      (message "📡 [BRIDGE <<] %s" (string-trim line)))
+
+                    ;; 2. ANSI Scrubbing (Step 3)
+                    (setq line (replace-regexp-in-string "\e\\[[0-9;]*[mKk]" "" line))
+                    
+                    ;; 3. State Stability Markers
+                    (when (string-match-p "RNG seed has been set to" line)
+                      (message "🚀 STARGATE: DragonRuby VM is STABLE. Ready for leap."))
+
+                    ;; 4. Event Detection (Step 4)
+                    ;; Sovereign Law: Only process lines that are explicitly STARGATE signaled or JSON objects.
+                    (when (string-match-p "^\\(STARGATE\\|\\[STARGATE\\|\\[moment\\|{\\)" line)
+                      (dragonruby-stargate-bridge--handle-event line))
+                    
+                    (forward-line 1)))
+                
+                ;; 5. Surgical Cleanup: Only what we processed
+                (delete-region (point-min) last-newline))))
+        (setq dragonruby-stargate-bridge--processing nil)))))
 
 (defun dragonruby-stargate-bridge--handle-event (payload)
-  "Parse and distribute a PAYLOAD (JSON or ACK) from the runtime."
-  (condition-case nil
+  "Parse and distribute a PAYLOAD (JSON or ACK) from the runtime.
+Invariants: Never mutates the bridge buffer, provides debug visibility."
+  (condition-case err
       ;; Strategy: Search for the JSON block within the payload if present
-      (let ((json-start (string-match "{" payload)))
+      ;; HARDENED: Only treat as JSON if it contains a '"type"' key.
+      (let ((json-start (string-match "{\\(?:.*\\)\"type\"" payload)))
         (if json-start
-            (let* ((json-string (substring payload json-start))
+            (let* ((json-string (substring payload (string-match "{" payload)))
                    (json-object-type 'alist)
                    (json-key-type 'string)
                    (event (json-read-from-string json-string))
@@ -95,34 +133,38 @@
           
           ;; Fallback: Non-JSON confirmation signals (ACKs)
           (cond
-           ((string-match "STARGATE: Interposition SUCCESSful" payload)
+           ((string-match "STARGATE: \\[\\(TRACE\\|DEBUG\\|ERROR\\)\\]" payload)
+            (message "📡 [RUBY] %s" (string-trim payload)))
+           ((string-match "STARGATE::INFECTED" payload)
             (run-hook-with-args 'dragonruby-stargate-bridge-event-hook '((type . "infection_ack"))))
            ((string-match "🛑 STARGATE: Simulation PAUSED" payload)
             (run-hook-with-args 'dragonruby-stargate-bridge-event-hook '((type . "stasis_ack"))))
            ((string-match "▶️ STARGATE: Simulation RESUMED" payload)
             (run-hook-with-args 'dragonruby-stargate-bridge-event-hook '((type . "record_ack")))))))
-    (error nil)))
+    (error
+     (when dragonruby-stargate-bridge--debug
+       (message "📡 [BRIDGE] JSON/Event Error: %S in payload: %S" err payload)))))
 
 (defun dragonruby-stargate-bridge-send-code (code)
   "Send CODE to the DragonRuby runtime via the bridge."
   (when dragonruby-stargate-bridge--debug
     (message "📡 [BRIDGE >>] %s" code))
   (if (and dragonruby-stargate-bridge--process (process-live-p dragonruby-stargate-bridge--process))
-      (process-send-string dragonruby-stargate-bridge--process (concat code "\n"))
+      (let ((coding-system-for-write 'utf-8-dos))
+        (process-send-string dragonruby-stargate-bridge--process (concat code "\r\n")))
     (message "❌ Stargate Bridge: Connection lost.")))
 
-(defun dragonruby-stargate-bridge-find-and-install (&optional silent)
+(defun dragonruby-stargate-bridge-find-and-install (&optional process silent)
   "Find the DragonRuby simulation process and install the filter.
-If SILENT is non-nil, don't message when the process is not found."
+If PROCESS is provided, use it. If SILENT is non-nil, suppress messages."
   (interactive)
-  ;; DragonRuby Toolkit uses "dragonruby" as the process name via (dragonruby-run).
-  (let ((proc (get-process "dragonruby")))
+  (let ((proc (or process (get-process "dragonruby"))))
     (if (and proc (process-live-p proc))
         (progn
           (setq dragonruby-stargate-bridge--process proc)
-          ;; Only set filter if not already set to our filter
-          (unless (eq (process-filter proc) #'dragonruby-stargate-bridge--filter)
-            (set-process-filter proc #'dragonruby-stargate-bridge--filter))
+          (set-process-filter proc #'dragonruby-stargate-bridge--filter)
+          (set-process-coding-system proc 'utf-8-dos 'utf-8-dos)
+          (dragonruby-stargate-bridge-toggle-debug dragonruby-stargate-bridge--debug)
           (unless silent
             (message "📡 Stargate Bridge: Cabled to DragonRuby Simulation."))
           t) ;; Return t on success
@@ -135,16 +177,46 @@ If SILENT is non-nil, don't message when the process is not found."
 (defalias 'stargate-bridge-cable #'dragonruby-stargate-bridge-find-and-install)
 
 (defun dragonruby-stargate-bridge-diagnostic ()
-  "Run a diagnostic on the Stargate communication bridge."
+  "Run a deep diagnostic and ATTEMPT RECOVERY of the bridge."
   (interactive)
-  (message "🔍 Stargate Diagnostic: ---------------------------")
-  (message "🔍 Bridge Process: %s" (if dragonruby-stargate-bridge--process (process-name dragonruby-stargate-bridge--process) "NONE"))
-  (message "🔍 Process Alive: %s" (if (and dragonruby-stargate-bridge--process (process-live-p dragonruby-stargate-bridge--process)) "YES" "NO"))
-  (message "🔍 Buffer Length: %d" (buffer-size (dragonruby-stargate-bridge--get-buffer)))
-  (if (and dragonruby-stargate-bridge--process (process-live-p dragonruby-stargate-bridge--process))
-      (dragonruby-stargate-bridge-send-code "puts '[STARGATE_DEBUG] PONG: Communication Bridge is CABLED.'")
-    (dragonruby-stargate-bridge-find-and-install))
-  (message "🔍 Stargate Diagnostic: ---------------------------"))
+  ;; 1. Emergency Reset (Unlock the Bridge)
+  (setq dragonruby-stargate-bridge--processing nil)
+  
+  (let* ((proc (get-process "dragonruby"))
+         (filter (and proc (process-filter proc)))
+         (buf (dragonruby-stargate-bridge--get-buffer))
+         (source (symbol-file 'dragonruby-stargate-bridge-diagnostic)))
+    (message "🔍 STARGATE: [NERVE-TRACKER] --------------------")
+    (message "🔍 Version: 1.1.2 (Hardened)")
+    (message "🔍 Source : %s" source)
+    (message "🔍 Lock   : %s (Resetting to nil now...)" dragonruby-stargate-bridge--processing)
+    (message "🔍 Process Found: %s (%s)" (if proc "YES" "NO") (if proc (process-name proc) "-"))
+    (message "🔍 Process Alive: %s" (if (and proc (process-live-p proc)) "YES" "NO"))
+    (message "🔍 Process Filter: %s" filter)
+    (message "🔍 Bridge Buffer: %s (Size: %d)" (buffer-name buf) (buffer-size buf))
+    
+    (when (and proc (process-live-p proc))
+      ;; Force re-attachment if missing
+      (unless (eq filter #'dragonruby-stargate-bridge--filter)
+        (message "📡 BRIDGE: Re-attaching filter (Safety Catch)...")
+        (set-process-filter proc #'dragonruby-stargate-bridge--filter))
+      
+      (message "📡 Sending Canonical Probes to DragonRuby...")
+      (dragonruby-stargate-bridge-send-code "puts '[STARGATE_DEBUG] PROBE: Authority=' + (Object.respond_to?(:tick, true) && Object.new.method(:tick).owner.to_s.include?('Interposition') ? 'YES' : 'NO')")
+      (dragonruby-stargate-bridge-send-code "puts '[STARGATE_DEBUG] PONG: Communication Bridge is CABLED.'"))
+    (message "🔍 STARGATE: [NERVE-TRACKER] --------------------")))
+
+(defun dragonruby-stargate-bridge-toggle-debug (&optional state)
+  "Toggle atomic debugging for the bridge and sync with runtime.
+If STATE is provided (t or nil), set it explicitly."
+  (interactive)
+  (setq dragonruby-stargate-bridge--debug (if (null state) (not dragonruby-stargate-bridge--debug) state))
+  (let ((val (if dragonruby-stargate-bridge--debug "true" "false")))
+    (dragonruby-stargate-bridge-send-code (format "$stargate_debug = %s" val))
+    (message "📡 STARGATE: Atomic Debug is now %s." (if dragonruby-stargate-bridge--debug "ON" "OFF")))
+  ;; Refresh dashboard if fbound
+  (when (fboundp 'dragonruby-stargate-status-refresh)
+    (dragonruby-stargate-status-refresh)))
 
 (provide 'dragonruby-stargate-bridge)
 ;;; dragonruby-stargate-bridge.el ends here

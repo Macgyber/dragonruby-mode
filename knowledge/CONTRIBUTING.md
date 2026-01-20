@@ -24,10 +24,8 @@ We don't hide our kitchen. Some features are shipped in the codebase but disable
 
 Add these explicitly at your own risk to your `init.el` or `config.el` to unlock early-access tools:
 
-| Feature Flag | Description | Status |
-|--------------|-------------|--------|
+| `(setq dragonruby-enable-stargate t)` | **Stargate Module**: Time-travel and state management (Record/Jump/Fork). | ✅ v1.0 Stable |
 | `(setq dragonruby-experimental-smart-jump t)` | **Smart Source Jump**: Opens source files (`.psd`, `.kra`) from previews. | 🧪 Experimental |
-| `(setq dragonruby-experimental-concepts-guide t)` | **Living Documentation**: Symlinks code to `.org` definitions. | 🧪 Experimental |
 
 ### Your Feedback is Gold
 If you enable these and find a bug or have an idea, please use the **Experimental Feedback** template when opening an issue.
@@ -70,4 +68,4 @@ Open an issue with the `question` label.
 
 ---
 
-*DragonRuby Emacs Mode — v0.8.1*
+*DragonRuby Emacs Mode — v1.0.0 (Stable)*

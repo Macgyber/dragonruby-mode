@@ -74,10 +74,18 @@
         (dolist (mod '("core/dragonruby-kernel.el"
                        "core/dragonruby-scheduler.el"
                        "core/dragonruby-utils.el"
+                       "stargate/protocol/dragonruby-stargate-bridge.el"
+                       "stargate/emacs/dragonruby-stargate-core.el"
+                       "stargate/emacs/dragonruby-stargate-core--impl.el"
+                       "stargate/ui/dragonruby-stargate-status.el"
                        "audio/dragonruby-audio-fs.el"
                        "audio/dragonruby-audio-overlay.el"))
           (let ((f (expand-file-name mod mod-dir)))
-            (when (file-exists-p f) (load f nil t))))))
+            (if (file-exists-p f)
+                (progn
+                  (message "📁 STARGATE: Loading fresh module: %s" f)
+                  (load-file f))
+              (message "❌ STARGATE: MODULE NOT FOUND: %s" f))))))
 
     ;; 4. REBOOT: re-enable in previously active buffers
     (dolist (buf active-buffers)
@@ -131,8 +139,21 @@
   (load (expand-file-name ".emacs" dragonruby-project-root) nil t)  ;; NOMESSAGE = t
   (message "♻️ Local profile reloaded"))
 
+(defun dragonruby-bridge-nuke-and-pave ()
+  "Ultimate surgical reload: Reads the bridge from disk and evals it directly."
+  (interactive)
+  (let* ((mod-dir (expand-file-name "modules" dragonruby-project-root))
+         (bridge (expand-file-name "stargate/protocol/dragonruby-stargate-bridge.el" mod-dir)))
+    (if (file-exists-p bridge)
+        (with-temp-buffer
+          (insert-file-contents bridge)
+          (eval-buffer)
+          (message "🔥 STARGATE: Bridge NUKED and PAVED (Raw Disk Eval)."))
+      (message "❌ STARGATE: Bridge file NOT found for nuke: %s" bridge))))
+
 (global-set-key (kbd "<f5>") #'reload-local-emacs)
 (global-set-key (kbd "<f6>") #'dragonruby-hot-reload)
+(global-set-key (kbd "C-<f6>") #'dragonruby-bridge-nuke-and-pave)
 (global-set-key (kbd "<f12>") #'find-file)
 
 ;; ============================================================
@@ -154,7 +175,12 @@
  '(org-level-2 ((t (:height 1.2 :weight bold :foreground "#ABB2BF"))))
  '(org-level-3 ((t (:height 1.1 :weight semi-bold :foreground "#DCDFE4")))))
 
-;; (message "🚀 DragonRuby kernel online")
+;; ============================================================
+;; ✨ Windows Icon & Emoji Support
+;; ============================================================
+(when (eq system-type 'windows-nt)
+  (set-fontset-font t 'emoji '("Segoe UI Emoji" . "iso10646-1"))
+  (set-fontset-font t 'symbol '("Segoe UI Emoji" . "iso10646-1")))
 
 ) ;; End of unless guard
 

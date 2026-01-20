@@ -23,11 +23,21 @@ module Stargate
 
       def save_to_disk(hash, data)
         return if hash == "000000"
+        # Law of Persistence: Ensure the vault exists.
+        $gtk.system("mkdir -p .stargate/blobs") if $gtk
         $gtk.write_file(".stargate/blobs/#{hash}", data)
       end
 
       def load_from_disk(hash)
-        $gtk.read_file(".stargate/blobs/#{hash}")
+        data = $gtk.read_file(".stargate/blobs/#{hash}")
+        return nil unless data
+
+        # Law of Historical Integrity: Never apply a corrupted blob.
+        computed = $gtk.sha256(data)
+        if computed != hash
+          raise "CRITICAL: State Integrity Violation! Hash mismatch for #{hash} (Computed: #{computed})"
+        end
+        data
       end
 
       def apply(raw_data)
