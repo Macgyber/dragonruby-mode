@@ -8,9 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 <details open>
-<summary><h2>[1.0.0] - 2026-01-19 (STARGATE v1.0 STABLE: SESSION INTEGRITY)</h2></summary>
+<summary><h2>[1.1.0] - 2026-01-20 (STARGATE v1.1: MODULAR ARCHITECTURE)</h2></summary>
 
-### 🌌 Stargate v1.0 Stable (Hardened)
+### 🌌 Stargate v1.1: Specialized Modules (The Great Refactor)
+- **Modular Architecture**: Decoupled the project into 18+ independent specialized modules. Ensuring high maintainability and robust resource management.
+- **The RAM Cache (BlackBox)**: Implemented a circular 300-frame RAM buffer in DragonRuby. This eliminates disk I/O lag for recent history and enables ultra-fast temporal jumps.
+- **Asynchronous Persistence**: Optimized telemetry to flush to disk once per second while maintaining 60fps streaming to Emacs.
+- **Process Monitor (Sentinel)**: Added high-level process monitoring to the Bridge. Emacs now detects DragonRuby termination instantly, preventing UI freezes and safely archiving sessions.
+- **Specialized Modules (Emacs)**:
+    - `stargate-fsm.el`: Pure state transition logic.
+    - `stargate-sessions.el`: Specialized disk orchestration.
+    - `stargate-telemetry.el`: Unified event processing.
+    - `stargate-status-view.el`: Restored classic "Status Dashboard" aesthetics with professional visuals.
+- **Specialized Modules (Ruby)**:
+    - `black_box.rb`: RAM caching layer.
+    - `chronos.rb`: Deterministic address keeper.
+    - `commands.rb`: Clean command bus processor.
+    - `protocol.rb`: Optimized silent JSON emitter.
+
+### 🛡️ Core & System
+- **Hot-Reload Recovery**: Introduced `M-x dragonruby-stargate--initialize-runtime` to refresh the runtime components from the specialized modules on demand.
+- **Global Keymap Refinement**: Standardized `<f7>` (Record), `<f8>` (Pause), `<f9>` (Timeline), and `<f10>` (Status) across all contexts.
+
+</details>
+
+<details>
+<summary><h2>[1.0.0] - 2026-01-19 (STARGATE v1.0 milestone)</h2></summary>
+
+### 🌌 Stargate v1.0 milestone (Hardened)
 - **Universal Address Integrity**: Implemented `session_id@branch@tick` globally. History is now immutable and immune to cross-session contamination.
 - **Deterministic Data**: Purged physical time (`observed_at`) from the core logic. The simulation now relies exclusively on deterministic hashes and seeds.
 - **Failsafe FSM**: The Finite State Machine in `manager.el` now strictly prevents operational leaps (Record/Jump/Fork) unless the system is in a verified stable interposition.
@@ -26,14 +51,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 </details>
 
 <details>
-<summary><h2>[0.8.1] - 2026-01-18 (STARGATE STABILIZATION: THE INDUSTRIAL LEAP)</h2></summary>
+<summary><h2>[0.8.1] - 2026-01-18 (STARGATE STABILIZATION: PROFESSIONAL GRADE)</h2></summary>
 
 ### 🌌 Stargate Stabilization (Deployment Grade)
 - **Portal Strategy**: Implemented a sandbox-compliant injection mechanism using a temporary `stargate_portal.rb` in `mygame/`. This bypasses DragonRuby's file restrictions and ensures 100% loading reliability.
-- **Void Shield (Anti-Lag Storm)**: Developed a high-speed selective log processor that vaporizes massive bursts of engine noise (like Render logs during resize) before they touch the Emacs UI. Zero blocking during window operations.
+- **Telemetry Filter (Anti-Lag)**: Developed a high-speed selective log processor that filters massive bursts of engine output (such as Render logs during resize) before they reach the Emacs UI. Zero blocking during window operations.
 - **Lifecycle-Aware Injection**: The Bridge now actively monitors for the `RNG seed` signal, ensuring the VM is stable and ready before attempting any injection.
 - **Deterministic Single Injection**: Implemented a global "Infection Requested" lock in Emacs. Guarantees that the injection command is sent exactly once per stable session, eliminating re-entry bugs and minibuffer errors.
-- **Industrial Runtime Refactor**:
+- **Professional Runtime Refactor**:
   - **Standard Alias Protection**: Real idempotency in `bootstrap.rb` using explicit `method_defined?` checks to prevent infinite recursion on hot reloads.
   - **Fallback Strategy**: Added fallback support for projects without a pre-defined `tick` method.
   - **Segregated States**: Separate logic for technical installation (`$stargate_installed`) and operational readiness (`$stargate_operational`).
@@ -84,7 +109,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Project Root Anchor**: Implemented one-time project root detection per buffer. Eliminated recursive upward disk scans in idle pulses.
 - **Lazy Sprite Overlays**: Visual metadata and image creation are now deferred to hover time. 0% CPU impact during idle pulses.
 - **Architectural Throttling**: Increased idle delay to 1.5s. Implemented global guards that abort background logic if no project root is anchored.
-- **Memory Hygiene**: Sanitized the Kernel ledger to eliminate defunct timers and hooks.
+- **Memory Hygiene**: Sanitized the Core ledger to eliminate defunct timers and hooks.
 - **Emergency Recovery**: Introduced `M-x dragonruby-kernel-system-halt` (alias `stargate-halt`) for immediate system recovery.
 
 ### 🌌 Stargate: Time-Travel & Determinism
@@ -98,10 +123,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details>
 <summary><h2>[0.7.3] - 2026-01-12 (CORE KERNEL & RELIABLE RELOAD)</h2></summary>
 
-### 🧠 Unified Micro-Kernel (System Architecture)
-- **Central Life Registry**: Implementation of a global "Registry Book" for Timers, Hooks, and Processes. No resource can be born without being registered by the Kernel.
-- **Atomic Shutdown**: The shutdown system (`system-shutdown`) is now an atomic operation that guarantees the death of all old activity before any change.
-- **Zombie Hunt**: Safety net that scans the global Emacs timer list to cancel orphan functions from the `dragonruby-` namespace.
+### 🧠 Unified Core System (System Architecture)
+- **Central Life Registry**: Implementation of a global "Registry Book" for Timers, Hooks, and Processes. No resource can be initialized without being registered by the Core.
+- **Atomic Shutdown**: The shutdown system (`system-shutdown`) is now an atomic operation that guarantees the termination of all existing activity before any change.
+- **Resource Management**: Safety mechanism that scans the global Emacs timer list to cancel orphan functions from the `dragonruby-` namespace.
 
 ### 🔄 Reliable Hot-Reload (F6)
 - **OS Life Cycle**: Implementation of the `Shutdown -> Unload -> Load -> Reboot` flow.
@@ -117,7 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Visible Retinal Vision**: Sprites, Audio, Fonts, and Colors modules now operate exclusively in the visible region (with 3000 chars padding), eliminating lag in files with thousands of lines.
 
 ### 🌌 Stargate Module (Time Travel) — EXPERIMENTAL
-- **Kernel Organ**: First module designed as a "living organ" that beats synchronized with the Kernel Heartbeat (Scheduler).
+- **Core Component**: First module designed as a "living component" that is synchronized with the System Heartbeat (Scheduler).
 - **Session Recorder (Bridge)**: JSON pulse reassembly via console for real-time simulation moment capture.
 - **Code Injector**: Atomic injection system with risk classification (Alpha/Beta/Gamma) and automatic reversion.
 - **Temporal Navigation**: Visual visualization of the "Forest of Branches" and capability of instant jump between historical states.
@@ -172,13 +197,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details>
 <summary><h2>[0.7.0] - 2026-01-09 (PHASE 5: LEGO ARCHITECTURE & KERNEL)</h2></summary>
 
-### 🏗️ Lego Architecture (The Kernel)
 The system has been restructured from scratch. It is no longer a collection of scripts; it is a modular **Operating System**.
-- **The Kernel**: A central orchestrator that manages the life and death of each functionality.
+- **The Core Controller**: A central orchestrator that manages the lifecycle of each module.
 - **The Three Core Policies**:
-  1. **Namespace Law**: Each module owns its exclusive space.
-  2. **Capability Law**: Modules declare what they *need* (e.g., `:rendering`) and what they *provide*, not who they know.
-  3. **Cold Boot Law**: Nothing runs by default. Zero zombies.
+  1. **Namespace Policy**: Each module owns its exclusive space.
+  2. **Capability Policy**: Modules declare what they *need* (e.g., `:rendering`) and what they *provide*.
+  3. **Initialization Policy**: Modules are only loaded when explicitly enabled.
 
 ### 🛡️ Total Modularity
 All systems have been encapsulated in `modules/` with strict contracts (`manifest`):
@@ -215,8 +239,8 @@ The autocompletion system has been stabilized and verified.
 <details>
 <summary><h2>[0.6.0] - 2026-01-06 (INDUSTRIAL PHASE: ZERO BLOCKING & RELIABILITY)</h2></summary>
 
-### 🏭 Industrial Shielding ("Outside vs Inside")
-This version represents a complete reengineering under the philosophy of **"Invisible Order"**.
+### 🏭 Robustness and Architecture ("Outside vs Inside")
+This version represents a complete reengineering under the philosophy of **"Organized Efficiency"**.
 
 ### Added
 - **Active metrics on load**:

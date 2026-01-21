@@ -4,62 +4,38 @@ module Stargate
   module Protocol
     class << self
       def emit_moment(address, state_packet, seed, moment_type = 'tick')
-        return unless $gtk
         return unless state_packet
-
-        # Law of Fidelity: The Protocol DOES NOT filter moments.
-        # Every moment is a historical truth.
-
         payload = {
-          type: "moment",
-          address: address,
-          hash: state_packet[:hash],
-          seed: seed,
-          metadata: {
-            observed_at: {
-              tick: $gtk.args.state.tick_count,
-              monotonic_ms: Time.now.to_f * 1000
-            },
-            rng_calls: Stargate::Random.calls_this_frame,
-            moment_type: moment_type
+          "type" => "moment", "address" => address, "hash" => state_packet[:hash], "seed" => seed,
+          "metadata" => {
+            "observed_at" => { "tick" => $gtk.args.state.tick_count, "monotonic_ms" => Time.now.to_f * 1000 },
+            "rng_calls" => Stargate::Random.calls_this_frame, "moment_type" => moment_type
           }
         }
-
-        puts "[STARGATE_MOMENT] #{$gtk.to_json(payload)}"
+        # Law I: Absolute Observability. We use a prefix that the Bridge filters.
+        # To avoid console "lag", we only emit the raw JSON.
+        $stdout.puts "[STARGATE_MOMENT] #{json_encode(payload)}"
       end
 
-      def emit_divergence(address, expected_hash, actual_hash)
-        return unless $gtk
-        
-        payload = {
-          type: "divergence",
-          address: address,
-          expected: expected_hash,
-          actual: actual_hash,
-          observed_at: {
-            tick: $gtk.args.state.tick_count,
-            monotonic_ms: Time.now.to_f * 1000
-          }
-        }
-        
-        puts "[STARGATE_DIVERGENCE] #{$gtk.to_json(payload)}"
+      def emit_divergence(address, expected, actual)
+        payload = { "type" => "divergence", "address" => address, "expected" => expected, "actual" => actual }
+        $stdout.puts "[STARGATE_DIVERGENCE] #{json_encode(payload)}"
       end
 
-      def emit_branch(new_id, parent_id, divergence_frame)
-        return unless $gtk
+      def emit_branch(id, parent, div)
+        payload = { "type" => "branch", "id" => id, "parent" => parent, "divergence" => div }
+        $stdout.puts "[STARGATE_BRANCH] #{json_encode(payload)}"
+      end
 
-        payload = {
-          type: "branch",
-          id: new_id,
-          parent: parent_id,
-          divergence: divergence_frame,
-          observed_at: {
-            tick: $gtk.args.state.tick_count,
-            monotonic_ms: Time.now.to_f * 1000
-          }
-        }
-        
-        puts "[STARGATE_BRANCH] #{$gtk.to_json(payload)}"
+      def json_encode(obj)
+        case obj
+        when Hash then "{#{obj.map{|k,v| "\"#{k}\":#{json_encode(v)}"}.join(",")}}"
+        when Array then "[#{obj.map{|v| json_encode(v)}.join(",")}]"
+        when String then "\"#{obj.to_s.gsub("\"", "\\\"")}\""
+        when NilClass then "null"
+        when Numeric, TrueClass, FalseClass then obj.to_s
+        else "\"#{obj.to_s.gsub("\"", "\\\"")}\""
+        end
       end
     end
   end

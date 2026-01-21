@@ -75,9 +75,8 @@ Internal state and external connections.
 
 ---
 
-## 🎨 CREATIVE Hub (Parent Button)
-
-The **CREATIVE** button is your portal to web-based editors, resources, and custom tools. Click it to expand and reveal all child buttons.
+## 🎨 CREATIVE Hub
+The **CREATIVE** menu is your entry point to web-based editors, resources, and custom tools. Click it to expand and reveal all available options.
 
 ### Default Web Tools
 
@@ -144,9 +143,7 @@ If enabled, clicking a sprite path in code looks for the *source* (e.g., `.kra`,
 
 ---
 
-## 🚀 Speed Feedback: Help us make it perfect!
-
-We want these tools to be lightning-fast and error-free. If something breaks or you have an idea for a "God-tier" feature:
+We want these tools to be efficient and error-free. If you encounter any issues or have a suggestion for a new feature:
 
 - 🐞 **[Report a Bug / Tool Failure](https://github.com/Macgyber/dragonruby-mode/issues/new?template=bug_report.yml)** — *If a button doesn't react or ImageMagick fails.*
 - ✨ **[Request a New Feature](https://github.com/Macgyber/dragonruby-mode/issues/new?template=feature_request.yml)** — *Tell us what tool is missing from your workflow.*

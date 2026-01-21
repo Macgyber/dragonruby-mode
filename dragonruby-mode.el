@@ -36,7 +36,7 @@
                        "audio" "colors" "paths" "concepts" "completion" "guide"))
           (add-to-list 'load-path (expand-file-name dir mod-dir)))
         
-        ;; Stargate
+        ;; Stargate Expert Modules
         (dolist (dir '("stargate/emacs" "stargate/protocol" "stargate/sessions" "stargate/ui"))
           (add-to-list 'load-path (expand-file-name dir mod-dir)))
         
@@ -68,6 +68,18 @@
 (require 'dragonruby-paths)
 (require 'dragonruby-concepts)
 (require 'dragonruby-completion)
+;; 3. Register Modules (Expert Sub-systems)
+(require 'dragonruby-stargate-parser)
+(require 'dragonruby-stargate-portal)
+(require 'dragonruby-stargate-monitor)
+(require 'dragonruby-stargate-recorder)
+(require 'dragonruby-stargate-timeline)
+(require 'dragonruby-stargate-scrubber)
+(require 'dragonruby-stargate-fsm)
+(require 'dragonruby-stargate-sessions)
+(require 'dragonruby-stargate-telemetry)
+(require 'dragonruby-stargate-status-view)
+(require 'dragonruby-stargate-status)
 (require 'dragonruby-stargate-core)
 (require 'dragonruby-guide)
 

@@ -6,14 +6,14 @@
 ;; URL: https://github.com/Macgyber/dragonruby-mode
 
 ;;; Commentary:
-;; This module implements the External Mutation Law (XII) and 
-;; Authoritative Buffers Policy (XV). It monitors buffer integrity
-;; via SHA-256 and prevents silent state corruption from external tools.
-;; Hardened for v1.0 Blindada: Exact-Content Hashing and Event Registration.
+;; This module implements frame integrity validation.
+;; It monitors buffer integrity via SHA-256 and prevents desync.
 
 ;;; Code:
 
 (require 'dragonruby-utils)
+(require 'dragonruby-stargate-recorder)
+(require 'dragonruby-stargate-sessions)
 
 (defvar dragonruby-stargate-tracker--hashes (make-hash-table :test 'equal)
   "Dictionary of authoritative buffer hashes (path -> sha256).")
@@ -31,7 +31,7 @@ Returns nil if all matches, or a list of mismatched file paths."
          (when buffer
             (with-current-buffer buffer
              (let* ((content (buffer-substring-no-properties (point-min) (point-max)))
-                    ;; Law XII: EXACT content is sovereign. Whitespace normalization removed.
+                    ;; Exact content is sovereign.
                     (current-hash (secure-hash 'sha256 content)))
                (unless (string-equal current-hash expected-hash)
                  (push path mismatches)))))))
@@ -49,13 +49,12 @@ Returns nil if all matches, or a list of mismatched file paths."
       (remhash path dragonruby-stargate-tracker--hashes))))
 
 (defun dragonruby-stargate-tracker-pause (mismatches)
-  "Halt the simulation due to integrity failure in MISMATCHES.
-This is the 'Stasis Mode' required by Law XV. Registers failure in history."
-  (message "🛑 STARGATE: Simulation HALTED. External Mutation Detected!")
+  "Halt the simulation due to integrity failure in MISMATCHES."
+  (message "🛑 STARGATE: Simulation PAUSED. External Mutation Detected!")
   ;; Signal the Runtime of the exact files that were corrupted
   (let ((files-str (mapconcat #'file-name-nondirectory mismatches ", ")))
-    (dragonruby-stargate-bridge-send-code 
-     (format "Stargate::Clock.pause!; Stargate::Protocol.emit_event(type: 'external_mutation', files: %S)" 
+    (dragonruby-stargate--send-active-command 
+     (format "Stargate::Clock.pause!; puts \"STARGATE: [WARN] External mutation in: %s\"" 
              files-str)))
   (run-hooks 'dragonruby-stargate-tracker-mismatch-hook))
 

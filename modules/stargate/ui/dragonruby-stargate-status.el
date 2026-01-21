@@ -1,126 +1,45 @@
-;;; dragonruby-stargate-status.el --- Stargate Status Dashboard -*- lexical-binding: t -*-
+;;; dragonruby-stargate-status.el --- Stargate Status Dashboard Controller -*- lexical-binding: t -*-
 
-;; Author: Macgyber <esteban3261g@gmail.com>
-;; Version: 0.8.0
-
-;;; Commentary:
-;; Mini-Dashboard for Stargate - shows current state without noise.
-
-;;; Code:
-
-(defun dragonruby-stargate-status-refresh ()
-  "Refresh the status dashboard if it's visible."
-  (when (get-buffer dragonruby-stargate-status-buffer)
-    (with-current-buffer dragonruby-stargate-status-buffer
-      (let ((inhibit-read-only t))
-        (erase-buffer)
-        (dragonruby-stargate-status--render)
-        (goto-char (point-min))))))
-
-(defvar dragonruby-stargate-status-buffer "*DragonRuby Status*"
-  "Buffer name for the Stargate status dashboard.")
+(require 'dragonruby-stargate-status-view)
+(require 'dragonruby-stargate-telemetry)
+(require 'dragonruby-stargate-recorder)
+(require 'dragonruby-stargate-timeline)
 
 (defvar dragonruby-stargate-status-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "q") #'quit-window)
+    (set-keymap-parent map special-mode-map)
     (define-key map (kbd "g") #'dragonruby-stargate-status-refresh)
-    (define-key map (kbd "i") #'dragonruby-stargate--infect-runtime)
-    (define-key map (kbd "d") #'dragonruby-stargate-bridge-toggle-debug)
-    map)
-  "Keymap for Stargate status dashboard.")
+    (define-key map (kbd "i") #'dragonruby-stargate--initialize-runtime)
+    (define-key map (kbd "r") #'dragonruby-stargate-record)
+    (define-key map (kbd "<f7>") #'dragonruby-stargate-record)
+    (define-key map (kbd "p") #'dragonruby-stargate-pause)
+    (define-key map (kbd "<f8>") #'dragonruby-stargate-pause)
+    (define-key map (kbd "t") #'dragonruby-stargate-timeline)
+    (define-key map (kbd "<f9>") #'dragonruby-stargate-timeline)
+    (define-key map (kbd "q") #'quit-window)
+    map))
 
-(define-derived-mode dragonruby-stargate-status-mode special-mode "Stargate-Status"
-  "Major mode for the Stargate status dashboard."
-  (setq buffer-read-only t))
+(define-derived-mode dragonruby-stargate-status-mode special-mode "Stargate-Analyzer")
 
 (defun dragonruby-stargate-status-buffer ()
-  "Show the Stargate status dashboard."
+  "Show the classic Stargate status dashboard."
   (interactive)
-  (let ((buf (get-buffer-create dragonruby-stargate-status-buffer)))
+  (let ((buf (get-buffer-create "*Stargate Status*")))
     (with-current-buffer buf
       (dragonruby-stargate-status-mode)
+      (dragonruby-stargate-status-refresh))
+    (display-buffer buf)))
+
+(defun dragonruby-stargate-status-refresh ()
+  "Refresh the dashboard via the Status View expert."
+  (interactive)
+  (when (get-buffer "*Stargate Status*")
+    (with-current-buffer "*Stargate Status*"
       (let ((inhibit-read-only t))
         (erase-buffer)
-        (dragonruby-stargate-status--render)
-        (goto-char (point-min))))
-    (display-buffer buf)
-    buf))
+        (dragonruby-stargate-status-view--render)
+        (goto-char (point-min))))))
 
-(defun dragonruby-stargate-status--render ()
-  "Render the status dashboard content."
-  (let* ((connected (and (processp dragonruby-stargate-bridge--process)
-                         (process-live-p dragonruby-stargate-bridge--process)))
-         (state dragonruby-stargate--state)
-         (infected dragonruby-stargate--runtime-infected)
-         (session dragonruby-stargate--active-session)
-         (debug dragonruby-stargate-bridge--debug)
-         (moments (when dragonruby-stargate--session-index
-                   (hash-table-count (cdr (assoc "moments" dragonruby-stargate--session-index))))))
-    
-    (insert (propertize "🐉 DragonRuby — Stargate Status\n" 'face '(:height 1.3 :weight bold)))
-    (insert (propertize (make-string 50 ?─) 'face 'shadow) "\n\n")
-    
-    ;; Stargate Status
-    (insert (propertize "Stargate Systems\n" 'face '(:weight bold)))
-    (insert (format "  Process     : %s\n"
-                    (if connected
-                        (propertize "🔌 Connected & Cabled" 'face 'font-lock-doc-face)
-                      (propertize "⚫ No Connection" 'face 'shadow))))
-    
-    (insert (format "  Interposition: %s\n"
-                    (if infected
-                        (propertize "🧬 Sovereignty Established" 'face 'success)
-                      (propertize "✘ Missing (Runtime detached)" 'face 'error))))
-
-    (insert (format "  Sync Status : %s\n"
-                    (cond
-                     ((eq state :active) (propertize "🟢 Active & Syncing" 'face 'success))
-                     ((eq state :infecting) (propertize "🔄 Infecting..." 'face 'warning))
-                     ((eq state :radar-blind) (propertize "⚫ Radar Blind" 'face 'warning))
-                     (infected (propertize "💤 Interposed & Idle" 'face 'shadow))
-                     (t (propertize "⚫ Inactive" 'face 'shadow)))))
-    
-    (insert (format "  Atomic Debug: %s\n"
-                    (if debug
-                        (propertize "✔ Enabled (Deep Diagnostics)" 'face 'success)
-                      (propertize "✘ Disabled" 'face 'shadow))))
-
-    (insert (format "  Engine ID   : %s\n" 
-                    (if connected 
-                        (propertize (number-to-string (process-id dragonruby-stargate-bridge--process)) 'face 'font-lock-constant-face)
-                      (propertize "---" 'face 'shadow))))
-
-    (insert (format "  Monitor     : %s\n"
-                    (if (and dragonruby-stargate--global-timer
-                             (timerp dragonruby-stargate--global-timer))
-                         (propertize "✔ Global Sweep Active" 'face 'success)
-                       (propertize "✘ Inactive" 'face 'error))))
-    
-    (insert (format "  Session     : %s\n"
-                    (if session
-                        (propertize (file-name-nondirectory (directory-file-name session)) 'face 'font-lock-string-face)
-                      (propertize "None" 'face 'shadow))))
-    
-    (when moments
-      (insert (format "  Moments Recorded: %s\n" (propertize (number-to-string moments) 'face 'font-lock-constant-face))))
-    
-    (insert "\n")
-    
-    ;; Hints
-    (insert (propertize "Operational Controls\n" 'face '(:weight bold)))
-    (insert "  • " (propertize "d" 'face 'font-lock-keyword-face) " : Toggle Atomic Debug (Bridge Sync)\n")
-    (insert "  • " (propertize "i" 'face 'font-lock-keyword-face) " : Manual Infection (Force Cable)\n")
-    (insert "  • " (propertize "F7" 'face 'font-lock-keyword-face) ": Start/Resume Recording\n")
-    (insert "  • " (propertize "F8" 'face 'font-lock-keyword-face) ": Pause (Stasis)\n")
-    (insert "  • " (propertize "F9" 'face 'font-lock-keyword-face) ": Open Temporal Timeline\n")
-    (insert "  • " (propertize "g" 'face 'font-lock-keyword-face) " : Refresh Radar\n")
-    (insert "  • " (propertize "q" 'face 'font-lock-keyword-face) " : Close Console\n")
-    
-    (insert "\n")
-    (insert (propertize (make-string 50 ?─) 'face 'shadow) "\n")))
-
-;; Auto-refresh when Stargate state changes
-(add-hook 'dragonruby-stargate-bridge-event-hook #'dragonruby-stargate-status-refresh)
+(add-hook 'dragonruby-stargate-session-updated-hook #'dragonruby-stargate-status-refresh)
 
 (provide 'dragonruby-stargate-status)
-;;; dragonruby-stargate-status.el ends here

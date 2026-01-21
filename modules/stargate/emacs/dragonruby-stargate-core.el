@@ -6,7 +6,7 @@
 ;; URL: https://github.com/Macgyber/dragonruby-mode
 
 ;;; Commentary:
-;; Stargate: Time-traveling state management for DragonRuby (v1.0 Blindada).
+;; Stargate: Time-traveling state management for DragonRuby.
 ;; Provides authoritative time-travel, branching, and state integrity.
 
 ;;; Code:
@@ -16,29 +16,33 @@
 ;; Autoload implementation functions
 (autoload 'dragonruby-stargate-enable "dragonruby-stargate-core--impl" nil t)
 (autoload 'dragonruby-stargate-disable "dragonruby-stargate-core--impl" nil t)
-(autoload 'dragonruby-stargate-inject-buffer "dragonruby-stargate-core--impl" nil t)
-(autoload 'dragonruby-stargate-record "dragonruby-stargate-core--impl" nil t)
-(autoload 'dragonruby-stargate-pause "dragonruby-stargate-core--impl" nil t)
-(autoload 'dragonruby-stargate-jump "dragonruby-stargate-core--impl" nil t)
+(autoload 'dragonruby-stargate-record "dragonruby-stargate-recorder" nil t)
+(autoload 'dragonruby-stargate-pause "dragonruby-stargate-recorder" nil t)
+(autoload 'dragonruby-stargate-jump "dragonruby-stargate-timeline" nil t)
+(autoload 'dragonruby-stargate-status-buffer "dragonruby-stargate-status" nil t)
+(autoload 'dragonruby-stargate-emergency-halt "dragonruby-stargate-recorder" nil t)
 
-;; Autoload other public interface functions from sub-modules if needed
-(autoload 'dragonruby-stargate-timeline "dragonruby-stargate-timeline" nil t)
-(autoload 'dragonruby-stargate-session-init "dragonruby-stargate-manager" nil t)
-(autoload 'dragonruby-stargate-session-load "dragonruby-stargate-manager" nil t)
-(autoload 'dragonruby-stargate-session-fork "dragonruby-stargate-manager" nil t)
+;; Autoload other public interface functions from sub-modules
+(autoload 'dragonruby-stargate-timeline "dragonruby-stargate-scrubber" nil t)
+(autoload 'dragonruby-stargate-session-init "dragonruby-stargate-sessions" nil t)
+(autoload 'dragonruby-stargate-session-load "dragonruby-stargate-sessions" nil t)
+
+(autoload 'dragonruby-stargate-timeline-fork "dragonruby-stargate-timeline" nil t)
 
 (defgroup dragonruby-stargate nil
   "Stargate: Time-traveling state management for DragonRuby."
   :group 'dragonruby)
 
-;; --- KEYMAP (The Architect's Console) ---
+;; --- KEYMAP (Stargate Command Center) ---
 (defvar dragonruby-stargate-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "r") #'dragonruby-stargate-record)
     (define-key map (kbd "p") #'dragonruby-stargate-pause)
     (define-key map (kbd "j") #'dragonruby-stargate-jump)
     (define-key map (kbd "t") #'dragonruby-stargate-timeline)
+    (define-key map (kbd "s") #'dragonruby-stargate-status-buffer)
     (define-key map (kbd "l") #'dragonruby-stargate-session-load)
+    (define-key map (kbd "K") #'dragonruby-stargate-emergency-halt)
     map)
   "Keymap for Stargate commands.")
 
@@ -46,6 +50,7 @@
 (global-set-key (kbd "<f7>") #'dragonruby-stargate-record)
 (global-set-key (kbd "<f8>") #'dragonruby-stargate-pause)
 (global-set-key (kbd "<f9>") #'dragonruby-stargate-timeline)
+(global-set-key (kbd "<f10>") #'dragonruby-stargate-status-buffer)
 
 ;; -----------------------------------------------------------------------------
 ;; 📜 Manifest
@@ -61,11 +66,12 @@
  :enable-fn #'dragonruby-stargate-enable
  :disable-fn #'dragonruby-stargate-disable)
 
-;; --- ALIASES (The Architect's Shortcuts) ---
+;; --- ALIASES (Convenience Shortcuts) ---
 (defalias 'stargate-init #'dragonruby-stargate-session-init)
 (defalias 'stargate-timeline #'dragonruby-stargate-timeline)
 (defalias 'stargate-load #'dragonruby-stargate-session-load)
-(defalias 'stargate-fork #'dragonruby-stargate-session-fork)
+(defalias 'stargate-status #'dragonruby-stargate-status-buffer)
+(defalias 'stargate-fork #'dragonruby-stargate-timeline-fork)
 
 (provide 'dragonruby-stargate-core)
 ;;; core.el ends here

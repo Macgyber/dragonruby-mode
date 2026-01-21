@@ -6,24 +6,22 @@
 ;; URL: https://github.com/Macgyber/dragonruby-mode
 
 ;;; Commentary:
-;; This module classifies code changes into risk categories: 
-;; Alpha (safe), Beta (risky), or Gamma (dangerous) as required by Law VI.
-;; Hardened for v1.0 Blindada: Meta-programming detection and risk-aware injection.
+;; This module classifies code changes into risk categories.
+;; It ensures that code transitions follow safe injection protocols.
 
 ;;; Code:
 
 (require 'dragonruby-stargate-bridge)
 
 (defun dragonruby-stargate-injector-classify (snippet)
-  "Classify the risk level of SNIPPET.
-Conservative: default to gamma if suspicious meta-programming or structural changes are found."
+  "Classify the risk level of SNIPPET."
   (cond
    ;; GAMMA: Structural changes and Dynamic meta-programming
    ((string-match-p (concat "\\<" (regexp-opt '("class" "module" 
-                                                "attr_accessor" "attr_reader" "attr_writer"
-                                                "eval" "instance_eval" "class_eval" "module_eval"
-                                                "send" "public_send" "define_method" 
-                                                "define_singleton_method" "const_set" "remove_const") t) "\\>") snippet)
+                                                 "attr_accessor" "attr_reader" "attr_writer"
+                                                 "eval" "instance_eval" "class_eval" "module_eval"
+                                                 "send" "public_send" "define_method" 
+                                                 "define_singleton_method" "const_set" "remove_const") t) "\\>") snippet)
     'gamma)
    
    ;; BETA: Functional logic changes (Methods, control flow)
@@ -37,14 +35,14 @@ Conservative: default to gamma if suspicious meta-programming or structural chan
   "Return human-readable details for a risk CATEGORY."
   (cl-case category
     (gamma '(:label "GAMMA" :color "red" :desc "Structural/Meta Change: Irreversible. Proceed with caution."))
-    (beta  '(:label "BETA"  :color "yellow" :desc "Logic Change: Dynamic method update. Reversible."))
+    (beta  '(:label "BETA"  :color "yellow" :desc "Logic Change: Reversible method update."))
     (alpha '(:label "ALPHA" :color "green" :desc "Data/Value Change: Safe expression update."))))
 
 (defun dragonruby-stargate-injector-transmit (snippet)
-  "Classify and transmit SNIPPET to the Stargate Runtime with intent."
+  "Classify and transmit SNIPPET to the Stargate Runtime."
   (let* ((category (dragonruby-stargate-injector-classify snippet))
          (details (dragonruby-stargate-injector-get-risk-details category))
-         ;; Wrap in a risk-aware injection call (Law VI Integrity)
+         ;; Wrap in a risk-aware injection call
          (wrapped-code (format "Stargate::Injection.inject!(%S, risk: :%s)" snippet category)))
     
     (message "🧠 Stargate Injector: [%s] detected. %s" 
@@ -56,8 +54,8 @@ Conservative: default to gamma if suspicious meta-programming or structural chan
       (unless (y-or-n-p "⚠️ STARGATE: Gamma change detected (irreversible). Inject anyway? ")
         (error "Injection aborted by user")))
 
-    ;; Transmit to the Body via the Bridge using the hardened payload
-    (dragonruby-stargate-bridge-send-code wrapped-code)
+    ;; Transmit using the file-based command system (Law XIX)
+    (dragonruby-stargate--send-active-command wrapped-code)
     category))
 
 (provide 'dragonruby-stargate-injector)

@@ -80,4 +80,4 @@ To protect this modular architecture, the project adheres to a **Strict CI Stand
 
 ---
 
-*DragonRuby Emacs Mode — v1.0.0 (Stable)*
+*DragonRuby Emacs Mode — v1.0.0 (Beta)*

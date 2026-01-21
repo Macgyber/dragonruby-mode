@@ -10,20 +10,18 @@
 ---
 
 ## The New Standard
-🏛️ **The New Standard: A Professional Baseline**
+🏛️ **The New Standard: A Comprehensive Baseline**
 
 For years, we accepted that "powerful" meant "complicated" and "fast" meant "ugly". We didn't agree.
 
 **DragonRuby Emacs Mode** is a milestone. It is the result of obsessively asking: *"What if your editor felt less like a tool and more like an extension of your mind?"*
 
 We haven't just added features; we have established an **Optimized Engine**. From the zero-latency sprite rendering to the industrial-grade memory management, every line of code here exists to protect your flow. We don't want to receive the credit; we want you to create the impossible, and forget we are even here.
-
-This is our contribution to the craft. This is the new baseline.
 ## 📑 Table of Contents
 
 - [The New Standard](#the-new-standard)
-- [The Stable Features](#the-stable-features)
-  - [Level 1: Color Intelligence](#level-1-color-intelligence)
+- [Core Features](#core-features)
+  - [Level 1: Color Visualization](#level-1-color-visualization)
   - [Level 2: Sprite Management](#level-2-sprite-management)
   - [Asset Workshop: Integrated Image Editor](#asset-workshop-integrated-image-editor)
   - [Level 4: The Creative Hub](#level-4-the-creative-hub)
@@ -31,7 +29,7 @@ This is our contribution to the craft. This is the new baseline.
 - [Tactical Features](#tactical-features)
   - [Audio Assistant](#audio-assistant)
   - [Font Visualizer](#font-visualizer)
-  - [Level 5: Time Travel Module (Stargate)](#level-5-time-travel-module)
+  - [Level 5: Time Travel Module (Stargate) — Experimental](#level-5-time-travel-module)
 - [Installation](#installation)
 - [Architecture: The Lego System](#architecture-the-lego-system)
   - [The Kernel](#the-kernel)
@@ -40,8 +38,8 @@ This is our contribution to the craft. This is the new baseline.
 
 ---
 
-## The Stable Features
-🛠️ **The Stable Features (The Foundational Base)**
+## Core Features
+🛠️ **Core Features (The Foundational Base)**
 
 ### Level 1: Color Intelligence
 🎨 **Level 1: Color Intelligence (Colors)**
@@ -132,8 +130,8 @@ Did you pick the right font? Why doesn't it look like you expected? Stop guessin
 **→ [📖 Complete Font System Guide](knowledge/FONTS.md)** (ABC/Pangram Viewer, Typography resources, Troubleshooting)
 
 ### Level 5: Time Travel Module
-🌌 **Level 5: Stargate Module (Time-Travel) — v1.0 Stable**
-Master the simulation. Record, Mutate, and Rewind with atomic precision.
+🌌 **Level 5: Stargate Module (Time-Travel) — Experimental**
+Master the simulation. Record, Mutate, and Rewind (Under Active Development).
 
 - **Session Recorder**: Continuous recording of states and seeds into a JSON-backed history.
 - **Code Injector**: Real-time code injection with reliable idempotency and sandbox-compliant loading.
@@ -205,10 +203,10 @@ The Kernel is the central nervous system. It strictly enforces the **Three Base 
 2.  **Capability Policy**: Modules request features (e.g. `:rendering`), and the Kernel finds the provider.
 3.  **Initialization Policy**: Nothing runs until you ask for it. Zero background overhead.
 
-### 🧱 Assembling Your Legos
-You have total control. You can enable or disable individual pieces in your configuration, or handle it visually:
+### 🧱 Configuring Modules
+You have total control. You can enable or disable individual modules in your configuration, or handle it visually:
 
-- **Visual Method**: Run `M-x customize-group RET dragonruby` to see all available modules and toggle them with a single click.
+- **Visual Method**: Run `M-x customize-group RET dragonruby` to see all available modules and toggle them.
 - **Config Method**: Add these lines to your `config.el` (Doom) or `init.el` (Vanilla) **before** loading the mode:
 
 ```elisp
@@ -284,9 +282,7 @@ A precise autocompletion system that respects your definitions. It is **NOT** an
 
 ---
 
-*Forged for creators who refuse to settle. Forged for DragonRuby.*
-
-**DragonRuby Emacs Mode — v1.0.0 (Stable)**
+**DragonRuby Emacs Mode — v1.0.0 (Beta)**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![CI](https://github.com/Macgyber/dragonruby-mode/actions/workflows/ci.yml/badge.svg)](https://github.com/Macgyber/dragonruby-mode/actions/workflows/ci.yml)
